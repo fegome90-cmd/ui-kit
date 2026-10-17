@@ -17,7 +17,7 @@ export interface Seccion {
 
 // `media` y `title` existen como atributos de <a>: se reemplazan por los de la tarjeta.
 type ChapterCardProps = Omit<React.ComponentProps<"a">, "title" | "media"> & {
-  /** Número del capítulo (1 a 5 eligen el color; desde el 6 se repite). */
+  /** Número del capítulo (1 a 5 eligen el color; desde el 6 se repite, y 0 o negativos dan la vuelta). */
   index: number;
   title: string;
   /** Imagen; un <img> recibe object-fit cover. Un <svg> en línea necesita preserveAspectRatio="xMidYMid slice". */
@@ -26,8 +26,8 @@ type ChapterCardProps = Omit<React.ComponentProps<"a">, "title" | "media"> & {
 };
 
 function ChapterCard({ index, title, media, sections = [], className, ...props }: ChapterCardProps) {
-  const entero = Number.isFinite(index) ? Math.trunc(index) : 1;
-  const color = CATEGORICAS[(((entero - 1) % CATEGORICAS.length) + CATEGORICAS.length) % CATEGORICAS.length];
+  const n = CATEGORICAS.length;
+  const color = CATEGORICAS[(((Math.trunc(index) - 1) % n) + n) % n];
   return (
     <a
       data-slot="chapter-card"

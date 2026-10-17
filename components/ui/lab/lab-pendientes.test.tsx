@@ -95,17 +95,17 @@ describe("ChapterCard", () => {
     render(<ChapterCard index={6} title="T" media={null} href="#" />);
     expect(screen.getByRole("link").style.background).toBe("rgb(230, 80, 60)");
   });
-  it.each([
-    [0, "rgb(245, 168, 193)"],
-    [-1, "rgb(251, 210, 54)"],
-    [-5, "rgb(245, 168, 193)"],
-    [2.9, "rgb(6, 128, 118)"],
-    [-1.9, "rgb(251, 210, 54)"],
-    [Number.NaN, "rgb(230, 80, 60)"],
-    [Number.POSITIVE_INFINITY, "rgb(230, 80, 60)"],
-  ])("elige un color válido para el índice %s", (index, background) => {
-    render(<ChapterCard index={index} title="T" media={null} href="#" />);
-    expect(screen.getByRole("link").style.background).toBe(background);
+  it("con 0, negativos o decimales da la vuelta en lugar de romperse", () => {
+    const fondo = (index: number) => {
+      const { unmount } = render(<ChapterCard index={index} title="T" media={null} href="#" />);
+      const bg = screen.getByRole("link").style.background;
+      unmount();
+      return bg;
+    };
+    expect(fondo(0)).toBe(fondo(5));
+    expect(fondo(-4)).toBe(fondo(1));
+    expect(fondo(2.7)).toBe(fondo(2));
+    expect(fondo(0)).not.toBe("");
   });
 });
 

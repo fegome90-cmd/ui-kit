@@ -121,9 +121,22 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
 - Kraa: los portales (menú de acciones, hoja móvil) replican `.kraa-theme` con `useKraaTheme`, porque salen del
   árbol del proveedor.
 
-## Licencias
+## Procedencia y derechos
 
-Kraa incluye Inter (SIL OFL 1.1, `docs/origen/OFL-Inter.txt`). Las fuentes de muestra de Ninja vienen de
-Fontsource (OFL), igual que Geist y Geist Mono para REA. Ninja y Kraa se derivan de interfaces públicas de
-terceros, y REA Atlas adapta la composición y el movimiento de piergorelli.com: no las publiques como diseño
-propio.
+El código original del repo está bajo licencia MIT (`LICENSE`). Esa licencia **no** cubre diseños, marcas,
+fuentes ni material de referencia de terceros:
+
+- **Ninja**: reconstrucción, a partir de estilos computados, de la interfaz pública de un índice tipográfico.
+  Sin logo, textos ni marcas del original. La fuente original (Aeonik) es comercial y no se incluye.
+- **Kraa**: reconstrucción candidata de la interfaz pública de Kraa (paquete `kraa-component-bank` v0.1.1).
+- **REA**: adapta la composición, la tipografía y el movimiento de piergorelli.com sin reutilizar su código
+  ni sus assets. `docs/origen/rea-atlas` conserva la investigación, el HTML de referencia y las capturas.
+- **FALP**: `SlideNavigator` usa como respaldo el azul institucional `#004990`, marcado
+  `rights: review-required`. La autoridad de marca es `fegome90-cmd/falp-brand-system`.
+- **REMI**: componentes genéricos del prototipo REMI, con medidas tomadas de capturas de un monitor de
+  enfermería. Solo datos ficticios; no es para uso clínico.
+- **Fuentes**: Inter (SIL OFL 1.1, `docs/origen/OFL-Inter.txt`) en Kraa. Hanken Grotesk, Geist, Geist Mono y
+  las tipografías de muestra de Ninja vienen de Fontsource (OFL).
+
+Estas piezas son material de estudio y referencia: no las uses ni publiques como diseño propio de quien
+las reutilice.

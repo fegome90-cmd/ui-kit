@@ -58,6 +58,10 @@ describe("captura de diseño", () => {
     expect(motivoBloqueo({ ...ok, status: 401 })).toBe("HTTP 401");
     expect(motivoBloqueo({ ...ok, status: 403 })).toBe("HTTP 403");
     expect(motivoBloqueo({ ...ok, urlFinal: "https://ejemplo.cl/login?next=/" })).toMatch(/página de acceso/);
+    // La query y el hash de un login (state, nonce…) no quedan en la evidencia.
+    expect(motivoBloqueo({ ...ok, urlFinal: "https://idp.ejemplo.cl/oauth/authorize?state=s3cr3t#x" })).toBe(
+      "redirige a una página de acceso (https://idp.ejemplo.cl/oauth/authorize)",
+    );
     expect(motivoBloqueo({ ...ok, urlFinal: "https://auth.ejemplo.cl/x" })).toMatch(/página de acceso/);
     expect(motivoBloqueo({ ...ok, hayPassword: true })).toBe("la página pide contraseña");
   });

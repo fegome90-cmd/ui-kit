@@ -66,7 +66,7 @@ export function motivoBloqueo(p: { status: number | null; urlFinal: string; hayP
     const u = new URL(p.urlFinal);
     ruta = `${u.hostname}${u.pathname}`;
   } catch {}
-  if (RUTA_LOGIN.test(ruta)) return `redirige a una página de acceso (${p.urlFinal})`;
+  if (RUTA_LOGIN.test(ruta)) return `redirige a una página de acceso (${sinQuery(p.urlFinal)})`;
   if (p.hayPassword) return "la página pide contraseña";
   return null;
 }

@@ -26,7 +26,8 @@ type ChapterCardProps = Omit<React.ComponentProps<"a">, "title" | "media"> & {
 };
 
 function ChapterCard({ index, title, media, sections = [], className, ...props }: ChapterCardProps) {
-  const color = CATEGORICAS[(index - 1) % CATEGORICAS.length];
+  const entero = Number.isFinite(index) ? Math.trunc(index) : 1;
+  const color = CATEGORICAS[(((entero - 1) % CATEGORICAS.length) + CATEGORICAS.length) % CATEGORICAS.length];
   return (
     <a
       data-slot="chapter-card"

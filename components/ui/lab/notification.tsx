@@ -78,6 +78,8 @@ function LabNotification({
   ...props
 }: LabNotificationProps) {
   const ref = React.useRef<HTMLDivElement>(null);
+  const onCloseRef = React.useRef(onClose);
+  const hasOnClose = !!onClose;
   // Callout no admite éxito ni error (Carbon): se degrada a info.
   const estado: Estado = variant === "callout" && (status === "success" || status === "danger") ? "info" : status;
   const Icono = ICONO[estado];
@@ -88,10 +90,14 @@ function LabNotification({
   }, [variant]);
 
   React.useEffect(() => {
-    if (variant !== "toast" || !timeout || !onClose) return;
-    const t = window.setTimeout(onClose, timeout);
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  React.useEffect(() => {
+    if (variant !== "toast" || !timeout || !hasOnClose) return;
+    const t = window.setTimeout(() => onCloseRef.current?.(), timeout);
     return () => window.clearTimeout(t);
-  }, [variant, timeout, onClose]);
+  }, [variant, timeout, hasOnClose]);
 
   const rol =
     variant === "callout"

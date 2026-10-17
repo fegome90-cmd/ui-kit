@@ -31,7 +31,7 @@ type TimeScaleProps = Omit<React.ComponentProps<"div">, "onChange"> & {
 function TimeScale({
   events,
   label,
-  minUnitWidth = 40,
+  minUnitWidth,
   value,
   defaultValue,
   onValueChange,
@@ -77,7 +77,7 @@ function TimeScale({
           role="tablist"
           aria-label={label}
           className="relative h-[56px]"
-          style={{ minWidth: `${rango * minUnitWidth}px` }}
+          style={{ minWidth: minUnitWidth === undefined ? undefined : `${rango * minUnitWidth}px` }}
         >
           <span aria-hidden className="absolute top-[11px] right-0 left-0 h-px bg-lab-line" />
           {hitos.map((h, i) => {

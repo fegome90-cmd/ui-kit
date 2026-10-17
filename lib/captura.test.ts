@@ -71,6 +71,16 @@ describe("captura de diseño", () => {
     ).toBe("aa  captures/a.png\nbb  dom/b.json\n");
   });
 
+  it("motivoBloqueo excluye query y hash de la URL de acceso", () => {
+    expect(
+      motivoBloqueo({
+        status: 200,
+        urlFinal: "https://ejemplo.cl/login?token=secreto#sesion",
+        hayPassword: false,
+      }),
+    ).toBe("redirige a una página de acceso (https://ejemplo.cl/login)");
+  });
+
   it("sinQuery no deja tokens ni archivos embebidos", () => {
     expect(sinQuery("https://cdn.x/f/inter.woff2?token=abc#v")).toBe("https://cdn.x/f/inter.woff2");
     expect(sinQuery("data:font/woff2;base64,AAAA")).toBe("data:font/woff2 (embebida)");

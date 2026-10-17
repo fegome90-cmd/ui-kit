@@ -121,6 +121,9 @@ const fuente = args.url ? { kind: "url", uri: args.url } : { kind: "image", uri:
 if (!evidencia.fuentes.some((f) => f.kind === fuente.kind && f.uri === fuente.uri)) evidencia.fuentes.push(fuente);
 evidencia.autoriza = args.autoriza ?? evidencia.autoriza;
 evidencia.licencia = args.licencia ?? evidencia.licencia;
+delete evidencia.incompleta;
+evidencia.estado = "ok";
+delete evidencia.bloqueo;
 
 const sha256 = (ruta) => createHash("sha256").update(readFileSync(ruta)).digest("hex");
 
@@ -267,7 +270,6 @@ async function recorrer(page) {
   });
 }
 
-delete evidencia.incompleta;
 const browser = await chromium.launch(
   process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
 );

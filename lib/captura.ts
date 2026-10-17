@@ -79,11 +79,30 @@ export function lineasSha256(hashes: ReadonlyArray<{ archivo: string; sha256: st
     .join("");
 }
 
+/** Para qué se usa una tipografía. Sale de la etiqueta del elemento que contiene el texto. */
+export const ROLES = ["titular", "cuerpo", "interfaz", "otro"] as const;
+export type Rol = (typeof ROLES)[number];
+
+const TITULARES = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
+const CUERPO = new Set(["p", "li", "blockquote", "dd", "dt", "td", "th", "figcaption", "caption", "cite", "q"]);
+const INTERFAZ = new Set(["button", "a", "input", "label", "select", "option", "textarea", "summary", "legend"]);
+
+/** Rol de un elemento por su etiqueta y su atributo `role`. Lo ambiguo (span, div, strong…) queda como «otro». */
+export function rolDe(tag: string, role: string | null = null): Rol {
+  const t = tag.toLowerCase();
+  if (TITULARES.has(t) || role === "heading") return "titular";
+  if (INTERFAZ.has(t) || role === "button" || role === "link" || role === "tab" || role === "menuitem")
+    return "interfaz";
+  if (CUERPO.has(t)) return "cuerpo";
+  return "otro";
+}
+
 /** Lo que el script lee de la página sobre tipografías (document.fonts, reglas @font-face y estilos computados). */
 export interface TipografiasCrudas {
   caras: ReadonlyArray<{ family: string; weight: string; style: string; status: string }>;
   reglas: ReadonlyArray<{ family: string; src: string }>;
-  usadas: ReadonlyArray<string>;
+  /** Pila `font-family` computada y etiqueta de cada elemento visible con texto propio. */
+  usadas: ReadonlyArray<{ pila: string; tag: string; role: string | null }>;
 }
 
 /** Una familia tipográfica observada. `licencia` la completa una persona en G0; el script nunca la adivina. */
@@ -94,6 +113,8 @@ export interface Tipografia {
   archivos: string[];
   cargada: boolean;
   usada: boolean;
+  /** Roles en que aparece (titular, cuerpo, interfaz, otro). Vacío si no la usa ningún texto visible. */
+  roles: Rol[];
   licencia: string | null;
 }
 
@@ -141,7 +162,7 @@ export function resumirTipografias(c: TipografiasCrudas): Tipografia[] {
     if (!familia || GENERICAS.has(clave)) return null;
     let t = por.get(clave);
     if (!t) {
-      t = { familia, pesos: [], estilos: [], archivos: [], cargada: false, usada: false, licencia: null };
+      t = { familia, pesos: [], estilos: [], archivos: [], cargada: false, usada: false, roles: [], licencia: null };
       por.set(clave, t);
     }
     return t;
@@ -161,13 +182,17 @@ export function resumirTipografias(c: TipografiasCrudas): Tipografia[] {
     if (!t) continue;
     for (const m of regla.src.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) agregar(t.archivos, sinQuery(m[1]));
   }
-  for (const pila of c.usadas) {
-    const t = de(primeraFamilia(pila));
-    if (t) t.usada = true;
+  for (const u of c.usadas) {
+    const t = de(primeraFamilia(u.pila));
+    if (!t) continue;
+    t.usada = true;
+    const rol = rolDe(u.tag, u.role);
+    if (!t.roles.includes(rol)) t.roles.push(rol);
   }
   for (const t of por.values()) {
     t.pesos.sort();
     t.estilos.sort();
+    t.roles.sort(porRol);
   }
   return [...por.values()].sort((a, b) => a.familia.localeCompare(b.familia));
 }
@@ -189,6 +214,28 @@ export function fusionarTipografias(
     p.archivos = [...new Set([...p.archivos, ...n.archivos])];
     p.cargada ||= n.cargada;
     p.usada ||= n.usada;
+    p.roles = [...new Set([...(p.roles ?? []), ...n.roles])].sort(porRol);
   }
   return [...por.values()].sort((a, b) => a.familia.localeCompare(b.familia));
+}
+
+const porRol = (a: Rol, b: Rol) => ROLES.indexOf(a) - ROLES.indexOf(b);
+
+/**
+ * Qué familias cubre cada rol, para que G2 proponga tokens por rol (titular, cuerpo, interfaz) en vez de una lista
+ * suelta. Un rol vacío significa que ese texto usa una familia genérica o del sistema.
+ */
+export function rolesTipograficos(familias: ReadonlyArray<Tipografia>): Record<Rol, string[]> {
+  const r = Object.fromEntries(ROLES.map((rol) => [rol, [] as string[]])) as Record<Rol, string[]>;
+  for (const t of familias) for (const rol of t.roles ?? []) r[rol].push(t.familia);
+  return r;
+}
+
+/**
+ * Estilos computados que pueden ser enormes o llevar datos: un `data:` (imagen o textura embebida) se resume y una
+ * URL pierde query y hash. Lo demás se corta en `max` caracteres.
+ */
+export function recortarValor(valor: string, max = 300): string {
+  const v = valor.replace(/url\(\s*["']?([^"')]+)["']?\s*\)/g, (_, u: string) => `url("${sinQuery(u)}")`);
+  return v.length > max ? `${v.slice(0, max)}… (+${v.length - max})` : v;
 }

@@ -7,7 +7,10 @@ import {
   nombreCaptura,
   parseEstado,
   primeraFamilia,
+  recortarValor,
   resumirTipografias,
+  rolDe,
+  rolesTipograficos,
   sinQuery,
   slug,
   VIEWPORTS,
@@ -72,7 +75,19 @@ describe("captura de diseño", () => {
     expect(primeraFamilia('"Inter Variable", system-ui, sans-serif')).toBe("Inter Variable");
   });
 
-  it("resumirTipografias agrupa por familia y omite las genéricas", () => {
+  it("rolDe clasifica por etiqueta y por role", () => {
+    expect(rolDe("H1")).toBe("titular");
+    expect(rolDe("div", "heading")).toBe("titular");
+    expect(rolDe("p")).toBe("cuerpo");
+    expect(rolDe("li")).toBe("cuerpo");
+    expect(rolDe("button")).toBe("interfaz");
+    expect(rolDe("a")).toBe("interfaz");
+    expect(rolDe("div", "button")).toBe("interfaz");
+    expect(rolDe("span")).toBe("otro");
+    expect(rolDe("div")).toBe("otro");
+  });
+
+  it("resumirTipografias agrupa por familia, omite las genéricas y anota roles", () => {
     const r = resumirTipografias({
       caras: [
         { family: '"Marca"', weight: "700", style: "normal", status: "loaded" },
@@ -84,10 +99,16 @@ describe("captura de diseño", () => {
         { family: "Marca", src: 'url("https://x.cl/marca-400.woff2?sig=1") format("woff2"), url(https://x.cl/m.woff)' },
         { family: "sans-serif", src: "url(https://x.cl/nada.woff2)" },
       ],
-      usadas: ['"Marca", sans-serif', "Helvetica, Arial", "system-ui"],
+      usadas: [
+        { pila: '"Marca", sans-serif', tag: "h1", role: null },
+        { pila: '"Marca", sans-serif', tag: "button", role: null },
+        { pila: "Helvetica, Arial", tag: "p", role: null },
+        { pila: "system-ui", tag: "span", role: null },
+      ],
     });
+    const vacia = { pesos: [], estilos: [], archivos: [], licencia: null };
     expect(r).toEqual([
-      { familia: "Helvetica", pesos: [], estilos: [], archivos: [], cargada: false, usada: true, licencia: null },
+      { familia: "Helvetica", ...vacia, cargada: false, usada: true, roles: ["cuerpo"] },
       {
         familia: "Marca",
         pesos: ["400", "700"],
@@ -95,27 +116,29 @@ describe("captura de diseño", () => {
         archivos: ["https://x.cl/marca-400.woff2", "https://x.cl/m.woff"],
         cargada: true,
         usada: true,
+        roles: ["titular", "interfaz"],
         licencia: null,
       },
-      {
-        familia: "Sin Usar",
-        pesos: ["400"],
-        estilos: ["normal"],
-        archivos: [],
-        cargada: true,
-        usada: false,
-        licencia: null,
-      },
+      { familia: "Sin Usar", ...vacia, pesos: ["400"], estilos: ["normal"], cargada: true, usada: false, roles: [] },
     ]);
+    expect(rolesTipograficos(r)).toEqual({ titular: ["Marca"], cuerpo: ["Helvetica"], interfaz: ["Marca"], otro: [] });
   });
 
-  it("fusionarTipografias suma vistas y conserva la licencia anotada", () => {
+  it("fusionarTipografias suma vistas, roles y conserva la licencia anotada", () => {
     const base = { pesos: ["400"], estilos: ["normal"], archivos: ["a.woff2"], cargada: true, usada: false };
     const r = fusionarTipografias(
-      [{ familia: "Marca", ...base, licencia: "OFL" }],
+      [{ familia: "Marca", ...base, roles: ["cuerpo"], licencia: "OFL" }],
       [
-        { familia: "marca", ...base, pesos: ["700"], archivos: ["b.woff2"], usada: true, licencia: null },
-        { familia: "Otra", ...base, licencia: null },
+        {
+          familia: "marca",
+          ...base,
+          pesos: ["700"],
+          archivos: ["b.woff2"],
+          usada: true,
+          roles: ["titular"],
+          licencia: null,
+        },
+        { familia: "Otra", ...base, roles: [], licencia: null },
       ],
     );
     expect(r).toEqual([
@@ -125,9 +148,20 @@ describe("captura de diseño", () => {
         pesos: ["400", "700"],
         archivos: ["a.woff2", "b.woff2"],
         usada: true,
+        roles: ["titular", "cuerpo"],
         licencia: "OFL",
       },
-      { familia: "Otra", ...base, licencia: null },
+      { familia: "Otra", ...base, roles: [], licencia: null },
     ]);
+  });
+
+  it("recortarValor no deja tokens, data: enteros ni valores gigantes", () => {
+    expect(recortarValor("none")).toBe("none");
+    expect(recortarValor('url("https://cdn.x/grano.png?token=abc"), linear-gradient(red, blue)')).toBe(
+      'url("https://cdn.x/grano.png"), linear-gradient(red, blue)',
+    );
+    expect(recortarValor(`url("data:image/png;base64,${"A".repeat(5000)}")`)).toBe('url("data:image/png (embebida)")');
+    const largo = recortarValor("x".repeat(400));
+    expect(largo).toBe(`${"x".repeat(300)}… (+100)`);
   });
 });

@@ -16,7 +16,10 @@
 //   que matchean --dom, más las variables CSS de :root. Nada de valores de formularios.
 // - Las tipografías se leen siempre (en reposo, en cada viewport): familias cargadas por document.fonts, archivos
 //   de las reglas @font-face y familias usadas por el texto visible. Van a dom/<vista>--tipografias.json y,
-//   resumidas, a evidence.json con `licencia: null` para que G0 la complete. Las URL van sin query ni hash.
+//   resumidas, a evidence.json con `licencia: null` para que G0 la complete. Las URL van sin query ni hash. Cada
+//   familia lleva sus roles (titular, cuerpo, interfaz) y evidence.json resume qué familias cubre cada rol.
+// - Las capturas se toman con las animaciones desactivadas: el movimiento nunca queda observado, solo declarado
+//   (transition y animation en --dom). Cada captura de URL lo dice en `desconocido`.
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
@@ -29,7 +32,9 @@ import {
   motivoBloqueo,
   nombreCaptura,
   parseEstado,
+  recortarValor,
   resumirTipografias,
+  rolesTipograficos,
   slug,
   VIEWPORTS,
 } from "../lib/captura.ts";
@@ -47,6 +52,15 @@ const ESTILOS = [
   "padding",
   "gap",
   "box-shadow",
+  // énfasis: jerarquía por opacidad (Material 3: 100 % titular, 70–80 % apoyo, 50–60 % notas)
+  "opacity",
+  // profundidad: texturas, vidrio esmerilado, filtros
+  "background-image",
+  "backdrop-filter",
+  "filter",
+  // movimiento declarado (no observado: las capturas van sin animaciones)
+  "transition",
+  "animation",
 ];
 const MAX_ELEMENTOS = 20;
 
@@ -159,12 +173,14 @@ async function leerTipografias(page) {
         reglas.push({ family: r.style.getPropertyValue("font-family"), src: absoluto });
       }
     }
-    const usadas = new Set();
+    const usadas = new Map();
     for (const el of document.body.querySelectorAll("*")) {
       const conTexto = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
-      if (conTexto && el.checkVisibility()) usadas.add(getComputedStyle(el).fontFamily);
+      if (!conTexto || !el.checkVisibility()) continue;
+      const u = { pila: getComputedStyle(el).fontFamily, tag: el.tagName.toLowerCase(), role: el.getAttribute("role") };
+      usadas.set(`${u.pila}|${u.tag}|${u.role}`, u);
     }
-    return { caras, reglas, usadas: [...usadas], hojasIlegibles };
+    return { caras, reglas, usadas: [...usadas.values()], hojasIlegibles };
   });
 }
 
@@ -203,21 +219,34 @@ try {
         mkdirSync(join(dir, "dom"), { recursive: true });
         writeFileSync(rutaTipos, `${JSON.stringify({ vista: slug(args.vista), hojasIlegibles, familias }, null, 2)}\n`);
         evidencia.tipografias = fusionarTipografias(evidencia.tipografias ?? [], familias);
+        evidencia.rolesTipograficos = rolesTipograficos(evidencia.tipografias);
         if (hojasIlegibles)
           console.warn(
             `capturar: ${hojasIlegibles} hoja(s) de estilo de otro origen no se pudieron leer (@font-face incompleto)`,
           );
       }
       const nombreEstado = estado?.nombre ?? "reposo";
+      let accionForzada = false;
       if (estado) {
         const el = page.locator(estado.selector).first();
         if ((await el.count()) === 0) throw new Error(`el estado «${estado.nombre}» no encontró «${estado.selector}»`);
-        await el[estado.accion]();
+        // Un elemento animado en bucle nunca queda «estable» para Playwright: si la acción normal no llega, se
+        // fuerza y queda anotado en la captura.
+        accionForzada = await el[estado.accion]({ timeout: 5000 }).then(
+          () => false,
+          () => el[estado.accion]({ force: true }).then(() => true),
+        );
         await page.waitForTimeout(300);
       }
       const archivo = `captures/${nombreCaptura(args.vista, nombreEstado, vp)}`;
       await page.screenshot({ path: join(dir, archivo), fullPage: args["pagina-completa"], animations: "disabled" });
-      const datos = { vista: slug(args.vista), estado: nombreEstado, viewport: { ...vp, dpr: 1 } };
+      const datos = {
+        vista: slug(args.vista),
+        estado: nombreEstado,
+        viewport: { ...vp, dpr: 1 },
+        desconocido: ["movimiento (captura con animaciones desactivadas)"],
+      };
+      if (accionForzada) datos.accionForzada = true;
       if (args.dom) {
         mkdirSync(join(dir, "dom"), { recursive: true });
         const dom = await page.evaluate(
@@ -243,6 +272,9 @@ try {
           },
           { selector: args.dom, estilos: ESTILOS, max: MAX_ELEMENTOS },
         );
+        const recortar = (o) => Object.fromEntries(Object.entries(o).map(([p, v]) => [p, recortarValor(v)]));
+        dom.variables = recortar(dom.variables);
+        for (const el of dom.elementos) el.estilos = recortar(el.estilos);
         const archivoDom = `dom/${nombreCaptura(args.vista, nombreEstado, vp, "json")}`;
         writeFileSync(join(dir, archivoDom), `${JSON.stringify(dom, null, 2)}\n`);
         datos.dom = archivoDom;

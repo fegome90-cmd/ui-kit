@@ -42,8 +42,9 @@ evidencia/<AAAA-MM-DD>-<fuente>/
 
 ## G0 — Acceso y licencia
 
-1. Anota en `evidence.json`: `source.kind`, `source.uri` (URL, ruta o repo más commit), fecha de captura, quién
-   autorizó y si hubo sesión iniciada. Separa contenido actual de caché histórica o plantillas derivadas.
+1. Anota en `evidence.json` la fuente (`fuentes`: `kind` y `uri`, con el commit si es un repo), la fecha, quién
+   autorizó (`autoriza`) y si hubo sesión iniciada. Separa contenido actual de caché histórica o plantillas
+   derivadas. El script completa `fuentes`, `fecha` y, con `--autoriza`, `autoriza`.
 2. **Detente** si la URL responde 401 o 403, redirige a un login o muestra un muro de acceso («Log in to
    access», «Continue with …», SSO). Marca la fuente como `blocked-auth` en `evidence.json` y avísale al usuario.
    No intentes rodearlo.
@@ -56,7 +57,15 @@ evidencia/<AAAA-MM-DD>-<fuente>/
    Las **tipografías tienen licencia propia**, distinta de la del sitio: después de G1, completa `licencia` en
    cada familia de `evidence.json` → `tipografias` (OFL, comercial, del sistema…). Una familia sin licencia de
    redistribución no entra al banco: se reemplaza por una libre equivalente y se anota en el inventario.
-5. Si la familia tiene un sistema canónico (tokens o manual de marca), léelo primero. Una captura no redefine
+5. **Plantillas compradas.** Una plantilla de marketplace (temas de WordPress, Webflow, Framer, kits de UI…) se
+   compra para usarla, no para redistribuirla: sus licencias suelen cubrir un producto final. Este banco publica
+   un registry que cualquiera instala, así que redistribuye. Lee la licencia concreta de la plantilla; si no
+   permite redistribuir, sirve solo como referencia (`inferred`, reconstruido sin copiar su código ni sus assets) o
+   no entra.
+6. **Galerías de inspiración.** Awwwards, One Page Love, Muzli, Dribbble, Pinterest y similares muestran sitios
+   ajenos: no autorizan nada. El permiso es del dueño del sitio original. Si solo tienes la galería, la fuente es
+   `observed-image` o `inferred` y la autorización queda pendiente; anótalo en `autoriza`.
+7. Si la familia tiene un sistema canónico (tokens o manual de marca), léelo primero. Una captura no redefine
    tokens: a lo sumo propone uno nuevo, que el usuario aprueba.
 
 Si G0 no pasa, no hay G1.
@@ -65,7 +74,7 @@ Si G0 no pasa, no hay G1.
 
 Herramienta: `scripts/capturar.mjs` (Node más `@playwright/test`, que ya está en `devDependencies`; los
 navegadores se instalan una vez con `npx playwright install chromium`). Para lo que el script no cubre, la skill
-`playwright-cli` (`.claude/skills/playwright-cli`). No agregues dependencias para esto.
+`playwright-cli`, si está instalada (no está versionada en este repo). No agregues dependencias para esto.
 
 1. Dos viewports, siempre los mismos: **1440×900** (escritorio) y **390×844** (móvil), con DPR 1. El script los
    toma de `VIEWPORTS` en `lib/captura.ts`.
@@ -81,15 +90,30 @@ navegadores se instalan una vez con `npx playwright install chromium`). Para lo 
    ```
 
    - `--estado nombre=accion:selector` con `accion` en `hover`, `focus` o `click`. Por cada viewport y estado
-     recarga la página, provoca el estado y captura. El reposo siempre se captura.
-   - `--dom <selector>` guarda bounds y estilos computados (color, tipografía, radio, padding, sombra…) de los
-     elementos visibles que matchean, más las variables CSS de `:root`. No guarda valores de formularios.
+     recarga la página, provoca el estado y captura. El reposo siempre se captura. Si el elemento está animado
+     en bucle y Playwright no lo ve estable en 5 s, la acción se fuerza y la captura queda con
+     `accionForzada: true`: revisa esa imagen antes de usarla como evidencia del estado.
+   - `--dom <selector>` guarda bounds y estilos computados de los elementos visibles que matchean, más las
+     variables CSS de `:root`. No guarda valores de formularios. Además de color, tipografía, radio, padding y
+     sombra, mide:
+     - **énfasis**: `opacity`, para la jerarquía por opacidad (un titular al 100 %, el texto de apoyo al 70–80 %,
+       las notas al 50–60 %). El alfa de `color` también cuenta;
+     - **profundidad**: `background-image` (texturas, degradados), `backdrop-filter` (vidrio esmerilado) y
+       `filter`;
+     - **movimiento declarado**: `transition` y `animation`. Es lo que el CSS declara, no lo que se vio: las
+       capturas van con animaciones desactivadas, y cada captura de URL lo deja en `desconocido`. Si el movimiento
+       importa para el componente, descríbelo como no observado en el inventario.
+
+     Los valores largos se recortan y los `url(...)` quedan sin query; un `data:` embebido solo se nombra.
    - **Tipografías**, siempre (en reposo, en ambos viewports): familias cargadas (`document.fonts`, con pesos y
      estilos), archivos de las reglas `@font-face` y familias que usa el texto visible. Van a
      `dom/<vista>--tipografias.json` y, sumadas entre vistas, a `evidence.json` → `tipografias`, cada una con
      `licencia: null` para completar en G0. Las URL quedan sin query ni hash (pueden llevar tokens firmados) y
      las fuentes embebidas (`data:`) solo se nombran. Las familias genéricas (`sans-serif`, `system-ui`…) se
      omiten; una familia `usada` pero no `cargada` es una fuente del sistema de quien capturó, no de la marca.
+     Cada familia trae sus `roles` según la etiqueta del texto (`titular`: `h1–h6`; `cuerpo`: `p`, `li`…;
+     `interfaz`: `button`, `a`, `input`, `label`…; `otro`: `span`, `div` y lo ambiguo), y `evidence.json` →
+     `rolesTipograficos` resume qué familias cubre cada rol. Un rol vacío usa una genérica o del sistema.
      Si avisa de hojas de otro origen ilegibles (CSS sin CORS), los `@font-face` de esas hojas faltan: revisa
      sus archivos en la pestaña de red con playwright-cli.
    - `--pagina-completa` captura la página entera en vez del viewport.
@@ -113,7 +137,8 @@ navegadores se instalan una vez con `npx playwright install chromium`). Para lo 
 
 Estados que no se provocan con un hover, focus o click (por ejemplo `disabled` que depende de datos, o tema
 oscuro con un toggle de varios pasos): captúralos con playwright-cli (`resize`, `screenshot --filename=…`) con el
-mismo nombre de archivo, y corre `shasum -a 256 captures/* dom/* > SHA256SUMS` al terminar.
+mismo nombre de archivo, y corre `shasum -a 256 captures/* dom/* > SHA256SUMS` al terminar. Sin playwright-cli,
+esos estados quedan como «no observado» en el inventario.
 
 ## G2 — Inventario de candidatos
 

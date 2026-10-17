@@ -127,7 +127,18 @@ navegadores se instalan una vez con `npx playwright install chromium`). Para lo 
      `@font-face` de hojas de otro origen (que el navegador no deja leer, y por eso el script avisa) y las que el
      sitio baja con `fetch` y registra con la API `FontFace`. Un archivo en esa lista sin familia en `archivos`
      viene de una de esas dos vías.
-   - `--pagina-completa` captura la página entera en vez del viewport.
+   - `--pagina-completa` captura la página entera en vez del viewport. Antes recorre la página con scroll para que
+     aparezca lo que se revela al entrar en pantalla.
+   - `--tramos <n>` (de 1 a 40, no se combina con `--pagina-completa`) captura el viewport `n` veces bajando con la
+     rueda del mouse. Es la opción para *scrollytelling* y secciones fijadas, donde lo que se ve depende de la
+     posición de scroll y una captura de página completa sale casi vacía. Los archivos quedan como
+     `<vista>--reposo-t01--…`, y cada captura lleva su `tramo`. Si los últimos tramos son idénticos, la página
+     terminó antes.
+   - `--esperar <selector>` espera hasta 20 s a que un elemento sea visible: para pantallas de carga y portales que
+     montan el contenido tarde. Acepta selectores de Playwright (`"text=Explore the data"`). Si no aparece, la
+     corrida queda `incompleta`.
+   - `--ocultar <selector>` (repetible) esconde por CSS lo que tapa la captura: banners de cookies, chats. **No hace
+     clic**: no acepta ni rechaza nada. Cada captura lo deja en `ocultos`.
    - Sale con **2** y marca `blocked-auth` si G0 falla (401/403, redirección a login o campo de contraseña
      visible): no captura nada. Usa un navegador sin sesión; nunca toca la del usuario.
    - Sale con **1** si un selector de `--estado` no existe: lo ya capturado queda registrado y la corrida queda

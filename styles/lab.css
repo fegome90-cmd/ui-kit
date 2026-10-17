@@ -35,6 +35,9 @@
 
 @theme {
   --font-lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Titulares condensados (capítulos de Voices usan Mango Grotesque, sin licencia verificada). Bebas Neue es
+     OFL y el banco ya la carga; en otro proyecto, sin ella, cae a una condensada del sistema. */
+  --font-lab-condensed: "Bebas Neue", "Oswald", "Arial Narrow", "Roboto Condensed", sans-serif;
 
   --ease-lab-out: cubic-bezier(0.22, 1, 0.36, 1);
 

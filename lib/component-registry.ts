@@ -1535,6 +1535,142 @@ Pendientes <LabCount value={12} />`,
       "Un toast que se cierra solo debe tener su contenido disponible en otro lado (centro de notificaciones).",
     ],
   },
+  {
+    slug: "lab-proportion-split",
+    family: "Lab",
+    name: "Proporción partida",
+    category: "Gráficos",
+    description: "Un todo en dos o tres partes, cada una con su porcentaje y la lista de lo que contiene.",
+    files: ["components/ui/lab/proportion-split.tsx", "lib/lab/encodings.ts", "lib/utils.ts"],
+    usage: `<ProportionSplit
+  title="¿En qué se va el turno?"
+  parts={[{ label: "Registro", value: 47, items: ["Notas", "Indicaciones"] }, { label: "Atención directa", value: 53 }]}
+/>`,
+    props: [
+      { name: "title", type: "string", description: "Pregunta o título." },
+      { name: "parts", type: "{ label; value; items?: string[] }[]", description: "Dos o tres partes del mismo todo." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Meridian lo publica como imagen (con texto alternativo); evidencia en meridian-ai/captures/home--proporcion.",
+      "Allí los sectores no parecen dibujados en proporción; aquí el ángulo sale del valor y el porcentaje va como texto.",
+    ],
+  },
+  {
+    slug: "lab-feature-tabs",
+    family: "Lab",
+    name: "Lista que abre panel",
+    category: "Revelación",
+    description: "Lista de temas; el elegido se expande con su descripción y muestra su panel al lado.",
+    files: ["components/ui/lab/feature-tabs.tsx", "lib/utils.ts"],
+    usage: `<FeatureTabs label="Funciones" items={[{ id: "a", title: "Enriquecimiento", description: "…", panel: <Vista /> }]} />`,
+    props: [
+      { name: "items", type: "{ id; title; description?; panel }[]", description: "Temas y sus paneles." },
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      { name: "value / defaultValue", type: "string", description: "Controlado o no." },
+      { name: "onValueChange", type: "(id: string) => void", description: "Aviso al cambiar." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Meridian «Meridian features»: activo 260 px, inactivos 64 px, cambio por clic, sin rotación automática.",
+      "En el original son div sin roles ARIA; aquí es un tablist vertical con flechas, Inicio y Fin.",
+    ],
+  },
+  {
+    slug: "lab-chapter-card",
+    family: "Lab",
+    name: "Tarjeta de capítulo",
+    category: "Superficies",
+    description: "Imagen arriba y bloque de color con antetítulo, titular condensado y lista de secciones.",
+    files: ["components/ui/lab/chapter-card.tsx", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<ChapterCard index={2} title={"La tierra"} media={<img src="…" alt="" />} sections={[{ id: "2.1", title: "Raíces" }]} href="#" />`,
+    props: [
+      { name: "index", type: "number", description: "Número de capítulo; elige el color categórico." },
+      { name: "title", type: "string", description: "Titular; respeta saltos de línea." },
+      { name: "media", type: "ReactNode", description: "Imagen (object-fit cover)." },
+      { name: "sections", type: "{ id; title }[]", description: "Secciones del capítulo." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medida en Voices (overview, capítulo 2): 752 × 470, imagen 270 px, antetítulo 12/700 con 1,8 px, titular 64/48.",
+      "Voices escribe con el color de otro capítulo y 4 de 5 pares no llegan a 4,5:1; aquí el texto es el AA de cada color.",
+      "Titular en --font-lab-condensed (Bebas Neue, OFL) en lugar de Mango Grotesque. Hover no medido: no se reproduce.",
+    ],
+  },
+  {
+    slug: "lab-diverging-heatmap",
+    family: "Lab",
+    name: "Mapa de calor divergente",
+    category: "Gráficos",
+    description:
+      "Grilla de celdas: el color dice hacia qué lado va el valor y la opacidad, cuánto (tramos logarítmicos).",
+    files: ["components/ui/lab/diverging-heatmap.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<DivergingHeatmap title="Ingresos y egresos" rows={salas} cols={horas} values={valores} negativeLabel="Egresos" positiveLabel="Ingresos" />`,
+    props: [
+      { name: "rows / cols", type: "string[]", description: "Etiquetas de filas y columnas." },
+      { name: "values", type: "number[][]", description: "Negativo = un lado, positivo = el otro." },
+      { name: "negativeLabel / positiveLabel", type: "string", description: "Qué significa cada lado." },
+      {
+        name: "scheme",
+        type: '"accesible" | "voices"',
+        default: '"accesible"',
+        description: "Naranja/azul o el medido.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Leyenda medida en el portal de Voices: coral y verde, opacidades 0,15–0,85, cortes 100 / 1k / 10k / 100k / 1M+.",
+      "Por defecto naranja/azul: rojo contra verde es lo que peor distingue la deuteranopia. El medido es scheme=voices.",
+    ],
+  },
+  {
+    slug: "lab-bento-grid",
+    family: "Lab",
+    name: "Bento",
+    category: "Bloques",
+    description: "Tarjetas con brillo de dos anchos (2:3) que se alternan por fila; una columna en pantallas angostas.",
+    files: ["components/ui/lab/bento-grid.tsx", "components/ui/lab/lab-glow-card.tsx", "lib/utils.ts"],
+    usage: `<BentoGrid>
+  <BentoItem size="sm">…</BentoItem>
+  <BentoItem size="lg">…</BentoItem>
+</BentoGrid>`,
+    props: [
+      {
+        name: "size",
+        type: '"sm" | "lg" | "full"',
+        default: '"sm"',
+        description: "BentoItem: 2/5, 3/5 o fila completa.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Paradigm: 1240 px, separación 16 px, 440 px de alto, 498 / 726 alternando, radio 26 px, borde 0,5 s.",
+    ],
+  },
+  {
+    slug: "lab-scrolly-section",
+    family: "Lab",
+    name: "Scrollytelling",
+    category: "Bloques",
+    description: "Escena fija a un lado que cambia según el paso del relato que cruza el centro de la pantalla.",
+    files: ["components/ui/lab/scrolly-section.tsx", "lib/utils.ts"],
+    usage: `<ScrollySection steps={[{ id: "1", title: "…", body: "…", visual: <Grafico /> }]} />`,
+    props: [
+      { name: "steps", type: "{ id; title; body?; visual }[]", description: "Pasos del relato con su escena." },
+      { name: "onStepChange", type: "(id: string) => void", description: "Aviso al cambiar de paso." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform, capturado por tramos); el fundido de 0,4 s es inferido de sus transiciones de opacidad.",
+      "Cada paso lleva su texto; las escenas inactivas son inert. Bajo 760 px cada escena va antes de su texto.",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

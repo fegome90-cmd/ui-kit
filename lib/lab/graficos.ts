@@ -101,3 +101,17 @@ export function sectores(n: number, hueco = 0.04): { inicio: number; fin: number
 export function polar(cx: number, cy: number, r: number, a: number): Punto {
   return [f(cx + r * Math.sin(a)), f(cy - r * Math.cos(a))];
 }
+
+/**
+ * Tramo logarítmico con signo, como la leyenda de Voices (explore-the-data: 0, 100, 1k, 10k, 100k, 1M+).
+ * 0 = sin dato o cero; ±1 = menos de 100; ±2 = 100–999; ±3 = 1k–9,9k; ±4 = 10k–99,9k; ±5 = 100k o más.
+ */
+export function tramoLog(v: number): number {
+  if (!Number.isFinite(v) || v === 0) return 0;
+  const a = Math.abs(v);
+  const t = a < 100 ? 1 : a < 1e3 ? 2 : a < 1e4 ? 3 : a < 1e5 ? 4 : 5;
+  return Math.sign(v) * t;
+}
+
+/** Opacidad de cada tramo, medida en la leyenda de Voices. */
+export const OPACIDAD_TRAMO = [0, 0.15, 0.3, 0.5, 0.68, 0.85] as const;

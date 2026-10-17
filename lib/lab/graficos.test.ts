@@ -7,6 +7,7 @@ import {
   marcasEje,
   polar,
   sectores,
+  tramoLog,
   trazoArea,
   trazoLinea,
   trazoSuave,
@@ -89,5 +90,13 @@ describe("geometría de gráficos", () => {
     expect(Array.from({ length: 6 }, (_, i) => colorCategoria(i, 6))).toEqual([1, 2, 3, 4, 5, 2]);
     expect(Array.from({ length: 5 }, (_, i) => colorCategoria(i, 5))).toEqual([1, 2, 3, 4, 5]);
     expect(Array.from({ length: 8 }, (_, i) => colorCategoria(i, 8))).toEqual([1, 2, 3, 4, 5, 1, 2, 3]);
+  });
+
+  it("tramoLog sigue los cortes de la leyenda de Voices, con signo", () => {
+    expect([0, 50, 100, 999, 1000, 9999, 10_000, 99_999, 100_000, 5_000_000].map(tramoLog)).toEqual([
+      0, 1, 2, 2, 3, 3, 4, 4, 5, 5,
+    ]);
+    expect(tramoLog(-1500)).toBe(-3);
+    expect(tramoLog(Number.NaN)).toBe(0);
   });
 });

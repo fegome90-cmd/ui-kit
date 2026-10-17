@@ -2,9 +2,13 @@
 
 import { CircleCheck, TriangleAlert } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { BentoGrid, BentoItem } from "@/components/ui/lab/bento-grid";
 import { CategoryWheel } from "@/components/ui/lab/category-wheel";
+import { ChapterCard } from "@/components/ui/lab/chapter-card";
 import { DistributionChart } from "@/components/ui/lab/distribution-chart";
+import { DivergingHeatmap } from "@/components/ui/lab/diverging-heatmap";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
+import { FeatureTabs } from "@/components/ui/lab/feature-tabs";
 import { LabBackdrop, PATTERNS } from "@/components/ui/lab/lab-backdrop";
 import { LabGlowCard } from "@/components/ui/lab/lab-glow-card";
 import { LabGradientText } from "@/components/ui/lab/lab-gradient-text";
@@ -15,6 +19,8 @@ import { LabCount, LabLozenge } from "@/components/ui/lab/lozenge";
 import { LabNotification } from "@/components/ui/lab/notification";
 import { PresenceDot } from "@/components/ui/lab/presence-dot";
 import { ProcessSteps } from "@/components/ui/lab/process-steps";
+import { ProportionSplit } from "@/components/ui/lab/proportion-split";
+import { ScrollySection } from "@/components/ui/lab/scrolly-section";
 import { SeriesChart } from "@/components/ui/lab/series-chart";
 import { SignalDisclosure } from "@/components/ui/lab/signal-disclosure";
 import { StatRing } from "@/components/ui/lab/stat-ring";
@@ -147,7 +153,8 @@ function NotificationPreview() {
 /** Ilustración propia y colorida para que se note el paso de grises a color. */
 function Ilustracion() {
   return (
-    <svg aria-hidden viewBox="0 0 240 120" className="block h-[120px] w-full">
+    // slice = object-fit: cover para un SVG en línea (object-fit no se aplica a <svg>).
+    <svg aria-hidden viewBox="0 0 240 120" preserveAspectRatio="xMidYMid slice" className="block h-[120px] w-full">
       <rect width="240" height="120" fill="#e6503c" />
       <circle cx="70" cy="70" r="38" fill="#f5c518" />
       <rect x="120" y="30" width="90" height="70" rx="6" fill="#006a5d" />
@@ -381,6 +388,171 @@ LAB_PREVIEWS["lab-lozenge"] = () => (
 );
 LAB_PREVIEWS["lab-notification"] = NotificationPreview;
 
+// Grilla ficticia de ingresos (+) y egresos (−) por sala y hora, con valores de varios órdenes de magnitud.
+const SALAS = ["UCI", "Intermedio", "Medicina", "Cirugía", "Pediatría", "Urgencia"];
+const HORAS = Array.from({ length: 12 }, (_, i) => `${String(i * 2).padStart(2, "0")}h`);
+const FLUJO = SALAS.map((_, r) =>
+  HORAS.map((_, c) => {
+    const base = Math.round(Math.sin(r * 1.7 + c * 0.9) * 10 ** (1 + ((r + c) % 5)));
+    return (r * 7 + c * 3) % 11 === 0 ? 0 : base;
+  }),
+);
+
+LAB_PREVIEWS["lab-proportion-split"] = () => (
+  <div className="w-full max-w-[560px]">
+    <ProportionSplit
+      title="¿En qué se va un turno? (ficticio)"
+      parts={[
+        { label: "Registro", value: 47, items: ["Notas de evolución", "Indicaciones", "Balance hídrico"] },
+        { label: "Atención directa", value: 53, items: ["Curaciones", "Administración de fármacos", "Educación"] },
+      ]}
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-feature-tabs"] = () => (
+  <div className="w-full">
+    <FeatureTabs
+      label="Funciones (ficticio)"
+      items={[
+        {
+          id: "enriquecer",
+          title: "Enriquecimiento automático",
+          description: "Completa datos faltantes desde fuentes conectadas.",
+          panel: <p className="m-0 text-[18px]">Panel: enriquecimiento</p>,
+        },
+        {
+          id: "flujos",
+          title: "Flujos a medida",
+          description: "Reglas por servicio y por turno.",
+          panel: <p className="m-0 text-[18px]">Panel: flujos</p>,
+        },
+        {
+          id: "informes",
+          title: "Informes al instante",
+          description: "Resumen del turno en un clic.",
+          panel: <p className="m-0 text-[18px]">Panel: informes</p>,
+        },
+      ]}
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-chapter-card"] = () => (
+  <div className="grid w-full gap-[16px] min-[640px]:grid-cols-2">
+    <ChapterCard
+      index={1}
+      title={"Cambios\ngrandes"}
+      media={<Ilustracion />}
+      sections={[
+        { id: "1.1", title: "Raíces" },
+        { id: "1.2", title: "Un futuro móvil" },
+      ]}
+      href="#"
+    />
+    <ChapterCard
+      index={2}
+      title={"La tierra"}
+      media={<Ilustracion />}
+      sections={[{ id: "2.1", title: "Agua" }]}
+      href="#"
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-diverging-heatmap"] = () => (
+  <div className="grid w-full max-w-[620px] gap-[24px]">
+    <DivergingHeatmap
+      title="Egresos e ingresos por sala y hora (ficticio)"
+      rows={SALAS}
+      cols={HORAS}
+      values={FLUJO}
+      negativeLabel="Egresos"
+      positiveLabel="Ingresos"
+    />
+    <DivergingHeatmap
+      title='scheme="voices" (coral y verde medidos)'
+      rows={SALAS}
+      cols={HORAS}
+      values={FLUJO}
+      negativeLabel="Egresos"
+      positiveLabel="Ingresos"
+      scheme="voices"
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-bento-grid"] = () => (
+  <LabScope palette="paradigm" surface className="w-full rounded-[16px] p-[16px]">
+    <BentoGrid>
+      <BentoItem size="sm" tabIndex={0}>
+        <p className="m-0 text-[20px] font-semibold">Low-Code</p>
+        <p className="m-0 mt-[6px] text-[14px] text-lab-muted">sm · 2/5</p>
+      </BentoItem>
+      <BentoItem size="lg" tabIndex={0}>
+        <p className="m-0 text-[20px] font-semibold">Apps a medida</p>
+        <p className="m-0 mt-[6px] text-[14px] text-lab-muted">lg · 3/5</p>
+      </BentoItem>
+      <BentoItem size="lg" tabIndex={0}>
+        <p className="m-0 text-[20px] font-semibold">Web y móvil</p>
+      </BentoItem>
+      <BentoItem size="sm" tabIndex={0}>
+        <p className="m-0 text-[20px] font-semibold">Escala</p>
+      </BentoItem>
+      <BentoItem size="full" tabIndex={0}>
+        <p className="m-0 text-[20px] font-semibold">Componentes · full</p>
+      </BentoItem>
+    </BentoGrid>
+  </LabScope>
+);
+LAB_PREVIEWS["lab-scrolly-section"] = () => (
+  <div className="w-full">
+    <p className="m-0 mb-[16px] text-[13px] text-lab-muted">
+      Bajá con el scroll: la escena de la izquierda sigue al paso del centro.
+    </p>
+    <ScrollySection
+      steps={[
+        {
+          id: "cifra",
+          title: "Dos mil millones de personas",
+          body: "Primero, la magnitud (ficticio).",
+          visual: (
+            <div className="grid size-full place-items-center">
+              <StatRing size="lg" tone="accent" value="2B" caption="Cifra en anillo" />
+            </div>
+          ),
+        },
+        {
+          id: "series",
+          title: "El riesgo crece con la edad",
+          body: "Después, la secuencia.",
+          visual: (
+            <div className="grid size-full place-items-center">
+              <SeriesChart
+                className="w-full"
+                title="Riesgo relativo"
+                x={EDADES}
+                series={SERIES.slice(0, 4)}
+                highlight={["cv"]}
+              />
+            </div>
+          ),
+        },
+        {
+          id: "categorias",
+          title: "Y no es una sola causa",
+          body: "Al final, las categorías.",
+          visual: (
+            <div className="grid size-full place-items-center">
+              <CategoryWheel
+                title="Causas"
+                categories={[{ label: "A" }, { label: "B" }, { label: "C" }, { label: "D" }]}
+                size={200}
+              />
+            </div>
+          ),
+        },
+      ]}
+    />
+  </div>
+);
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -451,5 +623,54 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
           "radial-gradient(60px circle at 30% 40%, color-mix(in oklab, var(--lab-accent) 30%, transparent), transparent)",
       }}
     />
+  ),
+  "lab-proportion-split": (
+    <svg aria-hidden viewBox="0 0 40 40" className="h-[40px]">
+      <path d="M20 20 L20 2 A18 18 0 0 1 22 38 Z" className="fill-lab-ink" />
+      <path d="M18 20 L18 2 A18 18 0 0 0 16 38 Z" className="fill-lab-accent" />
+    </svg>
+  ),
+  "lab-feature-tabs": (
+    <span className="grid w-[110px] gap-[3px]">
+      <span className="h-[14px] rounded-[3px] border border-lab-line bg-lab-surface" />
+      <span className="h-[6px] rounded-[3px] bg-lab-line" />
+      <span className="h-[6px] rounded-[3px] bg-lab-line" />
+    </span>
+  ),
+  "lab-chapter-card": (
+    <span className="grid w-[70px]" style={{ background: "var(--lab-cat-2)", color: "var(--lab-cat-2-text)" }}>
+      <span className="h-[22px] bg-lab-line" />
+      <span className="px-[4px] font-lab-condensed text-[14px] uppercase">Cap. 2</span>
+    </span>
+  ),
+  "lab-diverging-heatmap": (
+    <span className="grid grid-cols-6 gap-[2px]">
+      {[-5, -3, -1, 1, 3, 5, -4, -2, 0, 2, 4, 5].map((t, i) => (
+        <span
+          // biome-ignore lint/suspicious/noArrayIndexKey: miniatura fija.
+          key={i}
+          className="size-[10px]"
+          style={{
+            background:
+              t === 0
+                ? "transparent"
+                : `color-mix(in oklab, ${t < 0 ? "rgb(230 97 1)" : "rgb(33 102 172)"} ${Math.abs(t) * 17}%, transparent)`,
+          }}
+        />
+      ))}
+    </span>
+  ),
+  "lab-bento-grid": (
+    <span className="grid w-[100px] grid-cols-5 gap-[3px]">
+      <span className="col-span-2 h-[16px] rounded-[4px] border border-lab-line" />
+      <span className="col-span-3 h-[16px] rounded-[4px] border border-lab-line" />
+      <span className="col-span-3 h-[16px] rounded-[4px] border border-lab-line" />
+      <span className="col-span-2 h-[16px] rounded-[4px] border border-lab-line" />
+    </span>
+  ),
+  "lab-scrolly-section": (
+    <span className="flex items-center gap-[6px] text-[11px] text-lab-muted">
+      <span className="size-[28px] rounded-[6px] bg-lab-accent-soft" /> 01 / 03 ↓
+    </span>
   ),
 };

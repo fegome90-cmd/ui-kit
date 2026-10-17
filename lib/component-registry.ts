@@ -1677,7 +1677,11 @@ Pendientes <LabCount value={12} />`,
     files: ["components/ui/lab/scrolly-section.tsx", "lib/utils.ts"],
     usage: `<ScrollySection steps={[{ id: "1", title: "…", body: "…", visual: <Grafico /> }]} />`,
     props: [
-      { name: "steps", type: "{ id; title; body?; visual }[]", description: "Pasos del relato con su escena." },
+      {
+        name: "steps",
+        type: "{ id; title; body?; visual }[]",
+        description: "Pasos del relato con su escena. La escena es decorativa (inerte): sin links ni controles.",
+      },
       { name: "onStepChange", type: "(id: string) => void", description: "Aviso al cambiar de paso." },
     ],
     status: "candidate",

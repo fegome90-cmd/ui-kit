@@ -14,7 +14,8 @@ export interface PasoRelato {
   id: string;
   title: string;
   body?: React.ReactNode;
-  /** La escena de este paso. */
+  /** La escena de este paso. Es decorativa: se muestra inerte y oculta a lectores de pantalla, así que
+   * no debe llevar links ni controles; lo que haya que leer o accionar va en `body`. */
   visual: React.ReactNode;
 }
 
@@ -85,7 +86,7 @@ function ScrollySection({ steps, onStepChange, className, ...props }: ScrollySec
             }}
             className="grid content-center gap-[12px] min-[760px]:min-h-[80vh]"
           >
-            <div aria-hidden className="min-[760px]:hidden">
+            <div aria-hidden inert className="min-[760px]:hidden">
               {s.visual}
             </div>
             <span className="text-[12px] font-semibold tracking-[0.08em] text-lab-muted uppercase">

@@ -6,6 +6,7 @@ import { ReaCommandPalette, useCommandShortcut } from "./rea-command-palette";
 import { ReaFilterGroup } from "./rea-filter-group";
 import { ReaCodeBox } from "./rea-inspector";
 import { ReaScrollProgress } from "./rea-scroll-progress";
+import { ReaTerrain, rgbDeHex } from "./rea-terrain";
 import { nextAccent } from "./rea-theme";
 import { useReaToast } from "./rea-toast";
 import { SlideNavigator } from "./slide-navigator";
@@ -142,5 +143,45 @@ describe("useReaToast y nextAccent", () => {
     expect(nextAccent("blue")).toBe("orange");
     expect(nextAccent("orange")).toBe("lime");
     expect(nextAccent("lime")).toBe("blue");
+  });
+});
+
+describe("ReaTerrain", () => {
+  it("rgbDeHex acepta hex largo y corto, con espacios, y da negro si no es hex", () => {
+    expect(rgbDeHex(" #2f5bff ")).toEqual([0x2f / 255, 0x5b / 255, 1]);
+    expect(rgbDeHex("#fff")).toEqual([1, 1, 1]);
+    expect(rgbDeHex("rgb(1, 2, 3)")).toEqual([0, 0, 0]);
+    expect(rgbDeHex("")).toEqual([0, 0, 0]);
+  });
+
+  it("es un canvas decorativo y no arranca donde la media query no se cumple", () => {
+    const { container } = render(
+      <section>
+        <ReaTerrain />
+      </section>,
+    );
+    const canvas = container.querySelector("canvas[data-slot=rea-terrain]");
+    expect(canvas).toHaveAttribute("aria-hidden", "true");
+    expect(canvas).not.toHaveAttribute("data-ready");
+  });
+
+  it("sigue los cambios de la media query y deja de escucharlos al desmontar", () => {
+    const add = vi.fn();
+    const remove = vi.fn();
+    const spy = vi.spyOn(window, "matchMedia").mockImplementation(
+      (query) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: add,
+          removeEventListener: remove,
+        }) as unknown as MediaQueryList,
+    );
+    const { unmount } = render(<ReaTerrain media="(min-width: 900px)" />);
+    expect(add).toHaveBeenCalledWith("change", expect.any(Function));
+    const on = add.mock.calls.find(([tipo]) => tipo === "change")?.[1];
+    unmount();
+    expect(remove).toHaveBeenCalledWith("change", on);
+    spy.mockRestore();
   });
 });

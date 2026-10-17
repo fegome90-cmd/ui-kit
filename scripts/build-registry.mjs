@@ -12,8 +12,9 @@
 //   con media queries y @utility, y llega tal cual. El mensaje `docs` indica el @import.
 // - cn() va como item propio (ui-kit-utils): extiende tailwind-merge con las escalas
 //   tipográficas de las familias; el `utils` estándar de shadcn las descartaría.
-import { readFileSync, writeFileSync } from "node:fs";
-import { COMPONENTS } from "../lib/component-registry.ts";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { COMPONENTS, provenanceOf, statusOf } from "../lib/component-registry.ts";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const versions = { ...pkg.dependencies, ...pkg.devDependencies };
@@ -42,6 +43,11 @@ const THEMES = {
       '@import "../styles/rea.css";',
     ],
   },
+  Lab: {
+    css: ["styles/lab.css"],
+    deps: ["@fontsource/bebas-neue"],
+    imports: ['@import "@fontsource/bebas-neue";', '@import "../styles/lab.css";'],
+  },
 };
 
 const themeName = (family) => `${family.toLowerCase()}-tokens`;
@@ -67,6 +73,26 @@ const LIB_ITEMS = {
     name: "rea-utils",
     title: "Utilidades REA",
     description: "Búsqueda sin tildes, pad2 y clamp.",
+  },
+  "lib/lab/graficos.ts": {
+    name: "lab-graficos",
+    title: "Geometría de gráficos Lab",
+    description: "Escalas, trazos suaves, marcas y sectores para los gráficos de Lab.",
+  },
+  "lib/lab/semantica.ts": {
+    name: "lab-semantica",
+    title: "Estados y categóricas Lab",
+    description: "Colores de estado (claro y oscuro) y paleta categórica.",
+  },
+  "lib/lab/paletas.ts": {
+    name: "lab-paletas",
+    title: "Paletas Lab",
+    description: "Paletas medidas por rol, con su origen, y contraste WCAG.",
+  },
+  "lib/lab/encodings.ts": {
+    name: "lab-encodings",
+    title: "Codificaciones Lab",
+    description: "Longitud, área (radio por raíz) y arco (parte del total) para comparar magnitudes.",
   },
   "lib/rea/use-reduced-motion.ts": {
     name: "rea-use-reduced-motion",
@@ -125,10 +151,22 @@ function scan(file) {
 const owner = new Map();
 for (const c of COMPONENTS) for (const f of c.files) if (isComponentFile(f) && !owner.has(f)) owner.set(f, c.slug);
 
+/**
+ * package.json instalado de un paquete, buscando node_modules hacia arriba como Node: un worktree de git
+ * sin dependencias propias usa las del checkout que lo contiene.
+ */
+function installedPackageJson(name) {
+  for (let dir = resolve("."); ; dir = dirname(dir)) {
+    const candidate = join(dir, "node_modules", name, "package.json");
+    if (existsSync(candidate)) return candidate;
+    if (dirname(dir) === dir) throw new Error(`${name} no está instalado (npm install)`);
+  }
+}
+
 // Versión instalada (la que pasó los tests), no el rango de package.json.
 const withVersion = (name) => {
   if (!versions[name]) throw new Error(`Dependencia ${name} sin declarar en package.json`);
-  const installed = JSON.parse(readFileSync(`node_modules/${name}/package.json`, "utf8")).version;
+  const installed = JSON.parse(readFileSync(installedPackageJson(name), "utf8")).version;
   return `${name}@${installed}`;
 };
 
@@ -182,8 +220,9 @@ for (const [family, theme] of Object.entries(THEMES)) {
   });
 }
 
-// Un item por entrada del banco.
+// Un item por entrada del banco. meta lleva la madurez y la procedencia al proyecto que instala.
 for (const c of COMPONENTS) {
+  const meta = { status: statusOf(c), provenance: provenanceOf(c) };
   const files = c.files.filter(isComponentFile);
   if (!files.length) {
     // Recetas que viven solo en el tema (p. ej. rea-hover-lift): el item instala el tema.
@@ -194,6 +233,7 @@ for (const c of COMPONENTS) {
       description: c.description,
       registryDependencies: [ref(themeName(c.family))],
       files: [],
+      meta,
     });
     continue;
   }
@@ -205,6 +245,7 @@ for (const c of COMPONENTS) {
     categories: [c.family.toLowerCase(), c.category.toLowerCase()],
     ...itemFor(c.slug, files, c.family),
     files: files.map((f) => ({ path: f, type: fileType(f), target: fileTarget(f) })),
+    meta,
   });
 }
 

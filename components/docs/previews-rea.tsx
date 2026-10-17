@@ -17,6 +17,7 @@ import { ReaScrollProgress, useScrollProgress } from "@/components/ui/rea/rea-sc
 import { ReaSearchBox } from "@/components/ui/rea/rea-search-box";
 import { ReaSpecimenList } from "@/components/ui/rea/rea-specimen-list";
 import { ReaSwatches } from "@/components/ui/rea/rea-swatches";
+import { ReaTerrain } from "@/components/ui/rea/rea-terrain";
 import { nextAccent, type ReaAccent, ReaProvider, type ReaTheme } from "@/components/ui/rea/rea-theme";
 import { ReaToast, useReaToast } from "@/components/ui/rea/rea-toast";
 import { ReaAccentDot, ReaThemeIcon, ReaToolButton } from "@/components/ui/rea/rea-tool-button";
@@ -357,6 +358,35 @@ function CatalogPreview() {
   );
 }
 
+function TerrainPreview() {
+  const [theme, setTheme] = useState<ReaTheme>("light");
+  const [accent, setAccent] = useState<ReaAccent>("blue");
+  return (
+    <ReaProvider theme={theme} accent={accent} surface style={{ width: "100%" }}>
+      <section className="relative isolate grid min-h-[420px] content-end gap-[16px] overflow-hidden p-[24px]">
+        <ReaTerrain />
+        <p className="m-0 max-w-[30ch] font-rea-sans text-rea-step-2 leading-[1.05] text-rea-ink">
+          Mové el puntero sobre el terreno.
+        </p>
+        <div style={stack}>
+          <ReaButton
+            size="sm"
+            variant="ghost"
+            arrow={null}
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          >
+            Tema: {theme === "light" ? "claro" : "oscuro"}
+          </ReaButton>
+          <ReaButton size="sm" variant="ghost" arrow={null} onClick={() => setAccent(nextAccent(accent))}>
+            Acento: {accent}
+          </ReaButton>
+        </div>
+        <Log>Solo corre con puntero fino, desde 900 px de ancho y sin movimiento reducido.</Log>
+      </section>
+    </ReaProvider>
+  );
+}
+
 export const REA_PREVIEWS: Record<string, () => ReactNode> = {
   "rea-theme": ThemePreview,
   "rea-slide-navigator": SlideNavigatorPreview,
@@ -408,6 +438,7 @@ export const REA_PREVIEWS: Record<string, () => ReactNode> = {
   "rea-gen-words": GenWordsPreview,
   "rea-wireline": WirelinePreview,
   "rea-swatches": () => <ReaSwatches colors={DEMO_REA_SWATCHES} label="Paleta REA" />,
+  "rea-terrain": TerrainPreview,
   "rea-hover-lift": () => (
     <div style={stack}>
       <div
@@ -481,6 +512,16 @@ export const REA_THUMBS: Record<string, ReactNode> = {
     </>
   ),
   "rea-hover-lift": <ReaNote tone="ink">translateY(-3px)</ReaNote>,
+  // Miniatura estática: el fondo CSS de anillos que el original usaba antes del shader (v3).
+  "rea-terrain": (
+    <span
+      className="block h-[50px] w-[120px]"
+      style={{
+        background:
+          "repeating-radial-gradient(ellipse at 52% 44%, transparent 0, transparent 6px, color-mix(in srgb, var(--rea-accent) 45%, transparent) 6.5px, transparent 7.5px, transparent 11px)",
+      }}
+    />
+  ),
   "rea-specimen-stage": <span style={{ fontSize: 34, letterSpacing: "-0.06em" }}>01/04</span>,
   "rea-site-header": <ReaNote tone="ink">REA ATLAS / design library</ReaNote>,
   "rea-catalog": <ReaNote tone="ink">Index / 04 entries</ReaNote>,

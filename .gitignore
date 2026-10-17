@@ -25,6 +25,9 @@ npm-debug.log*
 /registry.json
 /public/r/
 
+# evidencia de diseño capturada (material de terceros; ver .claude/skills/capturar-diseno)
+/evidencia/
+
 # tests
 /coverage/
 /test-results/
@@ -36,3 +39,7 @@ npm-debug.log*
 /_ctx/
 /ANCHOR.yaml
 /.mimosa/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
+# ajustes locales de Claude Code (permisos de cada máquina)
+/.claude/settings.local.json

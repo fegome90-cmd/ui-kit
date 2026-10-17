@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pipeline de CI único: lo usan el hook pre-push, Woodpecker y cualquier persona.
+# Pipeline de CI único y local (no hay CI remoto): lo corre el hook pre-push y cualquiera a mano.
 #   npm run ci            → todo (lint, tipos, tests + cobertura, build, e2e)
 #   SKIP_E2E=1 npm run ci → sin e2e (p. ej. si no hay Chromium instalado)
 set -euo pipefail

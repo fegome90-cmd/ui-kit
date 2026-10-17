@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CodeBlock, PreviewTabs } from "@/components/docs/doc-tabs";
 import { Preview } from "@/components/docs/previews";
-import { bySlug, COMPONENTS } from "@/lib/component-registry";
+import { bySlug, COMPONENTS, PROVENANCE_LABELS, provenanceOf, statusOf } from "@/lib/component-registry";
 import SOURCES from "@/lib/generated/sources.json";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -44,7 +44,8 @@ async function ComponentDocPage({ params }: Props) {
   return (
     <article className="cb-article">
       <p className="cb-eyebrow">
-        {doc.family} · {doc.category}
+        {doc.category} · {doc.family}
+        {statusOf(doc) === "candidate" && <span className="cb-status">Candidato</span>}
       </p>
       <h1>{doc.name}</h1>
       <p className="cb-lead">{doc.description}</p>
@@ -101,6 +102,7 @@ async function ComponentDocPage({ params }: Props) {
       )}
 
       <h2 className="cb-h2">Archivos</h2>
+      <p className="cb-lead">Procedencia: {PROVENANCE_LABELS[provenanceOf(doc)]}.</p>
       <ul className="cb-list">
         {doc.files.map((f) => (
           <li key={f}>

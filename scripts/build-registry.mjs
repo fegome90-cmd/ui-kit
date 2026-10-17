@@ -70,6 +70,16 @@ const LIB_ITEMS = {
     title: "Utilidades REA",
     description: "Búsqueda sin tildes, pad2 y clamp.",
   },
+  "lib/lab/graficos.ts": {
+    name: "lab-graficos",
+    title: "Geometría de gráficos Lab",
+    description: "Escalas, trazos suaves, marcas y sectores para los gráficos de Lab.",
+  },
+  "lib/lab/semantica.ts": {
+    name: "lab-semantica",
+    title: "Estados y categóricas Lab",
+    description: "Colores de estado (claro y oscuro) y paleta categórica.",
+  },
   "lib/lab/paletas.ts": {
     name: "lab-paletas",
     title: "Paletas Lab",

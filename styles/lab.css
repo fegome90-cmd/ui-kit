@@ -13,6 +13,24 @@
   --color-lab-accent: var(--lab-accent);
   --color-lab-accent-soft: var(--lab-accent-soft);
   --color-lab-context: var(--lab-context);
+  --color-lab-info: var(--lab-info);
+  --color-lab-info-soft: var(--lab-info-soft);
+  --color-lab-success: var(--lab-success);
+  --color-lab-success-soft: var(--lab-success-soft);
+  --color-lab-warning: var(--lab-warning);
+  --color-lab-warning-soft: var(--lab-warning-soft);
+  --color-lab-danger: var(--lab-danger);
+  --color-lab-danger-soft: var(--lab-danger-soft);
+  --color-lab-cat-1: var(--lab-cat-1);
+  --color-lab-cat-1-text: var(--lab-cat-1-text);
+  --color-lab-cat-2: var(--lab-cat-2);
+  --color-lab-cat-2-text: var(--lab-cat-2-text);
+  --color-lab-cat-3: var(--lab-cat-3);
+  --color-lab-cat-3-text: var(--lab-cat-3-text);
+  --color-lab-cat-4: var(--lab-cat-4);
+  --color-lab-cat-4-text: var(--lab-cat-4-text);
+  --color-lab-cat-5: var(--lab-cat-5);
+  --color-lab-cat-5-text: var(--lab-cat-5-text);
 }
 
 @theme {
@@ -122,4 +140,39 @@
   --lab-accent: #a5104f;
   --lab-accent-soft: #f1d9e3;
   --lab-context: #d1bac4;
+}
+
+/* Estados (texto o ícono y fondo suave) y categóricas. Valores en lib/lab/semantica.ts. */
+.lab {
+  --lab-info: #1d5bd8;
+  --lab-info-soft: #e3ecfd;
+  --lab-success: #17703a;
+  --lab-success-soft: #dcf3e3;
+  --lab-warning: #8a5a00;
+  --lab-warning-soft: #fff1cc;
+  --lab-danger: #c42b1c;
+  --lab-danger-soft: #fde3e0;
+}
+.lab[data-lab-palette="bioage"],
+.lab[data-lab-palette="paradigm"] {
+  --lab-info: #7fb0ff;
+  --lab-info-soft: #14244a;
+  --lab-success: #5fd08b;
+  --lab-success-soft: #0f3320;
+  --lab-warning: #f2c14e;
+  --lab-warning-soft: #3a2c08;
+  --lab-danger: #ff8a80;
+  --lab-danger-soft: #45161a;
+}
+.lab {
+  --lab-cat-1: #e6503c;
+  --lab-cat-1-text: #000000;
+  --lab-cat-2: #068076;
+  --lab-cat-2-text: #ffffff;
+  --lab-cat-3: #001480;
+  --lab-cat-3-text: #ffffff;
+  --lab-cat-4: #fbd236;
+  --lab-cat-4-text: #000000;
+  --lab-cat-5: #f5a8c1;
+  --lab-cat-5-text: #000000;
 }

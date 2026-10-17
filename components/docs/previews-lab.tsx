@@ -1,6 +1,9 @@
 "use client";
 
+import { CircleCheck, TriangleAlert } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { CategoryWheel } from "@/components/ui/lab/category-wheel";
+import { DistributionChart } from "@/components/ui/lab/distribution-chart";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
 import { LabBackdrop, PATTERNS } from "@/components/ui/lab/lab-backdrop";
 import { LabGlowCard } from "@/components/ui/lab/lab-glow-card";
@@ -8,7 +11,11 @@ import { LabGradientText } from "@/components/ui/lab/lab-gradient-text";
 import { LabMarquee } from "@/components/ui/lab/lab-marquee";
 import { LabPalette, LabScope } from "@/components/ui/lab/lab-palette";
 import { LabRevealCard } from "@/components/ui/lab/lab-reveal-card";
+import { LabCount, LabLozenge } from "@/components/ui/lab/lozenge";
+import { LabNotification } from "@/components/ui/lab/notification";
 import { PresenceDot } from "@/components/ui/lab/presence-dot";
+import { ProcessSteps } from "@/components/ui/lab/process-steps";
+import { SeriesChart } from "@/components/ui/lab/series-chart";
 import { SignalDisclosure } from "@/components/ui/lab/signal-disclosure";
 import { StatRing } from "@/components/ui/lab/stat-ring";
 import { PALETAS, PALETAS_LAB, type PaletaLab } from "@/lib/lab/paletas";
@@ -28,6 +35,111 @@ function Muestra({ texto, children }: { texto: string; children: ReactNode }) {
     <div className="flex flex-col items-center gap-[10px]">
       <span className="flex h-[24px] items-center">{children}</span>
       <code className="text-[12px] text-lab-muted">{texto}</code>
+    </div>
+  );
+}
+
+const ETAPAS = [
+  { title: "Ingreso", description: "Triage y registro (ficticio)." },
+  { title: "Evaluación", description: "Exámenes y diagnóstico." },
+  { title: "Tratamiento", description: "Indicaciones y controles." },
+  { title: "Alta", description: "Epicrisis y seguimiento." },
+];
+
+// Series ficticias: riesgo relativo por edad. Dos destacadas y seis de contexto.
+const EDADES = [40, 50, 60, 70, 80];
+const SERIES = [
+  { id: "cv", label: "Cardiovascular", values: [2, 5, 11, 22, 38] },
+  { id: "dm", label: "Diabetes", values: [3, 6, 10, 15, 19] },
+  ...[1, 2, 3, 4, 5, 6].map((k) => ({
+    id: `c${k}`,
+    label: `Contexto ${k}`,
+    values: EDADES.map((e, i) => Math.round((k * 1.3 + 1) * (1 + i * 0.6) + ((e * k) % 7))),
+  })),
+];
+
+const DISTRIBUCION: [number, number][] = [
+  [60, 1],
+  [65, 3],
+  [70, 7],
+  [75, 14],
+  [80, 24],
+  [85, 31],
+  [90, 22],
+  [95, 9],
+  [100, 2],
+];
+
+function NotificationPreview() {
+  const [abiertas, setAbiertas] = useState({ inline: true, toast: true, accion: true });
+  const [log, setLog] = useState("");
+  const cerrar = (k: keyof typeof abiertas) => () => setAbiertas((a) => ({ ...a, [k]: false }));
+  return (
+    <div className="grid w-full max-w-[560px] gap-[10px]">
+      {(["info", "success", "warning", "danger"] as const).map((st) => (
+        <LabNotification
+          key={st}
+          status={st}
+          title={
+            {
+              info: "Turno actualizado",
+              success: "Indicación guardada",
+              warning: "Turno sin cubrir",
+              danger: "No se pudo guardar",
+            }[st]
+          }
+        >
+          {
+            {
+              info: "Hay 2 ingresos nuevos.",
+              success: "Quedó en la ficha del paciente.",
+              warning: "Falta asignar la cama 12.",
+              danger: "Revisá la conexión y reintentá.",
+            }[st]
+          }
+        </LabNotification>
+      ))}
+      {abiertas.inline && (
+        <LabNotification status="warning" title="Inline cerrable" onClose={cerrar("inline")}>
+          Persiste hasta que la cerrás.
+        </LabNotification>
+      )}
+      {abiertas.accion && (
+        <LabNotification
+          variant="actionable"
+          status="danger"
+          title="Sincronización detenida"
+          action={{ label: "Reintentar", onClick: () => setLog("Acción: Reintentar") }}
+          onClose={cerrar("accion")}
+        >
+          Una sola acción; toma el foco al aparecer.
+        </LabNotification>
+      )}
+      {abiertas.toast && (
+        <LabNotification
+          variant="toast"
+          status="success"
+          title="Toast"
+          timestamp="Hoy, 14:32"
+          onClose={cerrar("toast")}
+        >
+          Flotante y breve.
+        </LabNotification>
+      )}
+      <LabNotification variant="callout" status="warning" title="Callout">
+        Llega con la página y no se cierra.
+      </LabNotification>
+      <button
+        type="button"
+        className="justify-self-start rounded-full border border-lab-line px-[12px] py-[4px] text-[13px]"
+        onClick={() => {
+          setAbiertas({ inline: true, toast: true, accion: true });
+          setLog("");
+        }}
+      >
+        Restablecer
+      </button>
+      {log && <p className="m-0 text-[13px] text-lab-muted">{log}</p>}
     </div>
   );
 }
@@ -199,6 +311,76 @@ export const LAB_PREVIEWS: Record<string, () => ReactNode> = {
   ),
 };
 
+LAB_PREVIEWS["lab-process-steps"] = () => (
+  <div className="grid w-full gap-[28px]">
+    <ProcessSteps steps={ETAPAS.slice(0, 3)} />
+    <ProcessSteps steps={ETAPAS} variant="timeline" current={1} />
+  </div>
+);
+LAB_PREVIEWS["lab-series-chart"] = () => (
+  <div className="w-full max-w-[640px]">
+    <SeriesChart title="Riesgo relativo por edad (ficticio)" x={EDADES} series={SERIES} highlight={["cv", "dm"]} />
+  </div>
+);
+LAB_PREVIEWS["lab-distribution-chart"] = () => (
+  <div className="w-full max-w-[640px]">
+    <DistributionChart
+      title="Edad al alta (ficticio)"
+      points={DISTRIBUCION}
+      annotations={[
+        { x: 68, label: "Paciente A" },
+        { x: 97, label: "Paciente B" },
+      ]}
+      xLabel="Edad"
+      yLabel="Pacientes"
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-category-wheel"] = () => (
+  <CategoryWheel
+    title="Tipos de alerta"
+    categories={[
+      { label: "Signos vitales", description: "presión, saturación" },
+      { label: "Medicación" },
+      { label: "Laboratorio" },
+      { label: "Caídas" },
+      { label: "Dolor" },
+      { label: "Nutrición" },
+    ]}
+  />
+);
+LAB_PREVIEWS["lab-lozenge"] = () => (
+  <div className="grid gap-[14px]">
+    <div className="flex flex-wrap items-center gap-[8px]">
+      <LabLozenge>Borrador</LabLozenge>
+      <LabLozenge tone="info">En revisión</LabLozenge>
+      <LabLozenge tone="success" icon={<CircleCheck />}>
+        Completado
+      </LabLozenge>
+      <LabLozenge tone="warning" icon={<TriangleAlert />} metric={3}>
+        En riesgo
+      </LabLozenge>
+      <LabLozenge tone="danger">Bloqueado</LabLozenge>
+      <LabLozenge tone="info">Una etiqueta demasiado larga que el lozenge trunca a 200 px</LabLozenge>
+    </div>
+    <div className="flex flex-wrap items-center gap-[16px] text-[14px]">
+      <span>
+        Pendientes <LabCount value={12} />
+      </span>
+      <span>
+        Cambio <LabCount value={4} signed tone="success" />
+      </span>
+      <span>
+        Lecturas <LabCount value={1284000} compact />
+      </span>
+      <span>
+        Alertas <LabCount value={7} tone="danger" bold />
+      </span>
+    </div>
+  </div>
+);
+LAB_PREVIEWS["lab-notification"] = NotificationPreview;
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -229,6 +411,38 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
   ),
   "lab-marquee": <span className="text-[12px] text-lab-muted">← Lightyear · Higro · Zurich ←</span>,
   "lab-reveal-card": <span className="h-[44px] w-[70px] rounded-[6px] bg-lab-accent grayscale" />,
+  "lab-process-steps": <span className="text-[12px] font-semibold text-lab-ink">1 → 2 → 3</span>,
+  "lab-series-chart": (
+    <svg aria-hidden viewBox="0 0 90 40" className="h-[40px]">
+      <path d="M0 35 L30 30 L60 22 L90 18" fill="none" className="stroke-lab-context" />
+      <path d="M0 32 L30 26 L60 28 L90 30" fill="none" className="stroke-lab-context" />
+      <path d="M0 36 L30 30 L60 16 L90 4" fill="none" strokeWidth="2.5" className="stroke-lab-accent" />
+    </svg>
+  ),
+  "lab-distribution-chart": (
+    <svg aria-hidden viewBox="0 0 90 40" className="h-[40px]">
+      <path d="M0 38 C30 38 40 4 55 4 C70 4 75 38 90 38 Z" className="fill-lab-accent-soft stroke-lab-accent" />
+      <circle cx="30" cy="30" r="3" className="fill-lab-surface stroke-lab-ink" />
+    </svg>
+  ),
+  "lab-category-wheel": (
+    <span className="flex gap-[3px]">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} className="size-[14px] rounded-[3px]" style={{ background: `var(--lab-cat-${n})` }} />
+      ))}
+    </span>
+  ),
+  "lab-lozenge": (
+    <span className="flex items-center gap-[6px]">
+      <LabLozenge tone="success">En curso</LabLozenge>
+      <LabCount value={12} />
+    </span>
+  ),
+  "lab-notification": (
+    <span className="rounded-[4px] border-l-[3px] border-l-lab-warning bg-lab-warning-soft px-[8px] py-[4px] text-[12px] text-lab-ink">
+      Turno sin cubrir
+    </span>
+  ),
   "lab-glow-card": (
     <span
       className="h-[44px] w-[90px] rounded-[8px] border border-lab-line"

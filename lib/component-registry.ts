@@ -1379,6 +1379,162 @@ useGridShortcut(() => setOn((v) => !v));
       "Que el brillo siga al puntero sale de la ficha «Interactive Bento Grid» de Awwwards, que solo está en video: inferido.",
     ],
   },
+  {
+    slug: "lab-process-steps",
+    family: "Lab",
+    name: "Etapas",
+    category: "Gráficos",
+    description:
+      "Las etapas de un proceso en orden, como chevrones o como línea con puntos. La etapa en curso es opcional.",
+    files: ["components/ui/lab/process-steps.tsx", "lib/utils.ts"],
+    usage: `<ProcessSteps
+  variant="timeline"
+  current={1}
+  steps={[{ title: "Ingreso" }, { title: "Evaluación" }, { title: "Alta" }]}
+/>`,
+    props: [
+      { name: "steps", type: "{ title: string; description?: ReactNode }[]", description: "Etapas en orden." },
+      { name: "variant", type: '"chevrons" | "timeline"', default: '"chevrons"', description: "BioAge o Meridian." },
+      { name: "current", type: "number", description: "Índice de la etapa en curso; sin valor, solo el orden." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Chevrones de BioAge (platform t06) y línea con puntos de Meridian, desde capturas.",
+      "Una etapa no es el estado actual: solo `current` destaca una, con aria-current=step, relleno y el texto «En curso».",
+    ],
+  },
+  {
+    slug: "lab-series-chart",
+    family: "Lab",
+    name: "Series destacadas",
+    category: "Gráficos",
+    description: "Varias series en el tiempo; una o dos destacadas y rotuladas sobre el resto atenuado como contexto.",
+    files: ["components/ui/lab/series-chart.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<SeriesChart title="Riesgo por edad" x={[40, 50, 60, 70, 80]} series={series} highlight={["cv", "dm"]} />`,
+    props: [
+      { name: "title", type: "string", description: "Título del gráfico y de la tabla." },
+      { name: "x", type: "(string | number)[]", description: "Etiquetas del eje x." },
+      { name: "series", type: "{ id; label; values: number[] }[]", description: "Todas las series." },
+      { name: "highlight", type: "string[]", description: "Ids destacados (1 o 2)." },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform t02): dos series destacadas sobre muchas líneas tenues. SVG propio.",
+      "El contexto no se rotula ni llega a 3:1: la tabla desplegable trae todas las series con sus valores.",
+    ],
+  },
+  {
+    slug: "lab-distribution-chart",
+    family: "Lab",
+    name: "Distribución anotada",
+    category: "Gráficos",
+    description: "Curva de cuántos casos hay en cada valor, con casos concretos marcados sobre ella.",
+    files: ["components/ui/lab/distribution-chart.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<DistributionChart
+  title="Edad al alta"
+  points={[[60, 2], [70, 10], [80, 30], [90, 12], [100, 1]]}
+  annotations={[{ x: 72, label: "Paciente A" }]}
+  xLabel="Edad"
+  yLabel="Pacientes"
+/>`,
+    props: [
+      { name: "points", type: "[number, number][]", description: "Pares [valor, cantidad] ya calculados." },
+      { name: "annotations", type: "{ x: number; label: string }[]", description: "Casos marcados." },
+      { name: "xLabel / yLabel", type: "string", description: "Qué miden los ejes." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform t03): distribución con dos individuos anotados. SVG propio.",
+      "No estima densidades: recibe la curva calculada. Las anotaciones van también en una lista.",
+    ],
+  },
+  {
+    slug: "lab-category-wheel",
+    family: "Lab",
+    name: "Rueda de categorías",
+    category: "Gráficos",
+    description:
+      "Clases del mismo nivel alrededor de un centro que las nombra, con sectores iguales y leyenda numerada.",
+    files: ["components/ui/lab/category-wheel.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<CategoryWheel title="Tipos de alerta" categories={[{ label: "Signos vitales" }, { label: "Medicación" }]} />`,
+    props: [
+      { name: "title", type: "string", description: "Lo que las categorías tienen en común." },
+      { name: "categories", type: "{ label; description? }[]", description: "De 2 a 8." },
+      { name: "size", type: "number", default: "240", description: "Diámetro en px." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Forma de BioAge (platform t05); colores categóricos medidos en los capítulos de Voices.",
+      "Sectores iguales: distingue clases, no mide. Desde la sexta categoría los colores se repiten; el número no.",
+    ],
+  },
+  {
+    slug: "lab-lozenge",
+    family: "Lab",
+    name: "Lozenge y contador",
+    category: "Indicadores",
+    description: "Lozenge para atributos con significado (estado, prioridad) y contador solo para cantidades.",
+    files: ["components/ui/lab/lozenge.tsx", "lib/utils.ts"],
+    usage: `<LabLozenge tone="success">En curso</LabLozenge>
+<LabLozenge tone="warning" metric={3}>En riesgo</LabLozenge>
+Pendientes <LabCount value={12} />`,
+    props: [
+      {
+        name: "tone",
+        type: '"neutral" | "info" | "success" | "warning" | "danger"',
+        default: '"neutral"',
+        description: "Significado.",
+      },
+      { name: "icon", type: "ReactNode", description: "Lozenge: ícono de apoyo (oculto)." },
+      { name: "metric", type: "number", description: "Lozenge: métrica de apoyo; solo con tono semántico." },
+      { name: "value", type: "number", description: "Contador: la cantidad." },
+      { name: "signed / compact / bold", type: "boolean", description: "Contador: signo, abreviatura, énfasis." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Reglas de Atlassian (Lozenge y Badge, leídas el 2026-10-17); implementación y colores propios.",
+      "Separa atributo (lozenge, con texto) de cantidad (contador): un punto de color no debe hacer las dos cosas.",
+    ],
+  },
+  {
+    slug: "lab-notification",
+    family: "Lab",
+    name: "Notificación",
+    category: "Indicadores",
+    description:
+      "Inline, toast, con acción o callout, según cuánto debe interrumpir. Estado con ícono y texto, no solo color.",
+    files: ["components/ui/lab/notification.tsx", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<LabNotification status="warning" title="Turno sin cubrir" onClose={cerrar}>
+  Falta asignar la cama 12.
+</LabNotification>`,
+    props: [
+      {
+        name: "variant",
+        type: '"inline" | "toast" | "actionable" | "callout"',
+        default: '"inline"',
+        description: "Nivel de interrupción.",
+      },
+      { name: "status", type: '"info" | "success" | "warning" | "danger"', default: '"info"', description: "Estado." },
+      { name: "title", type: "string", description: "Corto, sin punto final." },
+      { name: "onClose", type: "() => void", description: "Muestra la ×; callout nunca se cierra." },
+      { name: "action", type: "{ label; onClick }", description: "Solo actionable: la única acción." },
+      { name: "timeout", type: "number", description: "Solo toast: ms hasta cerrarse." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Variantes y reglas de IBM Carbon (Notification > Guidelines, leídas el 2026-10-17); implementación propia.",
+      "Roles: error = alert, actionable = alertdialog con foco al aparecer, callout = note, el resto = status.",
+      "Un toast que se cierra solo debe tener su contenido disponible en otro lado (centro de notificaciones).",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

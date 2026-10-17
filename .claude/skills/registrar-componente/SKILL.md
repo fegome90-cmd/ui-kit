@@ -87,6 +87,14 @@ npx shadcn registry validate
 Revisa el item generado: en `registry.json`, `meta.status` y `meta.provenance` deben coincidir con la entrada,
 y `dependencies` y `registryDependencies` deben salir de los imports reales.
 
+**Contraste.** Revisa cada combinación de texto o ícono sobre su fondo, en todas las variantes y estados que
+declaras (hover, foco, deshabilitado, claro y oscuro si aplica), contra WCAG AA: **4.5:1** para texto normal,
+**3:1** para texto grande y para bordes, íconos e indicadores de foco. Un texto con `opacity` o con alfa en el
+color pierde contraste: mídelo con el color resultante, no con el de la paleta. Si tienes disponible la skill
+`design:accessibility-review` o `web-design-guidelines`, úsala para esto. Un componente que no cumple queda
+`candidate` con una nota que diga qué combinación falla; no lo arregles cambiando colores de la familia sin
+preguntar.
+
 `make e2e` y `make ci` levantan el build. Córrelos solo si el usuario lo pide; si no, el pre-push los corre igual.
 
 ## 5. Cerrar

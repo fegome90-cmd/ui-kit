@@ -142,7 +142,38 @@ esos estados quedan como «no observado» en el inventario.
 
 ## G2 — Inventario de candidatos
 
-Escribe `inventario.md` con una tabla. Agrupa por semántica y repetición: no inventes componentes para rellenar.
+Escribe `inventario.md` en dos partes: una lectura del diseño y la tabla de candidatos.
+
+### Lectura del diseño
+
+Antes de listar componentes, anota qué decisiones de diseño ves y **por qué** crees que se tomaron, cada una con
+su evidencia (archivo de `captures/` o `dom/`). Sin el porqué, la lista no sirve para decidir tokens. Cubre:
+
+- **Tipografía por rol**: sale de `rolesTipograficos` en `evidence.json`. Cuál es la familia de los titulares (la
+  que define el carácter de la página), cuál acompaña en el cuerpo y en la interfaz, y si son de la misma familia
+  o un contraste buscado.
+- **Paleta y proporción**: colores de fondo, de marca y de acento, con su peso aproximado en la página. La regla
+  60-30-10 (neutros, marca, acento) es una referencia para describir, no una norma que imponer. Anota si un color
+  está reservado para algo (por ejemplo, solo para acciones).
+- **Jerarquía**: cómo se distingue lo importante. Tamaño, peso y, si `--dom` lo midió, `opacity` o alfa del
+  color (titular al 100 %, apoyo al 70–80 %, notas al 50–60 %).
+- **Espaciado**: padding de botones y tarjetas, separación entre secciones, si sigue una escala.
+- **Profundidad y movimiento**: texturas, vidrio, sombras en capas (`background-image`, `backdrop-filter`,
+  `box-shadow`); `transition` y `animation` declaradas. El movimiento va siempre como **declarado, no observado**.
+
+Lo que no tenga evidencia va como inferido o no va.
+
+### Candidatos
+
+Agrupa por semántica y repetición: no inventes componentes para rellenar. Antes de crear una fila:
+
+- **Un motivo repetido no es un componente.** Curvas, degradados, texturas, sombras o formas que reaparecen en
+  distintas piezas son tokens (variables de la familia) o utilidades (`@utility` en el CSS de la familia). Anótalo
+  en *Tokens* de las filas que lo usan.
+- **El elemento central de la página es un bloque.** El hero, la ilustración o el titular que domina la vista va
+  como `bloque` en `components/blocks/`. Si contiene piezas reutilizables, esas sí son primitivos aparte.
+- **Una sola aparición no justifica un primitivo.** Si algo aparece una vez y no tiene variantes, es parte del
+  bloque que lo contiene.
 
 | Campo | Contenido |
 |---|---|

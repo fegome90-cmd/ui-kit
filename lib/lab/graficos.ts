@@ -103,6 +103,36 @@ export function polar(cx: number, cy: number, r: number, a: number): Punto {
 }
 
 /**
+ * Ángulos de los centros (radianes, 0 = las 12, horario) de marcas alrededor de un círculo con un paso
+ * proporcional a su tamaño, dejando un hueco al final. Medido en Searching for Birds (nido: la primera marca a
+ * las 12, la última a 335°, el paso baja de 27,6° a 6,6° con el tamaño del huevo).
+ */
+export function angulosRanking(tamanos: ReadonlyArray<number>, hueco = (25 * Math.PI) / 180): number[] {
+  const total = tamanos.reduce((a, t) => a + t, 0);
+  if (total <= 0) return tamanos.map(() => 0);
+  const k = (2 * Math.PI - hueco) / total;
+  let a = -(tamanos[0] * k) / 2;
+  return tamanos.map((t) => {
+    const centro = a + (t * k) / 2;
+    a += t * k;
+    return +centro.toFixed(4);
+  });
+}
+
+/**
+ * Rotación (grados, para SVG) y anclaje de un rótulo radial en el ángulo `a` (0 = las 12, horario). En la
+ * mitad izquierda se da vuelta para que se lea de izquierda a derecha, como en Searching for Birds.
+ */
+export function rotuloRadial(a: number): { rotate: number; anchor: "start" | "end"; volteado: boolean } {
+  const n = ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const grados = (n * 180) / Math.PI - 90;
+  const volteado = n > Math.PI + 1e-9;
+  const g = volteado ? grados + 180 : grados;
+  // En (−180°, 180°]: el mismo giro, sin vueltas de más.
+  return { rotate: f(g > 180 ? g - 360 : g), anchor: volteado ? "end" : "start", volteado };
+}
+
+/**
  * Tramo logarítmico con signo, como la leyenda de Voices (explore-the-data: 0, 100, 1k, 10k, 100k, 1M+).
  * 0 = sin dato o cero; ±1 = menos de 100; ±2 = 100–999; ±3 = 1k–9,9k; ±4 = 10k–99,9k; ±5 = 100k o más.
  */

@@ -1822,6 +1822,35 @@ Pendientes <LabCount value={12} />`,
       "No se fija sola: la posición (fixed, borde) la pone quien la usa. Pendiente: QA con muchas secciones y en pantallas angostas, donde conviene ocultarla.",
     ],
   },
+  {
+    slug: "lab-radial-bars",
+    family: "Lab",
+    name: "Barras radiales",
+    category: "Gráficos",
+    description:
+      "Magnitud alrededor de un centro: barras que salen del centro o un ranking de marcas que gira desde las 12.",
+    files: ["components/ui/lab/radial-bars.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<RadialBars title="Menciones por tema" items={[{ label: "Acceso", value: 649 }, { label: "Espera", value: 512 }]} variant="ranking" />`,
+    props: [
+      { name: "items", type: "{ label; value }[]", description: "Ítems; en `ranking` se ordenan de mayor a menor." },
+      {
+        name: "variant",
+        type: '"bars" | "ranking"',
+        default: '"bars"',
+        description: "Barras desde el centro o marcas en anillo.",
+      },
+      { name: "unit", type: "string", description: "Unidad en la lista accesible." },
+      { name: "size", type: "number", default: "520", description: "Lado en px (se achica al ancho disponible)." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "`ranking` medido en el SVG de Searching for Birds: anillo de radio 180/900, desde −90° en sentido horario con ~25° de hueco, paso ∝ tamaño, rótulo de 18 a 9 px que se da vuelta en la mitad izquierda.",
+      "`bars` observado en Updata One (WebGL, sin DOM medible): el largo se mide desde el círculo interior; ancho fijo para no sugerir área.",
+      "Un solo color: en el original los colores de los huevos son decorativos. Pendiente: QA con rótulos largos y con más de 25 ítems; en pantallas de 390 px el texto escala a ~7 px (conviene mostrar la lista en su lugar).",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

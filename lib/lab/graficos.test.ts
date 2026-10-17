@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  angulosRanking,
   colorCategoria,
   escala,
   extension,
   marcas,
   marcasEje,
   polar,
+  rotuloRadial,
   sectores,
   squarify,
   tramoLog,
@@ -121,5 +123,21 @@ describe("geometría de gráficos", () => {
     expect(squarify([5, 0, -2, Number.NaN], 0, 0, 100, 100).map((x) => x.i)).toEqual([0]);
     expect(squarify([], 0, 0, 100, 100)).toEqual([]);
     expect(squarify([1], 0, 0, 0, 100)).toEqual([]);
+  });
+});
+
+describe("angulosRanking y rotuloRadial", () => {
+  it("la primera marca va a las 12 y el paso es proporcional al tamaño, dejando el hueco", () => {
+    const hueco = Math.PI / 6;
+    const a = angulosRanking([2, 1, 1], hueco);
+    expect(a[0]).toBe(0);
+    const k = (2 * Math.PI - hueco) / 4;
+    expect(a[1]).toBeCloseTo(1.5 * k, 3);
+    expect(a[2] - a[1]).toBeCloseTo(k, 3);
+  });
+  it("da vuelta los rótulos de la mitad izquierda", () => {
+    expect(rotuloRadial(Math.PI / 2)).toEqual({ rotate: 0, anchor: "start", volteado: false });
+    expect(rotuloRadial((3 * Math.PI) / 2)).toEqual({ rotate: 0, anchor: "end", volteado: true });
+    expect(rotuloRadial(0).rotate).toBe(-90);
   });
 });

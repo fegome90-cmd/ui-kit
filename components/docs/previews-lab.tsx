@@ -23,6 +23,7 @@ import { LabNotification } from "@/components/ui/lab/notification";
 import { PresenceDot } from "@/components/ui/lab/presence-dot";
 import { ProcessSteps } from "@/components/ui/lab/process-steps";
 import { ProportionSplit } from "@/components/ui/lab/proportion-split";
+import { RadialBars } from "@/components/ui/lab/radial-bars";
 import { RangeBars } from "@/components/ui/lab/range-bars";
 import { ScrollySection } from "@/components/ui/lab/scrolly-section";
 import { SeriesChart } from "@/components/ui/lab/series-chart";
@@ -683,6 +684,50 @@ function DotNavPreview() {
 }
 LAB_PREVIEWS["lab-dot-nav"] = () => <DotNavPreview />;
 
+LAB_PREVIEWS["lab-radial-bars"] = () => (
+  <div className="grid w-full justify-items-center gap-[40px]">
+    <RadialBars
+      title="Menciones por tema (ficticio)"
+      unit="menciones"
+      items={[
+        { label: "Acceso", value: 649 },
+        { label: "Espera", value: 512 },
+        { label: "Trato", value: 430 },
+        { label: "Costos", value: 388 },
+        { label: "Medicamentos", value: 301 },
+        { label: "Información", value: 276 },
+        { label: "Infraestructura", value: 190 },
+        { label: "Seguridad", value: 154 },
+        { label: "Digital", value: 120 },
+        { label: "Otros", value: 64 },
+      ]}
+    />
+    <RadialBars
+      title="Consultas más buscadas (ficticio)"
+      variant="ranking"
+      unit="búsquedas"
+      items={[
+        ["Fiebre", 980],
+        ["Tos", 760],
+        ["Cefalea", 690],
+        ["Dolor lumbar", 540],
+        ["Alergia", 430],
+        ["Insomnio", 380],
+        ["Gastritis", 360],
+        ["Ansiedad", 300],
+        ["Mareo", 190],
+        ["Otitis", 186],
+        ["Conjuntivitis", 170],
+        ["Acné", 150],
+        ["Caries", 120],
+        ["Esguince", 100],
+        ["Varicela", 70],
+        ["Herpes", 60],
+      ].map(([label, value]) => ({ label: String(label), value: Number(value) }))}
+    />
+  </div>
+);
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -855,5 +900,25 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
         </span>
       ))}
     </span>
+  ),
+  "lab-radial-bars": (
+    <svg aria-hidden viewBox="0 0 60 60" className="h-[48px]">
+      <circle cx="30" cy="30" r="7" className="fill-none stroke-lab-line" />
+      {[24, 16, 20, 12, 18, 10, 14, 8].map((l, i) => {
+        const a = (i * Math.PI) / 4;
+        return (
+          <line
+            key={a}
+            x1={30 + 7 * Math.sin(a)}
+            y1={30 - 7 * Math.cos(a)}
+            x2={30 + (7 + l) * Math.sin(a)}
+            y2={30 - (7 + l) * Math.cos(a)}
+            strokeWidth={3}
+            strokeLinecap="round"
+            className="stroke-lab-accent"
+          />
+        );
+      })}
+    </svg>
   ),
 };

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DotNav, seccionVisible } from "./dot-nav";
 import { FilteredStat, textoCifra } from "./filtered-stat";
+import { ordenRanking, RadialBars } from "./radial-bars";
 
 describe("FilteredStat", () => {
   const segments = [
@@ -96,5 +97,32 @@ describe("DotNav", () => {
     expect(document.activeElement).toBe(observados[0]);
     expect(screen.getByRole("link", { name: "Sección A" })).toHaveAttribute("aria-current", "location");
     vi.unstubAllGlobals();
+  });
+});
+
+describe("RadialBars", () => {
+  const items = [
+    { label: "B", value: 50 },
+    { label: "A", value: 100 },
+    { label: "C", value: 25 },
+  ];
+  it("barras: el largo desde el círculo interior es proporcional al valor", () => {
+    const { container } = render(<RadialBars title="Temas" items={items} />);
+    const largo = [...container.querySelectorAll("[data-marks=bars] line")].map((l) =>
+      Math.hypot(
+        Number(l.getAttribute("x2")) - Number(l.getAttribute("x1")),
+        Number(l.getAttribute("y2")) - Number(l.getAttribute("y1")),
+      ),
+    );
+    expect(largo[0] / largo[1]).toBeCloseTo(0.5, 1);
+    expect(largo[2] / largo[1]).toBeCloseTo(0.25, 1);
+  });
+  it("ranking: ordena de mayor a menor, área proporcional y lista accesible", () => {
+    const { container } = render(<RadialBars title="Ranking" items={items} variant="ranking" unit="u" />);
+    const r = [...container.querySelectorAll("[data-marks=ranking] circle")].map((c) => Number(c.getAttribute("r")));
+    expect((r[1] / r[0]) ** 2).toBeCloseTo(0.5, 1);
+    expect([...container.querySelectorAll("text")].map((t) => t.textContent)[0]).toBe("1 · A");
+    expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["A: 100 u", "B: 50 u", "C: 25 u"]);
+    expect(ordenRanking(items).map((i) => i.puesto)).toEqual([1, 2, 3]);
   });
 });

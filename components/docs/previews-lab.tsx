@@ -252,8 +252,7 @@ export const LAB_PREVIEWS: Record<string, () => ReactNode> = {
         Ajuste de dosis de las 14:00 y control de glicemia cada 6 h.
       </SignalDisclosure>
       <SignalDisclosure title="Abierto por defecto" defaultOpen signal={<PresenceDot label="Nuevo" rings={1} />}>
-        El detalle sigue en el DOM cuando está cerrado, queda inert y pasa a visibility: hidden al terminar la
-        transición.
+        El detalle sigue en el DOM cuando está cerrado: queda inert y con visibility: hidden.
       </SignalDisclosure>
     </div>
   ),

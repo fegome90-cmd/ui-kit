@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 // paso que cruza el centro de la pantalla se vuelve el activo y la escena cambia. Observado en BioAge
 // (platform, capturado por tramos t01–t09 en evidencia/2026-10-17-bioage): cada dato llega en su escena.
 // El cambio de escena es un fundido de 0,4 s (inferido: BioAge usa transiciones de opacidad de 0,4–0,5 s).
-// Recuperable: cada paso lleva su texto; las escenas inactivas son inert. Bajo 760 px no hay escena fija:
+// Recuperable: cada paso lleva su texto; las escenas son decorativas e inert (la fija y la de mobile). Bajo 760 px no hay escena fija:
 // cada escena va antes de su texto. Sin IntersectionObserver (o en tests) se ve el primer paso.
 
 export interface PasoRelato {

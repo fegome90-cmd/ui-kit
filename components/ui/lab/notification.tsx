@@ -78,8 +78,6 @@ function LabNotification({
   ...props
 }: LabNotificationProps) {
   const ref = React.useRef<HTMLDivElement>(null);
-  const onCloseRef = React.useRef(onClose);
-  const hasOnClose = !!onClose;
   // Callout no admite éxito ni error (Carbon): se degrada a info.
   const estado: Estado = variant === "callout" && (status === "success" || status === "danger") ? "info" : status;
   const Icono = ICONO[estado];

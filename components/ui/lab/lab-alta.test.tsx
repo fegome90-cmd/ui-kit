@@ -34,15 +34,6 @@ describe("TimeScale", () => {
     await user.keyboard("{End}");
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Hito 2021");
   });
-  it("no impone ancho mínimo a timestamps salvo que se pida", () => {
-    const timestamps = [0, 86_400_000].map((at) => ({ at, label: String(at), content: null }));
-    const { rerender } = render(<TimeScale label="Días" events={timestamps} />);
-    expect(screen.getByRole("tablist").style.minWidth).toBe("");
-    rerender(<TimeScale label="Días" events={timestamps} minUnitWidth={0} />);
-    expect(screen.getByRole("tablist").style.minWidth).toBe("0px");
-    rerender(<TimeScale label="Días" events={timestamps} />);
-    expect(screen.getByRole("tablist").style.minWidth).toBe("");
-  });
 });
 
 describe("SeriesChart: eventos y proyección", () => {

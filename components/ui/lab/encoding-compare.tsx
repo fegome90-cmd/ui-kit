@@ -24,6 +24,8 @@ type EncodingCompareProps = Omit<React.ComponentProps<"figure">, "onChange"> & {
   onEncodingChange?: (encoding: Encoding) => void;
   /** Formato de los valores en etiquetas y tabla. */
   format?: (value: number) => string;
+  /** Las marcas crecen desde cero al aparecer y al cambiar de codificación (solo con motion-safe). */
+  animate?: boolean;
 };
 
 function EncodingCompare({
@@ -33,6 +35,7 @@ function EncodingCompare({
   defaultEncoding = "length",
   onEncodingChange,
   format = (v) => v.toLocaleString("es-CL"),
+  animate = false,
   className,
   ...props
 }: EncodingCompareProps) {
@@ -75,7 +78,14 @@ function EncodingCompare({
         </div>
       </div>
 
-      <Grafico datos={datos} encoding={encoding} format={format} />
+      {/* key: al cambiar de codificación se vuelve a montar y la animación corre de nuevo. */}
+      <Grafico
+        key={animate ? encoding : undefined}
+        datos={datos}
+        encoding={encoding}
+        format={format}
+        animate={animate}
+      />
 
       <table className="w-full border-collapse text-[13px]">
         <caption className="sr-only">{title}</caption>
@@ -120,7 +130,21 @@ function EncodingCompare({
 const ANCHO = 320;
 
 /** El gráfico es una vista de la tabla: aria-hidden, porque la tabla ya lo dice todo. */
-function Grafico({ datos, encoding, format }: { datos: Dato[]; encoding: Encoding; format: (v: number) => string }) {
+// Barras desde su borde izquierdo; círculos y sectores desde su centro.
+const CRECE_IZQ = "motion-safe:animate-lab-grow [transform-box:fill-box] [transform-origin:left_center]";
+const CRECE_CENTRO = "motion-safe:animate-lab-grow [transform-box:fill-box] [transform-origin:center]";
+
+function Grafico({
+  datos,
+  encoding,
+  format,
+  animate,
+}: {
+  datos: Dato[];
+  encoding: Encoding;
+  format: (v: number) => string;
+  animate: boolean;
+}) {
   if (encoding === "length") {
     const l = longitudes(datos);
     const fila = 28;
@@ -132,7 +156,7 @@ function Grafico({ datos, encoding, format }: { datos: Dato[]; encoding: Encodin
               width={Math.max(2, l[i] * (ANCHO - 64))}
               height={fila - 10}
               rx={3}
-              className="fill-lab-accent"
+              className={cn("fill-lab-accent", animate && CRECE_IZQ)}
               style={{ opacity: OPACIDAD[i] }}
             />
             <text x={l[i] * (ANCHO - 64) + 8} y={fila / 2 - 1} className="fill-lab-ink text-[12px]">
@@ -151,7 +175,11 @@ function Grafico({ datos, encoding, format }: { datos: Dato[]; encoding: Encodin
       <svg aria-hidden viewBox={`0 0 ${ANCHO} ${rMax * 2 + 22}`} className="w-full" data-marks="area">
         {datos.map((d, i) => (
           <g key={d.label} transform={`translate(${celda * i + celda / 2} ${rMax})`}>
-            <circle r={Math.max(1.5, r[i] * rMax)} className="fill-lab-accent" style={{ opacity: OPACIDAD[i] }} />
+            <circle
+              r={Math.max(1.5, r[i] * rMax)}
+              className={cn("fill-lab-accent", animate && CRECE_CENTRO)}
+              style={{ opacity: OPACIDAD[i] }}
+            />
             <text y={rMax + 16} textAnchor="middle" className="fill-lab-ink text-[12px]">
               {format(d.value)}
             </text>
@@ -168,7 +196,7 @@ function Grafico({ datos, encoding, format }: { datos: Dato[]; encoding: Encodin
           <path
             key={datos[i].label}
             d={trazoArco(80, 80, 72, 44, s.inicio, s.fin)}
-            className="fill-lab-accent stroke-lab-surface"
+            className={cn("fill-lab-accent stroke-lab-surface", animate && CRECE_CENTRO)}
             strokeWidth={2}
             style={{ opacity: OPACIDAD[i] }}
           />

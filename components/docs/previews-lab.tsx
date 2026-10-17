@@ -236,7 +236,7 @@ export const LAB_PREVIEWS: Record<string, () => ReactNode> = {
   "lab-encoding-compare": () => (
     <div className="grid w-full max-w-[420px] gap-[16px]">
       <EncodingCompare title="Pacientes por turno (ficticio)" data={TURNOS} />
-      <EncodingCompare title="Mismo dato, como arco" data={TURNOS} defaultEncoding="arc" />
+      <EncodingCompare title="Mismo dato, como arco (animate)" data={TURNOS} defaultEncoding="arc" animate />
     </div>
   ),
   "lab-signal-disclosure": () => (

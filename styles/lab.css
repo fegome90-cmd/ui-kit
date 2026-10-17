@@ -55,6 +55,16 @@
     }
   }
 
+  /* Las marcas crecen desde cero (Data GIF Maker, «Preview»: puntos a ~0,7 s, completas a ~1,75 s, leído en
+     cuadros; inferido). transform-box: fill-box en el elemento para que escale desde su propio origen. */
+  --animate-lab-grow: lab-grow 1.5s var(--ease-lab-out) both;
+
+  @keyframes lab-grow {
+    from {
+      transform: scale(0);
+    }
+  }
+
   @keyframes lab-marquee {
     to {
       transform: translateX(-50%);

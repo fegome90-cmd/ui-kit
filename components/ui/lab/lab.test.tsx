@@ -115,6 +115,15 @@ describe("EncodingCompare", () => {
     expect(onEncodingChange.mock.calls.map((c) => c[0])).toEqual(["area", "arc"]);
   });
 
+  it("animate hace crecer las marcas solo con motion-safe, desde su origen", () => {
+    const { container, rerender } = render(<EncodingCompare title="T" data={DATOS} />);
+    expect(container.querySelector("rect")?.getAttribute("class")).not.toContain("animate-lab-grow");
+    rerender(<EncodingCompare title="T" data={DATOS} animate />);
+    const cls = container.querySelector("rect")?.getAttribute("class") ?? "";
+    expect(cls).toContain("motion-safe:animate-lab-grow");
+    expect(cls).toContain("[transform-origin:left_center]");
+  });
+
   it("el gráfico es aria-hidden: la tabla es la fuente accesible", () => {
     const { container } = render(<EncodingCompare title="T" data={DATOS} />);
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");

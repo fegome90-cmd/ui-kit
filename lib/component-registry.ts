@@ -1213,11 +1213,18 @@ useGridShortcut(() => setOn((v) => !v));
       },
       { name: "onEncodingChange", type: "(e: Encoding) => void", description: "Aviso al cambiar." },
       { name: "format", type: "(v: number) => string", description: "Formato de valores (es-CL por defecto)." },
+      {
+        name: "animate",
+        type: "boolean",
+        default: "false",
+        description: "Las marcas crecen desde cero al aparecer y al cambiar (motion-safe).",
+      },
     ],
     status: "candidate",
     provenance: "inferred",
     notes: [
       "Mecanismo de Google Data GIF Maker (evidencia/2026-10-17-data-gif-maker); la interfaz es propia.",
+      "animate: en «Preview» las formas crecen desde cero (puntos a ~0,7 s, completas a ~1,75 s, leído en cuadros): 1,5 s inferido.",
       "Longitud y área comparan con el mayor; el arco muestra la parte del total. No responden la misma pregunta.",
       "Los ítems se distinguen por opacidad del acento: los más tenues no llegan a 3:1. La tabla lleva los valores.",
     ],

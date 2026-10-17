@@ -331,6 +331,15 @@ LAB_PREVIEWS["lab-process-steps"] = () => (
 LAB_PREVIEWS["lab-series-chart"] = () => (
   <div className="w-full max-w-[640px]">
     <SeriesChart title="Riesgo relativo por edad (ficticio)" x={EDADES} series={SERIES} highlight={["cv", "dm"]} />
+    <SeriesChart
+      className="mt-[24px]"
+      title="Con evento anotado y proyección (ficticio)"
+      x={["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago"]}
+      series={[{ id: "b", label: "Consultas", values: [12, 14, 13, 41, 22, 18, 19, 21] }]}
+      highlight={["b"]}
+      events={[{ at: 3, label: "Brote de influenza" }]}
+      projectedFrom={5}
+    />
   </div>
 );
 LAB_PREVIEWS["lab-distribution-chart"] = () => (

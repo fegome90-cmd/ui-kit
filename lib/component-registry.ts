@@ -1425,12 +1425,15 @@ useGridShortcut(() => setOn((v) => !v));
       { name: "series", type: "{ id; label; values: number[] }[]", description: "Todas las series." },
       { name: "highlight", type: "string[]", description: "Ids destacados (1 o 2)." },
       { name: "format", type: "(v: number) => string", description: "Formato de valores." },
+      { name: "events", type: "{ at: number; label: string }[]", description: "Hitos anotados (índice del eje x)." },
+      { name: "projectedFrom", type: "number", description: "Índice desde el que la serie es proyección (punteada)." },
     ],
     status: "candidate",
     provenance: "observed-image",
     notes: [
       "Mecanismo de BioAge (platform t02): dos series destacadas sobre muchas líneas tenues. SVG propio.",
       "El contexto no se rotula ni llega a 3:1: la tabla desplegable trae todas las series con sus valores.",
+      "events: el pico anotado de Searching for Birds. projectedFrom: real y proyectado, como en las ilustraciones de Greenlock.",
     ],
   },
   {

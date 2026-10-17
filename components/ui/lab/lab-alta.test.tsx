@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { HierarchyCells, valorNodo } from "./hierarchy-cells";
 import { RangeBars, textoRango } from "./range-bars";
+import { SeriesChart } from "./series-chart";
 import { TimeScale } from "./time-scale";
 
 describe("TimeScale", () => {
@@ -27,6 +28,31 @@ describe("TimeScale", () => {
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Hito 2014");
     await user.keyboard("{End}");
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Hito 2021");
+  });
+});
+
+describe("SeriesChart: eventos y proyección", () => {
+  const props = {
+    title: "Consultas",
+    x: ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+    series: [{ id: "a", label: "Consultas", values: [1, 2, 9, 3, 4, 5] }],
+    highlight: ["a"],
+  };
+  it("dibuja el evento y lo dice en texto", () => {
+    const { container } = render(<SeriesChart {...props} events={[{ at: 2, label: "Brote" }]} />);
+    expect(container.querySelectorAll("[data-marks=events] line")).toHaveLength(1);
+    expect(screen.getByRole("listitem")).toHaveTextContent("Mar: Brote");
+  });
+  it("proyección: tramo punteado desde el índice, avisado en texto y en la tabla", () => {
+    const { container } = render(<SeriesChart {...props} projectedFrom={4} />);
+    expect(container.querySelector("[data-proyeccion]")).toHaveAttribute("stroke-dasharray", "6 5");
+    expect(screen.getByText("Desde May: proyección (línea punteada).")).toBeInTheDocument();
+    expect(container.querySelector("thead")).toHaveTextContent("Jun (proy.)");
+    expect(container.querySelector("thead")).not.toHaveTextContent("May (proy.)");
+  });
+  it("sin proyección válida no hay tramo punteado", () => {
+    const { container } = render(<SeriesChart {...props} projectedFrom={0} />);
+    expect(container.querySelector("[data-proyeccion]")).toBeNull();
   });
 });
 

@@ -6,6 +6,11 @@ import { cn } from "@/lib/utils";
 // contexto. Observado en BioAge (platform t02: riesgo por edad, «Heart disease» y «Diabetes» destacadas
 // sobre muchas líneas tenues). Las destacadas llevan su nombre al final de la línea; el contexto no se
 // rotula, por eso la tabla (desplegable) trae todas las series. El gráfico es aria-hidden.
+// Dos mecanismos más, como props:
+//   events         hitos sobre el eje x con línea punteada y rótulo: el pico de «Snowy Owl» anotado en
+//                  Searching for Birds (evidencia/2026-10-17-searching-birds, t03). También van en texto.
+//   projectedFrom  desde ese índice la serie es proyección y se dibuja punteada (las ilustraciones de
+//                  Greenlock separan lo real de lo proyectado así). La tabla marca esas columnas.
 
 export interface Serie {
   id: string;
@@ -21,6 +26,10 @@ type SeriesChartProps = Omit<React.ComponentProps<"figure">, "children"> & {
   /** Ids de las series destacadas (1 o 2 se leen bien). */
   highlight: string[];
   format?: (v: number) => string;
+  /** Hitos anotados: índice del eje x y rótulo. */
+  events?: { at: number; label: string }[];
+  /** Índice desde el que los valores son proyección (se dibujan punteados). */
+  projectedFrom?: number;
 };
 
 const W = 640;
@@ -34,9 +43,18 @@ function SeriesChart({
   series,
   highlight,
   format = (v) => v.toLocaleString("es-CL"),
+  events = [],
+  projectedFrom,
   className,
   ...props
 }: SeriesChartProps) {
+  const pf =
+    projectedFrom !== undefined && projectedFrom > 0 && projectedFrom < x.length - 1 ? projectedFrom : undefined;
+  /** Tramo real continuo y, si hay proyección, tramo punteado que empieza donde termina el real. */
+  const trazos = (p: [number, number][]) =>
+    pf === undefined
+      ? { real: trazoSuave(p) }
+      : { real: trazoSuave(p.slice(0, pf + 1)), proy: trazoSuave(p.slice(pf)) };
   const [lo, hi] = extension(series.flatMap((s) => s.values));
   const ticks = marcasEje(Math.min(0, lo), hi, 4);
   const y = escala(ticks[0], ticks[ticks.length - 1], H - M.bottom, M.top);
@@ -65,9 +83,17 @@ function SeriesChart({
           ) : null,
         )}
         <g data-marks="context">
-          {contexto.map((s) => (
-            <path key={s.id} d={trazoSuave(puntos(s))} fill="none" strokeWidth={1} className="stroke-lab-context" />
-          ))}
+          {contexto.map((s) => {
+            const t = trazos(puntos(s));
+            return (
+              <g key={s.id}>
+                <path d={t.real} fill="none" strokeWidth={1} className="stroke-lab-context" />
+                {t.proy && (
+                  <path d={t.proy} fill="none" strokeWidth={1} strokeDasharray="4 4" className="stroke-lab-context" />
+                )}
+              </g>
+            );
+          })}
         </g>
         <g data-marks="highlight">
           {destacadas.map((s, k) => {
@@ -75,7 +101,17 @@ function SeriesChart({
             const fin = p[p.length - 1];
             return (
               <g key={s.id}>
-                <path d={trazoSuave(p)} fill="none" strokeWidth={2.5} stroke={COLOR[k % COLOR.length]} />
+                <path d={trazos(p).real} fill="none" strokeWidth={2.5} stroke={COLOR[k % COLOR.length]} />
+                {trazos(p).proy && (
+                  <path
+                    data-proyeccion
+                    d={trazos(p).proy}
+                    fill="none"
+                    strokeWidth={2.5}
+                    strokeDasharray="6 5"
+                    stroke={COLOR[k % COLOR.length]}
+                  />
+                )}
                 <circle cx={fin[0]} cy={fin[1]} r={3.5} fill={COLOR[k % COLOR.length]} />
                 <text x={fin[0] + 8} y={fin[1] + 4} className="fill-lab-ink text-[12px] font-semibold">
                   {s.label}
@@ -84,9 +120,39 @@ function SeriesChart({
             );
           })}
         </g>
+        <g data-marks="events">
+          {events.map((ev) => (
+            <g key={`${ev.at}-${ev.label}`}>
+              <line
+                x1={sx(ev.at)}
+                x2={sx(ev.at)}
+                y1={M.top}
+                y2={H - M.bottom}
+                strokeDasharray="3 3"
+                strokeWidth={1}
+                className="stroke-lab-ink"
+              />
+              <text x={sx(ev.at) + 6} y={M.top + 10} className="fill-lab-ink text-[11px] font-semibold">
+                {ev.label}
+              </text>
+            </g>
+          ))}
+        </g>
       </svg>
+      {(events.length > 0 || pf !== undefined) && (
+        <ul className="m-0 grid list-none gap-[2px] p-0 text-[12px] text-lab-muted">
+          {events.map((ev) => (
+            <li key={`${ev.at}-${ev.label}`}>
+              {x[ev.at]}: <strong className="text-lab-ink">{ev.label}</strong>
+            </li>
+          ))}
+          {pf !== undefined && <li>Desde {x[pf]}: proyección (línea punteada).</li>}
+        </ul>
+      )}
       <details className="text-[13px] text-lab-ink">
-        <summary className="cursor-pointer text-lab-muted">Ver datos ({series.length} series)</summary>
+        <summary className="cursor-pointer text-lab-muted">
+          Ver datos ({series.length} {series.length === 1 ? "serie" : "series"})
+        </summary>
         <div className="overflow-x-auto">
           <table className="mt-[8px] w-full border-collapse">
             <caption className="sr-only">{title}</caption>
@@ -95,9 +161,10 @@ function SeriesChart({
                 <th scope="col" className="py-[4px] text-left font-medium text-lab-muted">
                   Serie
                 </th>
-                {x.map((e) => (
+                {x.map((e, i) => (
                   <th key={String(e)} scope="col" className="py-[4px] text-right font-medium text-lab-muted">
                     {e}
+                    {pf !== undefined && i > pf ? " (proy.)" : ""}
                   </th>
                 ))}
               </tr>

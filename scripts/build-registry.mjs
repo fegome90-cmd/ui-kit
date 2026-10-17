@@ -43,6 +43,7 @@ const THEMES = {
       '@import "../styles/rea.css";',
     ],
   },
+  Lab: { css: ["styles/lab.css"], deps: [], imports: ['@import "../styles/lab.css";'] },
 };
 
 const themeName = (family) => `${family.toLowerCase()}-tokens`;
@@ -68,6 +69,11 @@ const LIB_ITEMS = {
     name: "rea-utils",
     title: "Utilidades REA",
     description: "Búsqueda sin tildes, pad2 y clamp.",
+  },
+  "lib/lab/encodings.ts": {
+    name: "lab-encodings",
+    title: "Codificaciones Lab",
+    description: "Longitud, área (radio por raíz) y arco (parte del total) para comparar magnitudes.",
   },
   "lib/rea/use-reduced-motion.ts": {
     name: "rea-use-reduced-motion",

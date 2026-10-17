@@ -55,7 +55,7 @@ export const statusOf = (c: ComponentDoc): Status => c.status ?? "stable";
 export const provenanceOf = (c: ComponentDoc): Provenance => c.provenance ?? "source-code";
 
 /** Origen del componente. Cada familia trae su propio sistema de estilos. */
-export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA"] as const;
+export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA", "Lab"] as const;
 export type Family = (typeof FAMILIES)[number];
 
 /** Tipos de componente. El banco se navega por tipo; la familia es una etiqueta y un filtro. */
@@ -65,7 +65,10 @@ export const CATEGORIES = [
   "Navegación",
   "Barra de herramientas",
   "Indicadores",
+  "Gráficos",
+  "Revelación",
   "Superficies",
+  "Fondos",
   "Tipografía",
   "Movimiento",
   "Iconografía",
@@ -1103,6 +1106,139 @@ useGridShortcut(() => setOn((v) => !v));
         description: "{ id, title, category, collection, meta?, keywords?, details, code }.",
       },
       { name: "onCopyResult", type: "(ok: boolean) => void", description: "Resultado de copiar el código." },
+    ],
+  },
+
+  // ---------- Lab (tokens --lab-* bajo .lab; investigación de señales y magnitudes) ----------
+  {
+    slug: "lab-presence-dot",
+    family: "Lab",
+    name: "Punto de presencia",
+    category: "Indicadores",
+    description:
+      "Dice que hay algo, no cuánto ni qué tan grave. Anillos fijos opcionales y pulso solo con motion-safe.",
+    files: ["components/ui/lab/presence-dot.tsx", "lib/utils.ts"],
+    usage: `<PresenceDot label="Hay notas nuevas" rings={2} />
+<PresenceDot label="En curso" pulse />`,
+    props: [
+      {
+        name: "label",
+        type: "string",
+        description: "Qué significa. Sin etiqueta, el punto es decorativo (aria-hidden).",
+      },
+      { name: "rings", type: "0 | 1 | 2", default: "0", description: "Anillos concéntricos fijos." },
+      { name: "pulse", type: "boolean", default: "false", description: "Pulso; no corre con movimiento reducido." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "8, 12 o 16 px." },
+      { name: "tone", type: '"accent" | "muted"', default: '"accent"', description: "Color del punto." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Reconstruido desde los marcadores del mapa de Voices from the Frontlines (evidencia/2026-10-17-voices-frontlines).",
+      "El pulso no se observó: las capturas van sin animación. Validar que no se lea como alarma ni como gravedad.",
+      "Un punto solo codifica presencia: no usarlo para cantidad, categoría ni estado en la misma interfaz.",
+    ],
+  },
+  {
+    slug: "lab-stat-ring",
+    family: "Lab",
+    name: "Cifra en anillo",
+    category: "Gráficos",
+    description: "Una cifra total dentro de un anillo cerrado, con su explicación debajo. El anillo enmarca, no mide.",
+    files: ["components/ui/lab/stat-ring.tsx", "lib/utils.ts"],
+    usage: `<StatRing value="2B" caption="Personas con enfermedad cardiometabólica" />`,
+    props: [
+      { name: "value", type: "string", description: "La cifra tal como se muestra." },
+      { name: "caption", type: "string", description: "Qué cuenta la cifra." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "88, 120 o 156 px." },
+      { name: "tone", type: '"neutral" | "accent"', default: '"neutral"', description: "Borde neutro o de acento." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Reconstruido desde las cifras de BioAge (evidencia/2026-10-17-bioage, platform t02); medidas inferidas.",
+      "Riesgo: un anillo puede leerse como porcentaje. Por eso va siempre cerrado; validar con usuarios.",
+    ],
+  },
+  {
+    slug: "lab-encoding-compare",
+    family: "Lab",
+    name: "Comparador de codificaciones",
+    category: "Gráficos",
+    description:
+      "La misma tabla como longitud, área o arco, con la tabla siempre visible para comparar qué se lee mejor.",
+    files: ["components/ui/lab/encoding-compare.tsx", "lib/lab/encodings.ts", "lib/utils.ts"],
+    usage: `<EncodingCompare
+  title="Pacientes por turno"
+  data={[{ label: "Mañana", value: 12 }, { label: "Tarde", value: 9 }, { label: "Noche", value: 4 }]}
+/>`,
+    props: [
+      { name: "data", type: "{ label: string; value: number }[]", description: "De 1 a 5 datos; etiquetas únicas." },
+      { name: "title", type: "string", description: "Título del gráfico y de la tabla." },
+      {
+        name: "encoding / defaultEncoding",
+        type: '"length" | "area" | "arc"',
+        default: '"length"',
+        description: "Controlado o no.",
+      },
+      { name: "onEncodingChange", type: "(e: Encoding) => void", description: "Aviso al cambiar." },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores (es-CL por defecto)." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Mecanismo de Google Data GIF Maker (evidencia/2026-10-17-data-gif-maker); la interfaz es propia.",
+      "Longitud y área comparan con el mayor; el arco muestra la parte del total. No responden la misma pregunta.",
+      "Los ítems se distinguen por opacidad del acento: los más tenues no llegan a 3:1. La tabla lleva los valores.",
+    ],
+  },
+  {
+    slug: "lab-signal-disclosure",
+    family: "Lab",
+    name: "Señal con detalle",
+    category: "Revelación",
+    description: "Señal y título siempre visibles; el detalle se abre con clic o teclado y sigue en el DOM.",
+    files: ["components/ui/lab/signal-disclosure.tsx", "components/ui/lab/presence-dot.tsx", "lib/utils.ts"],
+    usage: `<SignalDisclosure title="Indicaciones nuevas" summary="2 desde el último turno">
+  Ajuste de dosis de las 14:00 y control de glicemia cada 6 h.
+</SignalDisclosure>`,
+    props: [
+      { name: "title", type: "ReactNode", description: "Qué hay detrás." },
+      { name: "summary", type: "ReactNode", description: "Una línea visible también cerrado." },
+      { name: "signal", type: "ReactNode", description: "Señal a la izquierda; por defecto un punto decorativo." },
+      { name: "open / defaultOpen", type: "boolean", default: "false", description: "Controlado o no." },
+      { name: "onOpenChange", type: "(open: boolean) => void", description: "Aviso al abrir o cerrar." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo del FAQ de Paradigm y la lista con panel de Meridian (evidencia/2026-10-17-{paradigm,meridian-ai}).",
+      "La expansión por hover de «Additional Information» solo está en video: no se reprodujo. Nunca abre solo con hover.",
+      "Validar qué no debe ocultarse nunca: un dato crítico no va detrás de una revelación.",
+    ],
+  },
+  {
+    slug: "lab-backdrop",
+    family: "Lab",
+    name: "Fondo con resplandor",
+    category: "Fondos",
+    description: "Superficie con un único resplandor del acento y viñeta. Decorativo: nunca codifica información.",
+    files: ["components/ui/lab/lab-backdrop.tsx", "lib/utils.ts"],
+    usage: `<LabBackdrop tone="deep" glow="corner" className="p-8">…</LabBackdrop>`,
+    props: [
+      { name: "tone", type: '"soft" | "deep"', default: '"soft"', description: "Fondo claro u oscuro." },
+      {
+        name: "glow",
+        type: '"none" | "corner" | "center"',
+        default: '"corner"',
+        description: "Dónde cae el resplandor.",
+      },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Motivo de BioAge (fondo con un solo acento, evidencia/2026-10-17-bioage), rehecho con los tokens de Lab.",
+      "Revisar el contraste del texto sobre el resplandor en cada tono antes de pasar a stable.",
     ],
   },
 ];

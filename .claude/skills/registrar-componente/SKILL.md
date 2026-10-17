@@ -1,6 +1,6 @@
 ---
 name: registrar-componente
-description: Da de alta (o actualiza) un componente o bloque en el banco de ui-kit con sus tres piezas obligatorias (archivo en components/, entrada en lib/component-registry.ts con status y provenance, y vista previa más miniatura) y lo deja instalable por el registry shadcn. Úsala al agregar, portar o mover un componente de cualquier familia (REMI, Ninja, Kraa, REA) o al cambiar su madurez o su procedencia.
+description: Da de alta (o actualiza) un componente o bloque en el banco de ui-kit con sus tres piezas obligatorias (archivo en components/, entrada en lib/component-registry.ts con status y provenance, y vista previa más miniatura) y lo deja instalable por el registry shadcn. Úsala al agregar, portar o mover un componente de cualquier familia (REMI, Ninja, Kraa, REA, Lab) o al cambiar su madurez o su procedencia.
 ---
 
 # Registrar un componente en el banco
@@ -33,7 +33,7 @@ Si la procedencia o los derechos no están claros, pregúntale al usuario antes 
 
 - Va en `components/ui/<familia>/<nombre>.tsx` (primitivo) o en `components/blocks/<familia>/<nombre>.tsx`
   (composición).
-- Usa los tokens de su familia. Ninja usa los tokens globales de shadcn; REMI, Kraa y REA usan sus tokens con
+- Usa los tokens de su familia. Ninja usa los tokens globales de shadcn; REMI, Kraa, REA y Lab usan sus tokens con
   prefijo o valores arbitrarios (`rounded-[0.75rem]`, `max-[960px]:`), nunca `rounded-xl`, `md:` ni `font-sans`.
 - Si agregas un tamaño `--text-*` al tema, regístralo en `extendTailwindMerge` (`lib/utils.ts`). Si no,
   `tailwind-merge` lo descarta.
@@ -69,10 +69,11 @@ En `lib/component-registry.ts`, dentro del bloque de su familia (los comentarios
 
 ## 3. Vista previa y miniatura
 
-- REA va en `components/docs/previews-rea.tsx` (`REA_PREVIEWS` y `REA_THUMBS`). El resto va en
+- REA va en `components/docs/previews-rea.tsx` (`REA_PREVIEWS` y `REA_THUMBS`) y Lab en
+  `components/docs/previews-lab.tsx` (`LAB_PREVIEWS` y `LAB_THUMBS`). El resto va en
   `components/docs/previews.tsx` (`PREVIEWS` y `THUMBS`), bajo el comentario de su familia.
 - La clave es el `slug`. `FamilyScope` ya envuelve en el contenedor de la familia (`.remi`, `KraaProvider`,
-  `ReaProvider`), así que no lo repitas.
+  `ReaProvider`, `.lab`), así que no lo repitas.
 - La vista previa muestra cada variante o estado que declares. La miniatura es una sola instancia chica: va con
   `inert`, sin interacción.
 

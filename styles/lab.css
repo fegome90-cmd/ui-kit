@@ -1,0 +1,51 @@
+/* Lab: familia neutra para la investigación de señales, magnitudes y revelación (Awwwards 2026-10,
+   evidencia en evidencia/2026-10-17-*). No copia la estética de ninguna fuente: tokens mínimos para
+   que lo que se compare sea el mecanismo, no el estilo. Los tokens viven en .lab para que un
+   contenedor pueda cambiarlos (por ejemplo, el acento). */
+
+@theme inline {
+  --color-lab-bg: var(--lab-bg);
+  --color-lab-surface: var(--lab-surface);
+  --color-lab-ink: var(--lab-ink);
+  --color-lab-muted: var(--lab-muted);
+  --color-lab-line: var(--lab-line);
+  --color-lab-accent: var(--lab-accent);
+  --color-lab-accent-soft: var(--lab-accent-soft);
+  --color-lab-context: var(--lab-context);
+}
+
+@theme {
+  --font-lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-lab-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Pulso de presencia: un anillo que se expande y se apaga. Solo con motion-safe. */
+  --animate-lab-pulse: lab-pulse 2s var(--ease-lab-out) infinite;
+
+  @keyframes lab-pulse {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+}
+
+.lab {
+  /* Un solo acento con un solo significado: «esto es lo que importa aquí». */
+  --lab-bg: #f6f7f9;
+  --lab-surface: #ffffff;
+  --lab-ink: #14171c;
+  --lab-muted: #5b6270; /* 6,1:1 sobre --lab-surface */
+  --lab-line: #dfe3ea;
+  --lab-accent: #1d5bd8; /* 5,9:1 sobre --lab-surface; 5,0:1 sobre --lab-accent-soft */
+  --lab-accent-soft: #e3ecfd;
+  --lab-context: #b9c0cc; /* 1,8:1: solo contexto atenuado, nunca texto ni la única forma de leer un dato */
+
+  font-family: var(--font-lab-sans);
+  color: var(--lab-ink);
+  font-variant-numeric: tabular-nums;
+}

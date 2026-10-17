@@ -5,10 +5,10 @@ Sigue el estilo shadcn: el código vive en el repo y se copia o importa, no es u
 
 ## Tipos y familias
 
-El banco se navega **por tipo de componente**: acciones, formularios, navegación, indicadores, superficies,
-tipografía, movimiento, iconografía, bloques y tema (`CATEGORIES` en `lib/component-registry.ts`). La familia dice
-de qué sistema de estilos viene cada pieza y sirve de filtro en el índice. Cada familia conserva su propio sistema
-de estilos; conviven sin pisarse.
+El banco se navega **por tipo de componente**: acciones, formularios, navegación, indicadores, gráficos,
+revelación, superficies, fondos, tipografía, movimiento, iconografía, bloques y tema (`CATEGORIES` en
+`lib/component-registry.ts`). La familia dice de qué sistema de estilos viene cada pieza y sirve de filtro en el
+índice. Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
 
 | Familia | Origen | Estilos | Contenedor |
 |---|---|---|---|
@@ -16,6 +16,7 @@ de estilos; conviven sin pisarse.
 | Ninja | `ninja-ui` v3 | Tailwind v4 + Radix + `cva`, tokens en `styles/ninja.css` | ninguno (`:root`) |
 | Kraa | `kraa-component-bank` v0.1.1 | Tailwind v4 + `cva` + `cn()` + Radix, tema en `styles/kraa-theme.css` | `KraaProvider` (`.kraa-theme`) |
 | REA | `REA_Atlas_completo_v4` (2026-10-16) | Tailwind v4 + `cva` + `cn()`, tema en `styles/rea.css` | `ReaProvider` (`.rea-theme`) |
+| Lab | Investigación propia de señales, magnitudes y revelación (2026-10-17) | Tailwind v4 + `cva` + `cn()`, tokens neutros en `styles/lab.css` | `.lab` |
 
 - **REMI** solo trae lo genérico. Se quedaron en el monitor el punto de pendientes, el diálogo de escala,
   las indicaciones, los indicadores clínicos y `lib/pending`. Las medidas son las del monitor a
@@ -27,13 +28,16 @@ de estilos; conviven sin pisarse.
   referencias están en `docs/origen/rea-atlas/`.
 - **Ninja** se copió tal cual: solo cambiaron las rutas de import, el formato (Biome) y los ajustes de lint que
   se anotan junto al código.
+- **Lab** es para comparar mecanismos, no estilos: tokens neutros y un solo acento con un solo significado. Sus
+  piezas salen de capturas de referencias de Awwwards con la skill `capturar-diseno` y son todas `candidate`.
+  Ninguna está validada para uso clínico.
 - **Kraa** conserva su API y sus valores, pero las clases CSS propias pasaron a utilidades de Tailwind. Su `cx()`
   se reemplazó por `cn()`, y se agregaron `KraaSelect` y `KraaAvatar` en lugar de `.kraa-select` y `.kraa-avatar`.
   Los READMEs originales están en `docs/origen/`.
 
 ## Convención (estilo shadcn)
 
-Las cuatro familias siguen la convención.
+Las cinco familias siguen la convención.
 
 - **Componentes con utilidades de Tailwind**: variantes con `cva`, clases combinadas con `cn()` (`lib/utils.ts`),
   `data-slot` en la raíz y exportaciones con nombre. El código vive en el repo, no en un paquete.
@@ -52,11 +56,11 @@ Las cuatro familias siguen la convención.
 
 ```
 app/                      layout, estilos globales y páginas del banco (/componentes)
-components/ui/{remi,ninja,kraa,rea}/   componentes por familia
+components/ui/{remi,ninja,kraa,rea,lab}/   componentes por familia
 components/blocks/{ninja,kraa,rea}/    composiciones
 components/docs/          navegación, pestañas y vistas previas del banco
 lib/component-registry.ts registro: una entrada por componente (genera su página)
-lib/kraa/, lib/rea/       modelo y utilidades de Kraa y REA
+lib/kraa/, lib/rea/, lib/lab/   modelo y utilidades de Kraa, REA y Lab
 lib/demo/                 datos ficticios para las vistas previas
 styles/                   CSS de cada familia y fuentes de muestra
 ```
@@ -65,7 +69,8 @@ styles/                   CSS de cada familia y fuentes de muestra
 
 1. Créalo en `components/ui/<familia>/` (o en `components/blocks/<familia>/`).
 2. Regístralo en `lib/component-registry.ts`.
-3. Agrega su vista previa y su miniatura en `components/docs/previews.tsx`.
+3. Agrega su vista previa y su miniatura en `components/docs/previews.tsx` (REA en `previews-rea.tsx`, Lab en
+   `previews-lab.tsx`).
 
 Si falta alguno de los tres pasos, los tests fallan: un módulo sin entrada en el registro, o una entrada sin
 vista previa, no pasa.
@@ -138,6 +143,9 @@ fuentes ni material de referencia de terceros:
   `rights: review-required`. La autoridad de marca es `fegome90-cmd/falp-brand-system`.
 - **REMI**: componentes genéricos del prototipo REMI, con medidas tomadas de capturas de un monitor de
   enfermería. Solo datos ficticios; no es para uso clínico.
+- **Lab**: reconstrucciones propias, sin código ni assets de los originales, a partir de capturas de BioAge,
+  Voices from the Frontlines (CLEVER°FRANKE), Meridian AI, Paradigm Solutions y Google Data GIF Maker, encontrados
+  en Awwwards. La evidencia (capturas y hashes) queda fuera de git, en `evidencia/`.
 - **Fuentes**: Inter (SIL OFL 1.1, `docs/origen/OFL-Inter.txt`) en Kraa. Hanken Grotesk, Geist, Geist Mono y
   las tipografías de muestra de Ninja vienen de Fontsource (OFL).
 

@@ -7,6 +7,7 @@ const FAMILY_NOTES: Record<Family, string> = {
   Ninja: "Estilo shadcn: Tailwind v4 + Radix + cva. Los tokens están en styles/ninja.css.",
   Kraa: "Tailwind + cva + cn() con tokens --kraa-* y Radix. Todo va dentro de KraaProvider (.kraa-theme).",
   REA: "Patrones de REA Atlas en React con Tailwind + cva + cn() y tokens --rea-*. Todo va dentro de ReaProvider (.rea-theme).",
+  Lab: "Investigación de señales, magnitudes y revelación. Tokens neutros --lab-* bajo .lab, para comparar mecanismos y no estilos.",
 };
 
 export default function ComponentesIndex() {

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "rea-design-library-reference",
+  "homepage": "https://example.org/rea-design-library-reference",
+  "items": [
+    {
+      "name": "slide-navigator",
+      "type": "registry:ui",
+      "title": "SlideNavigator",
+      "description": "Navegación accesible para diapositivas; ejemplo de implementación, pendiente de comparación 1:1.",
+      "categories": ["navigation", "presentation"],
+      "files": [
+        {
+          "path": "src/components/slide-navigator/slide-navigator.tsx",
+          "type": "registry:ui",
+          "target": "@ui/slide-navigator/slide-navigator.tsx"
+        },
+        {
+          "path": "src/components/slide-navigator/slide-navigator.css",
+          "type": "registry:ui",
+          "target": "@ui/slide-navigator/slide-navigator.css"
+        }
+      ],
+      "meta": {
+        "catalogId": "falp.presentations.slide-navigator",
+        "verification": "candidate",
+        "rights": "review-required"
+      }
+    }
+  ]
+}

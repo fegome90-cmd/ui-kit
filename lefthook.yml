@@ -1,0 +1,23 @@
+# Hooks de git locales (CI local). Se instalan solos con `npm install` (script "prepare").
+# Saltar en una emergencia: LEFTHOOK=0 git commit ...  (queda a criterio; el pre-push vuelve a revisar todo)
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      # Formatea y corrige lo seguro en los archivos en stage, y los vuelve a agregar.
+      glob: "*.{js,mjs,ts,tsx,json,css}"
+      run: npx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: typecheck
+      glob: "*.{ts,tsx}"
+      run: npm run -s typecheck
+    - name: tests-relacionados
+      glob: "*.{ts,tsx}"
+      # Solo los tests afectados por los archivos en stage (rápido).
+      run: NODE_ENV=test npx vitest related --run --passWithNoTests {staged_files}
+
+pre-push:
+  jobs:
+    - name: ci-completo
+      run: npm run -s ci

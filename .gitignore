@@ -1,0 +1,36 @@
+# dependencias
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# varios
+.DS_Store
+*.pem
+npm-debug.log*
+
+# env (solo se versiona el ejemplo)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# generado por scripts/gen-sources.mjs
+/lib/generated/
+
+# tests
+/coverage/
+/test-results/
+/playwright-report/
+
+# estado local de herramientas de agentes
+/.pi/
+/.codegraph/
+/_ctx/
+/ANCHOR.yaml
+/.mimosa/

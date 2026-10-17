@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "rea.motion.card-hover-lift",
+  "description": "Receta propia de ejemplo; NO extraída ni verificada contra FALP.",
+  "origin": "authored",
+  "trigger": "pointerenter",
+  "states": { "from": "rest", "to": "hover" },
+  "keyframes": [
+    { "offset": 0, "transform": "translateY(0px)" },
+    { "offset": 1, "transform": "translateY(-3px)" }
+  ],
+  "timing": { "durationToken": "motion.duration.fast", "easingToken": "motion.easing.out" },
+  "reducedMotion": { "strategy": "disable-transform", "fallback": "border-emphasis" },
+  "evidence": [],
+  "verification": "illustrative"
+}

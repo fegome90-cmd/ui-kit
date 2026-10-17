@@ -1,0 +1,280 @@
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Tokens extraídos de la página de referencia (estilos computados).
+ * Fuente original: Aeonik (comercial). Si tienes licencia, cárgala y
+ * quedará primera en --font-sans; si no, se usa Hanken Grotesk.
+ */
+:root {
+  --radius: 2rem; /* 32px — tarjetas y paneles */
+
+  --background: #f7f6f6; /* fondo de página */
+  --foreground: #121212; /* texto principal */
+  --card: #ffffff;
+  --card-foreground: #121212;
+  --popover: #ffffff;
+  --popover-foreground: #121212;
+  --primary: #ee585a; /* coral: CTA, links, sliders */
+  --primary-foreground: #fefefe;
+  --primary-hover: #e04a4c;
+  --secondary: #ffffff;
+  --secondary-foreground: #121212;
+  --muted: #d7d7db; /* tracks, switches apagados */
+  --muted-foreground: #8e8e93; /* nav inactivo, footer */
+  --accent: #faf9f5; /* crema */
+  --accent-foreground: #121212;
+  --destructive: #d93b3d;
+  --border: #d7d7db;
+  --input: #d7d7db;
+  --ring: #ee585a;
+
+  --shadow-soft: 0 2px 32px 0 rgb(72 72 74 / 0.16); /* header, tiles */
+  --shadow-float: 0 2px 80px 0 rgb(72 72 74 / 0.16); /* paneles flotantes */
+}
+
+/*
+ * Variante opcional que cumple WCAG AA (4.5:1). El coral y el gris del
+ * original no llegan: blanco sobre #EE585A = 3.4:1, #8E8E93 sobre fondo = 3.0:1.
+ * Aplica la clase "theme-aa" en <html> o en un contenedor.
+ */
+.theme-aa {
+  --primary: #c93538; /* 5.1:1 con texto blanco */
+  --primary-hover: #b02e31;
+  --ring: #c93538;
+  --muted-foreground: #6b6b70; /* ≥ 4.5:1 sobre #F7F6F6 */
+}
+
+.dark {
+  --background: #0e0e0e;
+  --foreground: #f7f6f6;
+  --card: #1a1a1a;
+  --card-foreground: #f7f6f6;
+  --popover: #1a1a1a;
+  --popover-foreground: #f7f6f6;
+  --primary: #ee585a;
+  --primary-foreground: #fefefe;
+  --primary-hover: #e04a4c;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #f7f6f6;
+  --muted: #3a3a3c;
+  --muted-foreground: #8e8e93;
+  --accent: #232321;
+  --accent-foreground: #f7f6f6;
+  --border: #3a3a3c;
+  --input: #3a3a3c;
+  --ring: #ee585a;
+  --shadow-soft: 0 2px 32px 0 rgb(0 0 0 / 0.5);
+  --shadow-float: 0 2px 80px 0 rgb(0 0 0 / 0.6);
+}
+
+@theme inline {
+  --font-sans: "Aeonik", "Hanken Grotesk Variable", Arial, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: 0.75rem; /* 12px */
+  --radius-md: 1rem; /* 16px — tiles */
+  --radius-lg: 1.5rem; /* 24px — botones */
+  --radius-xl: var(--radius); /* 32px — tarjetas/paneles */
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-float: var(--shadow-float);
+
+  /* Escala tipográfica observada */
+  --text-display: 2.75rem; /* 44px / 400 / -0.5px */
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.5px;
+  --text-nav: 1.5rem; /* 24px / 500 */
+  --text-nav--line-height: 1.15;
+
+  /* Movimiento — curvas medidas en el original (transition computada) */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1); /* contenido de tarjetas, burger */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1); /* colores, hover de iconos/botones */
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1); /* panel flotante, tooltips */
+  --ease-back: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* botón flotante que se esconde */
+
+  --animate-panel-in: panel-in 0.4s var(--ease-in-out-quart) both;
+  --animate-panel-out: panel-out 0.4s var(--ease-in-out-quart) both;
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(calc(100% + 24px));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes panel-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(calc(100% + 24px));
+    }
+  }
+
+  /* Menú desplegable: fade 200ms ease-in-out-quart (medido) */
+  --animate-menu-in: menu-in 0.2s var(--ease-in-out-quart) both;
+  --animate-menu-out: menu-out 0.2s var(--ease-in-out-quart) both;
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes menu-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* Breakpoints del original (mobile-first) */
+  --breakpoint-sm: 744px;
+  --breakpoint-md: 1020px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1440px;
+  --breakpoint-2xl: 1920px;
+}
+
+/*
+ * Título animado (AnimatedHeadline). El original lo dibuja con un shader;
+ * aquí se aproxima con CSS: cada letra cambia de tipografía con un retraso
+ * escalonado, pasando por cortes horizontales tipo glitch y un "eco" coral.
+ */
+@keyframes glyph-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0;
+  }
+  20% {
+    opacity: 1;
+    clip-path: inset(10% 0 55% 0);
+    translate: -4% 0;
+  }
+  40% {
+    clip-path: inset(45% 0 20% 0);
+    translate: 5% 0;
+  }
+  60% {
+    clip-path: inset(0 0 35% 0);
+    translate: -2% 0;
+  }
+  80% {
+    clip-path: inset(25% 0 0 0);
+    translate: 2% 0;
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+  }
+}
+@keyframes glyph-out {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    translate: 0 0;
+  }
+  30% {
+    clip-path: inset(40% 0 0 0);
+    translate: 4% 0;
+  }
+  60% {
+    clip-path: inset(70% 0 5% 0);
+    translate: -5% 0;
+  }
+  100% {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    translate: 0 0;
+  }
+}
+@keyframes glyph-ghost {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  25% {
+    opacity: 1;
+    translate: -7% 4%;
+  }
+  70% {
+    opacity: 0.8;
+    translate: -3% 2%;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+.glyph-in {
+  animation: glyph-in var(--glyph-dur, 520ms) steps(5, jump-end) both;
+  animation-delay: calc(var(--i) * var(--glyph-stagger, 45ms));
+}
+.glyph-out {
+  animation: glyph-out var(--glyph-dur, 520ms) steps(4, jump-end) both;
+  animation-delay: calc(var(--i) * var(--glyph-stagger, 45ms));
+}
+.glyph-ghost {
+  animation: glyph-ghost calc(var(--glyph-dur, 520ms) * 1.4) var(--ease-out-quart) both;
+  animation-delay: calc(var(--i) * var(--glyph-stagger, 45ms));
+}
+
+/* Duraciones medidas: 250ms (color), 400ms (layout), 130ms (fade rápido), 800ms (burger) */
+:root {
+  --duration-color: 250ms;
+  --duration-move: 400ms;
+  --duration-fade: 130ms;
+  --duration-burger: 800ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.15;
+  }
+}

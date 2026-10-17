@@ -1,0 +1,722 @@
+/* Extraído una vez de los estilos del monitor REMI (globals.css + ui-kit.css) con
+   scripts/extract-remi-css.mjs. Desde aquí se mantiene a mano. Medidas originales a 1920×1080. */
+.remi {
+  --remi-brand: #0073c4;
+  --remi-dark: #1b1b1b;
+  --remi-panel: #e3ebf2;
+  --remi-blue: #0073c7;
+  --remi-muted: #6b7480;
+  --remi-line: #d8dfe6;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111;
+  font-size: 12px;
+}
+.remi * {
+  box-sizing: border-box;
+}
+.remi button,
+.remi input,
+.remi select {
+  font: inherit;
+}
+.remi button {
+  cursor: pointer;
+}
+.remi button:focus-visible,
+.remi a:focus-visible,
+.remi input:focus-visible,
+.remi select:focus-visible,
+.remi [tabindex]:focus-visible {
+  outline: 3px solid #e89000;
+  outline-offset: 2px;
+}
+.remi a {
+  color: inherit;
+}
+.remi .filter-cell {
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 227px;
+  min-width: 0;
+}
+.remi .filter-cell:nth-child(3) {
+  width: 229px;
+}
+.remi .filter-cell:nth-child(4) {
+  width: 228px;
+}
+.remi .filter-cell input,
+.remi .filter-cell select {
+  height: 22px;
+  width: 100%;
+  border: 1px solid #a4b8ce;
+  background: #fff;
+  color: #516b8a;
+  border-radius: 1px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+}
+.remi .filter-cell select {
+  font-style: italic;
+  padding: 0 5px;
+}
+.remi .filter-cell input::placeholder {
+  color: #5976af;
+}
+.remi .switch-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 9px;
+  min-height: 24px;
+  white-space: nowrap;
+  font-size: 11px;
+  cursor: pointer;
+}
+.remi .switch-field input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.remi .switch-field input:focus-visible + .switch-track {
+  outline: 3px solid #e89000;
+  outline-offset: 2px;
+}
+.remi .switch-track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #cfe3f5;
+  width: 54px;
+  height: 24px;
+  border-radius: 20px;
+  padding: 0 4px;
+  transition: background 0.15s;
+}
+.remi .switch-thumb {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.remi .switch-text {
+  font-size: 9px;
+  color: #fff;
+  font-style: italic;
+}
+.remi .switch-field input:checked + .switch-track {
+  background: #0788dc;
+  justify-content: flex-start;
+}
+.remi .switch-field input:checked + .switch-track .switch-thumb {
+  transform: translateX(30px);
+}
+.remi .blue-button {
+  background: #006fc5;
+  color: white;
+  border: 1px solid #0065af;
+  font-weight: 600;
+  min-width: 69px;
+  min-height: 24px;
+  padding: 2px 13px;
+  border-radius: 0;
+}
+.remi .blue-button:hover {
+  background: #005da9;
+}
+.remi .update-time {
+  font-size: 15px;
+}
+.remi .status-triangle {
+  font-size: 19px;
+  color: #22d227;
+  margin-right: 7px;
+}
+.remi .tool-buttons {
+  position: absolute;
+  right: 9px;
+  top: 2px;
+  display: flex;
+  border-radius: 20px;
+  background: #057ad9;
+  padding: 3px 6px;
+  gap: 10px;
+}
+.remi .tool-buttons button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: white;
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+}
+.remi .tool-buttons button:hover {
+  background: #005caa;
+  border-radius: 4px;
+}
+.remi .tool-buttons svg,
+.remi .tool-buttons path {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.remi .mini-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  vertical-align: middle;
+  min-height: 25px;
+  min-width: 25px;
+  color: inherit;
+}
+.remi .mini-button:hover {
+  filter: brightness(0.88);
+}
+.remi .mini-button:focus-visible {
+  outline-offset: 0;
+}
+.remi .mini-button svg {
+  width: 23px;
+  height: 23px;
+  display: block;
+}
+.remi .icon-text {
+  font-size: 21px;
+  font-weight: 700;
+}
+.remi .qr {
+  width: 23px;
+  height: 23px;
+  color: #111;
+  display: inline-block;
+}
+.remi .qr rect {
+  fill: currentColor;
+}
+.remi .attend-button:hover {
+  background: #005ba6;
+}
+.remi .visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 790px) {
+  .remi .switch-field {
+    margin: 7px 0;
+  }
+  .remi .update-time {
+    font-size: 12px;
+  }
+}
+@media (max-width: 460px) {
+  .remi .update-time {
+    font-size: 11px;
+  }
+  .remi .tool-buttons {
+    gap: 2px;
+  }
+}
+@media print {
+  .remi .tool-buttons {
+    display: none !important;
+  }
+}
+.remi .mini-button svg.icon {
+  display: block;
+  max-width: none;
+}
+.remi .mini-button .icon-alert {
+  width: 22px;
+  height: 22px;
+}
+.remi .mini-button .icon-person {
+  width: 27px;
+  height: 25px;
+}
+.remi .mini-button .icon-nurse {
+  width: 22px;
+  height: 22px;
+}
+.remi .mini-button .icon-stethoscope {
+  width: 22px;
+  height: 22px;
+}
+.remi .mini-button .icon-hc {
+  width: 24px;
+  height: 23px;
+}
+.remi .mini-button .icon-heart {
+  width: 32px;
+  height: 32px;
+  transform: translateX(-5px);
+}
+.remi .mini-button .icon-requests {
+  width: 24px;
+  height: 24px;
+}
+.remi .mini-button .icon-glass {
+  width: 26px;
+  height: 26px;
+}
+.remi .mini-button:has(.icon-person) {
+  min-width: 29px;
+}
+.remi .mini-button:has(.icon-heart) {
+  min-width: 32px;
+}
+.remi .action-green .icon-usercheck {
+  color: #00cd2a;
+}
+.remi .action-red .icon-usercheck {
+  color: #ff424c;
+}
+.remi .filter-cell.filter-layered {
+  position: relative;
+}
+.remi .filter-cell.filter-layered select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 29px;
+}
+.remi .filter-cell.filter-layered::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  right: 1px;
+  bottom: 1px;
+  width: 25px;
+  height: 20px;
+  background-color: #047bd5;
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 20"%3E%3Cpath d="M4 6 12.5 2l8.5 4-8.5 4Z M4 11l8.5 4 8.5-4 M4 15l8.5 4 8.5-4" fill="none" stroke="white" stroke-width="2.2" stroke-linejoin="round"/%3E%3C/svg%3E');
+  background-size: 25px 20px;
+  background-repeat: no-repeat;
+}
+.remi .qr g[fill="#fff"] rect {
+  fill: #fff;
+}
+.remi .qr g[fill="#0b0b0b"] rect {
+  fill: #0b0b0b;
+}
+.remi .tool-buttons {
+  top: 8px;
+  min-width: 99px;
+  justify-content: space-around;
+  gap: 6px;
+}
+.remi .update-time {
+  transform: translate(-67px, -7px);
+}
+.remi .status-triangle {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -3px;
+  margin-right: 7px;
+}
+.remi .status-triangle svg {
+  display: block;
+}
+@media (max-width: 790px) {
+  .remi .update-time {
+    transform: none;
+  }
+  .remi .tool-buttons {
+    top: 2px;
+    min-width: 90px;
+  }
+}
+.remi .filter-cell.filter-layered::after {
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 20"%3E%3Cpath d="M4 5.9 12.5 2 21 5.9l-8.5 4Z" fill="white"/%3E%3Cpath d="M4 11.2l8.5 4L21 11.2M4 15.2l8.5 3.7 8.5-3.7" stroke="white" stroke-width="2.25" fill="none" stroke-linejoin="round"/%3E%3C/svg%3E');
+}
+.remi .cell-items {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-height: 50px;
+  line-height: 1;
+}
+.remi .cell-items > .mini-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  line-height: 1;
+}
+.remi .mini-button .icon-chat {
+  width: 21px;
+  height: 21px;
+}
+.remi .mini-button .icon-tick {
+  width: 30px;
+  height: 30px;
+}
+.remi .action-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1px;
+  width: 124px;
+  transform: none;
+}
+.remi .action-cluster > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 0;
+  height: 31px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  overflow: hidden;
+  box-shadow: none;
+  line-height: 1;
+  color: #fff;
+}
+.remi .action-green,
+.remi .action-red {
+  width: 32px;
+  background: #00cd2a;
+  border: 1px solid #009a1d;
+  border-radius: 3px 0 0 3px;
+}
+.remi .action-red {
+  background: #ff424c;
+  border-color: #fa2832;
+}
+.remi .action-cluster > .action-blue {
+  width: 31px;
+  margin-left: 1px;
+  background: #0075dd;
+  border: 1px solid #0056a7;
+  border-radius: 0;
+}
+.remi .attend-button {
+  width: 58px;
+  background: #0075dd;
+  border: 1px solid #0056a7;
+  border-radius: 0 3px 3px 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.remi .action-cluster .icon-usercheck {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+.remi .action-cluster .icon-bed {
+  display: block;
+  width: 27px;
+  height: 27px;
+}
+.remi .icon-plus {
+  display: block;
+  flex: none;
+}
+.remi .cell-items .mini-button:has(.icon-plus) {
+  min-width: 22px;
+}
+.remi .mini-button .icon-person {
+  width: 22px;
+  height: 21px;
+}
+.remi .mini-button:has(.icon-person) {
+  min-width: 24px;
+}
+.remi .qr {
+  width: 23px;
+  height: 23px;
+  color: #0b0b0b;
+  display: block;
+}
+.remi .filter-cell.filter-layered input {
+  padding-right: 31px;
+}
+.remi .filter-cell.has-count .filter-count {
+  position: absolute;
+  right: 32px;
+  bottom: 4px;
+  line-height: 14px;
+  font-size: 12px;
+  font-style: italic;
+  color: #516b8a;
+  pointer-events: none;
+}
+.remi .filter-cell.has-count select {
+  padding-right: 44px;
+}
+.remi .mini-button svg.icon-plus {
+  width: 15px;
+  height: 15px;
+}
+.remi .mini-button svg.icon-person {
+  width: 22px;
+  height: 24px;
+}
+.remi .mini-button svg.icon-nurse,
+.remi .mini-button svg.icon-stethoscope {
+  width: 24px;
+  height: 24px;
+}
+.remi .mini-button svg.icon-chat {
+  width: 20px;
+  height: 20px;
+}
+.remi .mini-button svg.icon-hc {
+  width: 24px;
+  height: 20px;
+}
+.remi .mini-button svg.icon-heart {
+  width: 34px;
+  height: 33px;
+  transform: none;
+}
+.remi .mini-button:has(.icon-heart) {
+  min-width: 34px;
+}
+.remi .mini-button svg.icon-tick {
+  width: 29px;
+  height: 29px;
+}
+.remi .mini-button svg.icon-requests {
+  width: 24px;
+  height: 20px;
+}
+.remi .mini-button svg.icon-glass {
+  width: 24px;
+  height: 24px;
+}
+.remi .action-red {
+  background: #ff3f32;
+  border-color: #e8352a;
+}
+.remi .action-red .icon-usercheck {
+  color: #ff3f32;
+}
+.remi .dark-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 108px;
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid #0d0d0d;
+  border-radius: 3px;
+  background: linear-gradient(#5a5a5d, #2a2a2b 55%, #141414);
+  color: #6cbff3;
+  font:
+    700 11px Arial,
+    Helvetica,
+    sans-serif;
+  box-shadow: 0 1px 1px #0003;
+  cursor: pointer;
+}
+.remi .dark-button:hover {
+  background: linear-gradient(#6a6a6d, #333 55%, #1c1c1c);
+}
+.remi .dark-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.remi .dark-button-icon {
+  display: inline-flex;
+  margin-left: -4px;
+}
+.remi .pager {
+  display: inline-flex;
+  align-items: stretch;
+  height: 26px;
+  border-radius: 4px;
+  background: #0075dd;
+  box-shadow: 0 2px 4px #0003;
+  overflow: hidden;
+  font:
+    700 12px Arial,
+    sans-serif;
+  color: #fff;
+}
+.remi .pager button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+.remi .pager button:disabled {
+  cursor: default;
+}
+.remi .pager button:not(:disabled):hover {
+  background: #0062bb;
+}
+.remi .pager span {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-left: 1px solid #005fb5;
+  border-right: 1px solid #005fb5;
+}
+.remi .range-summary {
+  margin: 0;
+  font:
+    11px Arial,
+    sans-serif;
+  color: #222;
+}
+.remi .status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #ddd;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.remi .status-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid #ddd;
+  border-bottom: 0;
+  margin-right: -1px;
+  background: #f1f1f1;
+  color: #222;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.remi .status-tab[aria-selected="true"] {
+  background: #fff;
+  height: 27px;
+  margin-bottom: -1px;
+  padding-bottom: 1px;
+}
+.remi .status-tabs {
+  align-items: flex-end;
+}
+.remi .soft-button {
+  height: 24px;
+  padding: 0 14px;
+  border: 0;
+  background: #0075dd;
+  color: #fff;
+  font:
+    700 12px Arial,
+    sans-serif;
+  cursor: pointer;
+}
+.remi .soft-button:disabled {
+  background: #8fbbe5;
+  cursor: default;
+}
+.remi .fld {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: Arial, Helvetica, sans-serif;
+  min-width: 0;
+}
+.remi .fld label {
+  font-size: 11px;
+  color: #111;
+}
+.remi .fld-control {
+  position: relative;
+  display: flex;
+  height: 21px;
+}
+.remi .fld-control input,
+.remi .fld-control select {
+  flex: 1;
+  min-width: 0;
+  height: 21px;
+  border: 1px solid #a4b8ce;
+  background: #fff;
+  color: #111;
+  padding: 0 5px;
+  font:
+    12px Arial,
+    sans-serif;
+  border-radius: 0;
+}
+.remi .fld-control input::placeholder,
+.remi .fld-control select.is-placeholder {
+  color: #5976af;
+  font-style: italic;
+}
+.remi .fld-control select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 32px;
+}
+.remi .fld-chevron {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 26px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0075dd;
+  pointer-events: none;
+}
+.remi .fld-date {
+  padding-right: 26px !important;
+}
+.remi .fld-date::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 26px;
+  height: 21px;
+  cursor: pointer;
+}
+.remi .fld-calendar {
+  position: absolute;
+  right: 4px;
+  top: 1px;
+  pointer-events: none;
+}
+.remi .fld-unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  border: 1px solid #a4b8ce;
+  border-left: 0;
+  background: #e9e9e9;
+  color: #555;
+  font-size: 11px;
+}

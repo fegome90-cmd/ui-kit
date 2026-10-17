@@ -1,0 +1,15 @@
+flowchart TD
+  A[URL / Imagen / Código fuente] --> B{G0: acceso y licencia válidos?}
+  B -->|No| Q[Inventario bloqueado / Solicitar evidencia válida]
+  B -->|Sí| C[G1: captura y procedencia SHA-256]
+  C --> D[G2: tokens + patrones observados]
+  D --> E{Sistema canónico disponible?}
+  E -->|Sí| F[Reconciliar con autoridad y tokens existentes]
+  E -->|No| G[Proponer tokens semánticos]
+  F --> H[G3: React TSX + APIs + Stories]
+  G --> H
+  H --> I[G4: capturas originales vs stories]
+  I --> J{Fidelidad visual + tests + a11y?}
+  J -->|No| H
+  J -->|Sí| K[G5: Registry shadcn validado]
+  K --> L[PR y publicación autorizada]

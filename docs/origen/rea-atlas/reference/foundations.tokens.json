@@ -1,0 +1,35 @@
+{
+  "$description": "Ejemplo DTCG independiente. El azul es un valor documentado de FALP; esta copia es solo una muestra. La autoridad sigue en falp-brand-system.",
+  "color": {
+    "blue": {
+      "institutional": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0, 0.286275, 0.564706],
+          "hex": "#004990"
+        },
+        "$description": "Azul institucional documentado de FALP (no modificar aquí como fuente primaria)."
+      }
+    },
+    "action": {
+      "primary": { "$type": "color", "$value": "{color.blue.institutional}" }
+    }
+  },
+  "motion": {
+    "duration": {
+      "fast": {
+        "$type": "duration",
+        "$value": { "value": 160, "unit": "ms" },
+        "$description": "EJEMPLO ilustrativo: no es una medición del sitio FALP."
+      }
+    },
+    "easing": {
+      "out": {
+        "$type": "cubicBezier",
+        "$value": [0.16, 1, 0.3, 1],
+        "$description": "EJEMPLO ilustrativo."
+      }
+    }
+  }
+}

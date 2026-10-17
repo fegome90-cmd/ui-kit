@@ -25,6 +25,9 @@ npm-debug.log*
 /registry.json
 /public/r/
 
+# evidencia de diseño capturada (material de terceros; ver .claude/skills/capturar-diseno)
+/evidencia/
+
 # tests
 /coverage/
 /test-results/

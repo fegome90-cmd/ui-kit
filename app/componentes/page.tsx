@@ -20,6 +20,21 @@ export default function ComponentesIndex() {
         <code>components/ui</code> o se copia el archivo y se adapta.
       </p>
 
+      <h2 className="cb-h2">Instalar en otro proyecto</h2>
+      <p className="cb-lead">
+        Cada componente es un item del registry de shadcn, servido por este banco en <code>/r/&lt;nombre&gt;.json</code>
+        . Agrega el registry a tu <code>components.json</code> (con la URL donde corre el banco) e instala por nombre.
+      </p>
+      <CodeBlock
+        title="components.json"
+        code={`{\n  "registries": {\n    "@ui-kit": "http://localhost:3000/r/{name}.json"\n  }\n}`}
+      />
+      <CodeBlock title="bash" code="npx shadcn@latest add @ui-kit/rea-catalog" />
+      <p className="cb-lead">
+        El CLI instala también el tema de la familia (<code>styles/&lt;familia&gt;.css</code>) y te muestra la línea de{" "}
+        <code>@import</code> para tu CSS global.
+      </p>
+
       <h2 className="cb-h2">Cómo usar</h2>
       <CodeBlock
         title="Importar"

@@ -67,6 +67,28 @@ styles/                   CSS de cada familia y fuentes de muestra
 Si falta alguno de los tres pasos, los tests fallan: un módulo sin entrada en el registro, o una entrada sin
 vista previa, no pasa.
 
+## Instalar en otro proyecto (registry shadcn)
+
+`scripts/build-registry.mjs` genera `registry.json` desde `lib/component-registry.ts` y `shadcn build` lo
+convierte en `public/r/<item>.json` (los dos son artefactos: corren en `predev`, `prebuild` y en la CI, que
+además valida el registry). Hay un item por componente, más `<familia>-tokens` (el CSS del tema), `ui-kit-utils`
+(`cn()`) y los módulos de `lib` que usan los componentes.
+
+En el proyecto que instala, el namespace `@ui-kit` apunta a la URL del banco:
+
+```json
+{ "registries": { "@ui-kit": "http://localhost:3000/r/{name}.json" } }
+```
+
+```bash
+npx shadcn@latest add @ui-kit/rea-catalog
+```
+
+El CLI copia los archivos con su subcarpeta de familia (`components/ui/rea/…`), instala las dependencias npm y
+deja el tema en `styles/`. El tema se importa a mano: el CLI muestra la línea de `@import` para el CSS global.
+`ui-kit-utils` reemplaza `lib/utils.ts`; si el proyecto ya tiene un `cn()` propio, revisa el diff antes de
+aceptar.
+
 ## Comandos
 
 ```bash
@@ -76,6 +98,7 @@ npm run lint         # Biome
 npm run typecheck
 npm test             # Vitest (unitarios + componentes en jsdom)
 npm run test:e2e     # Playwright contra el build (requiere npm run build)
+npm run registry     # registry.json + public/r (también corre en predev/prebuild)
 npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-push
 ```
 
@@ -90,7 +113,9 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
   (`rights: review-required`). No se portaron el terreno WebGL ni el scrollytelling sticky del escenario.
 - REA: la copia decorativa de `ReaNav` usa `content: attr(data-label) / ""` para no leerse dos veces. Un navegador
   sin soporte de texto alternativo en `content` descarta la declaración y no muestra la copia en hover.
-- No hay `registry.json` para instalar los componentes con `npx shadcn add`.
+- El registry no tiene URL pública: `homepage` y el ejemplo de `components.json` usan localhost.
+- `shadcn` (devDependency) arrastra 7 vulnerabilidades altas en dependencias de desarrollo (`fast-glob` vía
+  `ts-morph`); no llegan al build de la app.
 - REMI: los íconos toman su tamaño natural del `viewBox` (1 unidad = 1 px de la captura); `size` los fuerza
   a un cuadrado.
 - Kraa: los portales (menú de acciones, hoja móvil) replican `.kraa-theme` con `useKraaTheme`, porque salen del

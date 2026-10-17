@@ -8,6 +8,7 @@ cd "$(dirname "$0")/.."
 step() { printf '\n\033[1;34m▶ %s\033[0m\n' "$1"; }
 
 step "Fuentes del banco"; node scripts/gen-sources.mjs
+step "Registry shadcn (generar, validar y construir)"; node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-registry.mjs && npx shadcn registry validate && npx shadcn build
 step "Biome (lint + formato, sin escribir)"; npx biome ci .
 step "TypeScript"; npx tsc --noEmit
 step "Tests unitarios y de componentes + cobertura"; NODE_ENV=test npx vitest run --coverage --coverage.reporter=text-summary

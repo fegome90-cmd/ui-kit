@@ -51,6 +51,13 @@ async function ComponentDocPage({ params }: Props) {
 
       <PreviewTabs preview={<Preview slug={slug} />} sources={sources} />
 
+      <h2 className="cb-h2">Instalación</h2>
+      <CodeBlock title="bash" code={`npx shadcn@latest add @ui-kit/${doc.slug}`} />
+      <p className="cb-lead">
+        Requiere el registry <code>@ui-kit</code> en <code>components.json</code> (ver Introducción). Instala también el
+        tema de la familia y las piezas de las que depende.
+      </p>
+
       <h2 className="cb-h2">Uso</h2>
       <CodeBlock code={doc.usage} />
 

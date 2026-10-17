@@ -20,8 +20,10 @@ npm-debug.log*
 # vercel
 .vercel
 
-# generado por scripts/gen-sources.mjs
+# generado por scripts/gen-sources.mjs y scripts/build-registry.mjs (+ shadcn build)
 /lib/generated/
+/registry.json
+/public/r/
 
 # tests
 /coverage/

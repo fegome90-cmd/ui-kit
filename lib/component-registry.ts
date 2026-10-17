@@ -55,21 +55,25 @@ export const statusOf = (c: ComponentDoc): Status => c.status ?? "stable";
 export const provenanceOf = (c: ComponentDoc): Provenance => c.provenance ?? "source-code";
 
 /** Origen del componente. Cada familia trae su propio sistema de estilos. */
-export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA"] as const;
+export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA", "Lab"] as const;
 export type Family = (typeof FAMILIES)[number];
 
+/** Tipos de componente. El banco se navega por tipo; la familia es una etiqueta y un filtro. */
 export const CATEGORIES = [
   "Acciones",
   "Formularios",
-  "Indicadores",
-  "Barra de herramientas",
   "Navegación",
+  "Barra de herramientas",
+  "Indicadores",
+  "Gráficos",
+  "Revelación",
   "Superficies",
+  "Fondos",
   "Tipografía",
   "Movimiento",
+  "Iconografía",
   "Bloques",
   "Tema",
-  "Iconografía",
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
@@ -1057,6 +1061,36 @@ useGridShortcut(() => setOn((v) => !v));
     notes: ["Receta de autoría ilustrativa del paquete REA: no está extraída ni verificada 1:1."],
   },
   {
+    slug: "rea-terrain",
+    family: "REA",
+    name: "Terreno topográfico",
+    category: "Fondos",
+    description:
+      "Curvas de nivel de un ruido fractal que derivan al cargar y levantan una colina en acento bajo el puntero. WebGL2 con respaldo Canvas 2D.",
+    files: ["components/ui/rea/rea-terrain.tsx", "lib/rea/use-reduced-motion.ts"],
+    usage: `<ReaProvider surface>
+  <section className="relative isolate min-h-[480px]">
+    <ReaTerrain />
+    <h1>…</h1>
+  </section>
+</ReaProvider>`,
+    props: [
+      { name: "interactive", type: "boolean", default: "true", description: "Si el puntero levanta la colina." },
+      {
+        name: "media",
+        type: "string",
+        default: '"(pointer: fine) and (min-width: 900px)"',
+        description: "Media query que habilita el terreno, como en el original.",
+      },
+    ],
+    status: "candidate",
+    notes: [
+      "Portado de initTerrain e initTerrain2D de site-concept.html v4 (docs/origen/rea-atlas/reference).",
+      "Falta compararlo lado a lado con site-concept.html. El propio original ya era aproximado respecto del sitio de referencia (DIFF-1VS1, fila 20).",
+      "Decorativo: aria-hidden. Con movimiento reducido no se dibuja; el contenedor necesita relative isolate.",
+    ],
+  },
+  {
     slug: "rea-specimen-stage",
     family: "REA",
     name: "Escenario de muestras",
@@ -1102,6 +1136,725 @@ useGridShortcut(() => setOn((v) => !v));
         description: "{ id, title, category, collection, meta?, keywords?, details, code }.",
       },
       { name: "onCopyResult", type: "(ok: boolean) => void", description: "Resultado de copiar el código." },
+    ],
+  },
+
+  // ---------- Lab (tokens --lab-* bajo .lab; investigación de señales y magnitudes) ----------
+  {
+    slug: "lab-presence-dot",
+    family: "Lab",
+    name: "Punto de presencia",
+    category: "Indicadores",
+    description:
+      "Dice que hay algo, no cuánto ni qué tan grave. Anillos fijos opcionales y pulso solo con motion-safe.",
+    files: ["components/ui/lab/presence-dot.tsx", "lib/utils.ts"],
+    usage: `<PresenceDot label="Hay notas nuevas" rings={2} />
+<PresenceDot label="En curso" pulse />`,
+    props: [
+      {
+        name: "label",
+        type: "string",
+        description: "Qué significa. Sin etiqueta, el punto es decorativo (aria-hidden).",
+      },
+      { name: "rings", type: "0 | 1 | 2", default: "0", description: "Anillos concéntricos fijos." },
+      { name: "pulse", type: "boolean", default: "false", description: "Pulso; no corre con movimiento reducido." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "8, 12 o 16 px." },
+      { name: "tone", type: '"accent" | "muted"', default: '"accent"', description: "Color del punto." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Reconstruido desde los marcadores del mapa de Voices from the Frontlines (evidencia/2026-10-17-voices-frontlines).",
+      "El pulso no se observó: las capturas van sin animación. Validar que no se lea como alarma ni como gravedad.",
+      "Un punto solo codifica presencia: no usarlo para cantidad, categoría ni estado en la misma interfaz.",
+    ],
+  },
+  {
+    slug: "lab-stat-ring",
+    family: "Lab",
+    name: "Cifra en anillo",
+    category: "Gráficos",
+    description: "Una cifra total dentro de un anillo cerrado, con su explicación debajo. El anillo enmarca, no mide.",
+    files: ["components/ui/lab/stat-ring.tsx", "lib/utils.ts"],
+    usage: `<StatRing value="2B" caption="Personas con enfermedad cardiometabólica" />`,
+    props: [
+      { name: "value", type: "string", description: "La cifra tal como se muestra." },
+      { name: "caption", type: "string", description: "Qué cuenta la cifra." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "88, 120 o 156 px." },
+      { name: "tone", type: '"neutral" | "accent"', default: '"neutral"', description: "Borde neutro o de acento." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Reconstruido desde las cifras de BioAge (evidencia/2026-10-17-bioage, platform t02); medidas inferidas.",
+      "Riesgo: un anillo puede leerse como porcentaje. Por eso va siempre cerrado; validar con usuarios.",
+    ],
+  },
+  {
+    slug: "lab-encoding-compare",
+    family: "Lab",
+    name: "Comparador de codificaciones",
+    category: "Gráficos",
+    description:
+      "La misma tabla como longitud, área o arco, con la tabla siempre visible para comparar qué se lee mejor.",
+    files: ["components/ui/lab/encoding-compare.tsx", "lib/lab/encodings.ts", "lib/utils.ts"],
+    usage: `<EncodingCompare
+  title="Pacientes por turno"
+  data={[{ label: "Mañana", value: 12 }, { label: "Tarde", value: 9 }, { label: "Noche", value: 4 }]}
+/>`,
+    props: [
+      { name: "data", type: "{ label: string; value: number }[]", description: "De 1 a 5 datos; etiquetas únicas." },
+      { name: "title", type: "string", description: "Título del gráfico y de la tabla." },
+      {
+        name: "encoding / defaultEncoding",
+        type: '"length" | "area" | "arc"',
+        default: '"length"',
+        description: "Controlado o no.",
+      },
+      { name: "onEncodingChange", type: "(e: Encoding) => void", description: "Aviso al cambiar." },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores (es-CL por defecto)." },
+      {
+        name: "animate",
+        type: "boolean",
+        default: "false",
+        description: "Las marcas crecen desde cero al aparecer y al cambiar (motion-safe).",
+      },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Mecanismo de Google Data GIF Maker (evidencia/2026-10-17-data-gif-maker); la interfaz es propia.",
+      "animate: en «Preview» las formas crecen desde cero (puntos a ~0,7 s, completas a ~1,75 s, leído en cuadros): 1,5 s inferido.",
+      "Longitud y área comparan con el mayor; el arco muestra la parte del total. No responden la misma pregunta.",
+      "Los ítems se distinguen por opacidad del acento: los más tenues no llegan a 3:1. La tabla lleva los valores.",
+    ],
+  },
+  {
+    slug: "lab-signal-disclosure",
+    family: "Lab",
+    name: "Señal con detalle",
+    category: "Revelación",
+    description: "Señal y título siempre visibles; el detalle se abre con clic o teclado y sigue en el DOM.",
+    files: ["components/ui/lab/signal-disclosure.tsx", "components/ui/lab/presence-dot.tsx", "lib/utils.ts"],
+    usage: `<SignalDisclosure title="Indicaciones nuevas" summary="2 desde el último turno">
+  Ajuste de dosis de las 14:00 y control de glicemia cada 6 h.
+</SignalDisclosure>`,
+    props: [
+      { name: "title", type: "ReactNode", description: "Qué hay detrás." },
+      { name: "summary", type: "ReactNode", description: "Una línea visible también cerrado." },
+      { name: "signal", type: "ReactNode", description: "Señal a la izquierda; por defecto un punto decorativo." },
+      { name: "open / defaultOpen", type: "boolean", default: "false", description: "Controlado o no." },
+      { name: "onOpenChange", type: "(open: boolean) => void", description: "Aviso al abrir o cerrar." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo del FAQ de Paradigm y la lista con panel de Meridian (evidencia/2026-10-17-{paradigm,meridian-ai}).",
+      "La expansión por hover de «Additional Information» solo está en video: no se reprodujo. Nunca abre solo con hover.",
+      "La apertura anima grid-template-rows en 0,3 s, medido en el acordeón de Meridian.",
+      "Validar qué no debe ocultarse nunca: un dato crítico no va detrás de una revelación.",
+    ],
+  },
+  {
+    slug: "lab-backdrop",
+    family: "Lab",
+    name: "Fondos",
+    category: "Fondos",
+    description:
+      "Cinco mecanismos de fondo medidos en las referencias (resplandor, lavado, aurora, viñeta y capa que gira), con los tokens de la paleta activa.",
+    files: ["components/ui/lab/lab-backdrop.tsx", "lib/utils.ts"],
+    usage: `<LabBackdrop pattern="aurora" tone="deep" className="p-8">…</LabBackdrop>`,
+    props: [
+      {
+        name: "pattern",
+        type: '"glow" | "wash" | "aurora" | "vignette" | "rotating"',
+        default: '"glow"',
+        description: "BioAge (glow, rotating), Meridian (wash, aurora), Paradigm (vignette).",
+      },
+      { name: "tone", type: '"soft" | "deep"', default: '"soft"', description: "Fondo o tinta de la paleta." },
+      { name: "glow", type: '"none" | "corner" | "center"', default: '"corner"', description: "Solo para glow." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Posiciones, paradas y tiempos medidos en el DOM (evidencia/2026-10-17-{bioage,meridian-ai,paradigm}); sin sus imágenes ni texturas.",
+      "rotating: BioAge gira una imagen propia; aquí gira un degradado cónico. Solo con motion-safe.",
+      "Revisar el contraste del texto sobre cada patrón y paleta antes de pasar a stable.",
+    ],
+  },
+  {
+    slug: "lab-palette",
+    family: "Lab",
+    name: "Paletas medidas",
+    category: "Tema",
+    description:
+      "Cinco paletas como tokens (neutra, BioAge, Meridian, Paradigm, Voices): mismos componentes, otra estética. Cada color dice si es medido o derivado.",
+    files: ["components/ui/lab/lab-palette.tsx", "lib/lab/paletas.ts", "lib/utils.ts"],
+    usage: `<LabScope palette="meridian" surface>
+  <StatRing value="2B" caption="…" />
+</LabScope>
+<LabPalette palette="meridian" />`,
+    props: [
+      {
+        name: "palette",
+        type: '"neutral" | "bioage" | "meridian" | "paradigm" | "voices"',
+        default: '"neutral"',
+        description: "Paleta que aplica LabScope o que muestra LabPalette.",
+      },
+      { name: "surface", type: "boolean", default: "false", description: "LabScope: pinta el fondo de la paleta." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Colores medidos por área y por texto en los sitios vivos; superficie, línea y atenuado se derivan componiendo valores medidos.",
+      "Un test exige AA (tinta, atenuado y texto sobre tinta a 4,5:1; acento como marca a 3:1) y que styles/lab.css coincida con los datos.",
+      "El acento de BioAge (4,1:1) no sirve para texto; en Paradigm se usa el cian #139bfd porque el azul de texto da 3,5:1.",
+    ],
+  },
+  {
+    slug: "lab-gradient-text",
+    family: "Lab",
+    name: "Texto con degradado",
+    category: "Tipografía",
+    description:
+      "Titular que va de la tinta al acento, recortado al texto. Sin soporte de background-clip queda en tinta.",
+    files: ["components/ui/lab/lab-gradient-text.tsx", "lib/utils.ts"],
+    usage: `<h1><LabGradientText>Engineering for Modern Enterprise</LabGradientText></h1>`,
+    props: [{ name: "…span", type: 'ComponentProps<"span">', description: "Props del span." }],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Degradado medido en los titulares de Paradigm (.word: radial 286,94 % 255,84 % en 43,93 % 53,96 %).",
+      "El extremo de acento puede bajar de 4,5:1: solo para titulares grandes.",
+    ],
+  },
+  {
+    slug: "lab-marquee",
+    family: "Lab",
+    name: "Marquesina",
+    category: "Movimiento",
+    description:
+      "Fila que se desplaza sin fin (45 s por vuelta), se pausa al pasar o enfocar y queda quieta con movimiento reducido.",
+    files: ["components/ui/lab/lab-marquee.tsx", "lib/utils.ts"],
+    usage: `<LabMarquee label="Clientes">
+  <span>Lightyear</span><span>Higro</span><span>Zurich</span>
+</LabMarquee>`,
+    props: [
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      { name: "duration", type: "number", default: "45", description: "Segundos por vuelta (medido: 45)." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en la fila de logos de Meridian (@keyframes scroll y nsLogosMarquee, 45 s, infinite).",
+      "La copia que cierra el bucle es aria-hidden e inert; con movimiento reducido desaparece y la fila se recorre con scroll.",
+    ],
+  },
+  {
+    slug: "lab-reveal-card",
+    family: "Lab",
+    name: "Tarjeta que se revela",
+    category: "Superficies",
+    description: "En reposo la imagen va en grises; al pasar o enfocar sube 2 px, gana sombra y toma color.",
+    files: ["components/ui/lab/lab-reveal-card.tsx", "lib/utils.ts"],
+    usage: `<LabRevealCard href="/capitulo-1" eyebrow="Capítulo 1" title="Cambios grandes" media={<img src="…" alt="" />} />`,
+    props: [
+      { name: "media", type: "ReactNode", description: "Imagen o ilustración; recibe el filtro." },
+      { name: "eyebrow", type: "string", description: "Etiqueta sobre el título." },
+      { name: "title", type: "string", description: "Título de la tarjeta." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Tiempos medidos en Voices from the Frontlines: transform 0,2 s, box-shadow 0,4 s, filter 0,5 s, grayscale(1) en reposo.",
+      "Que las tres transiciones formen una sola tarjeta es inferido. Con movimiento reducido no sube; el color cambia igual.",
+    ],
+  },
+  {
+    slug: "lab-glow-card",
+    family: "Lab",
+    name: "Tarjeta con brillo",
+    category: "Superficies",
+    description: "Borde de vidrio y un brillo del acento que sigue al puntero; con teclado se centra al enfocar.",
+    files: ["components/ui/lab/lab-glow-card.tsx", "lib/utils.ts"],
+    usage: `<LabGlowCard><h3>Low-Code</h3><p>…</p></LabGlowCard>`,
+    props: [{ name: "…div", type: 'ComponentProps<"div">', description: "Props del contenedor." }],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Medido en Paradigm: borde blanco al 6 %, drop-shadow del acento de 12 px y transiciones de 0,2 s.",
+      "Que el brillo siga al puntero sale de la ficha «Interactive Bento Grid» de Awwwards, que solo está en video: inferido.",
+    ],
+  },
+  {
+    slug: "lab-process-steps",
+    family: "Lab",
+    name: "Etapas",
+    category: "Gráficos",
+    description:
+      "Las etapas de un proceso en orden: chevrones, línea con puntos o escalera de etapas que acumulan. La etapa en curso es opcional.",
+    files: ["components/ui/lab/process-steps.tsx", "lib/utils.ts"],
+    usage: `<ProcessSteps
+  variant="timeline"
+  current={1}
+  steps={[{ title: "Ingreso" }, { title: "Evaluación" }, { title: "Alta" }]}
+/>`,
+    props: [
+      { name: "steps", type: "{ title: string; description?: ReactNode }[]", description: "Etapas en orden." },
+      {
+        name: "variant",
+        type: '"chevrons" | "timeline" | "staircase"',
+        default: '"chevrons"',
+        description: "BioAge, Meridian o Symbol Studio.",
+      },
+      { name: "current", type: "number", description: "Índice de la etapa en curso; sin valor, solo el orden." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Chevrones de BioAge (platform t06) y línea con puntos de Meridian, desde capturas.",
+      "Una etapa no es el estado actual: solo `current` destaca una, con aria-current=step, relleno y el texto «En curso».",
+      "`staircase` medida en el DOM de Symbol Studio: números de 32 px arriba, montantes de 166/118/64 px con 40 px de acento, peldaño de 4 px, peldaños que se ensanchan. Pensada para 3–5 etapas; el estado `current` es agregado.",
+    ],
+  },
+  {
+    slug: "lab-series-chart",
+    family: "Lab",
+    name: "Series destacadas",
+    category: "Gráficos",
+    description: "Varias series en el tiempo; una o dos destacadas y rotuladas sobre el resto atenuado como contexto.",
+    files: ["components/ui/lab/series-chart.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<SeriesChart title="Riesgo por edad" x={[40, 50, 60, 70, 80]} series={series} highlight={["cv", "dm"]} />`,
+    props: [
+      { name: "title", type: "string", description: "Título del gráfico y de la tabla." },
+      { name: "x", type: "(string | number)[]", description: "Etiquetas del eje x." },
+      { name: "series", type: "{ id; label; values: number[] }[]", description: "Todas las series." },
+      { name: "highlight", type: "string[]", description: "Ids destacados (1 o 2)." },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores." },
+      { name: "events", type: "{ at: number; label: string }[]", description: "Hitos anotados (índice del eje x)." },
+      { name: "projectedFrom", type: "number", description: "Índice desde el que la serie es proyección (punteada)." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform t02): dos series destacadas sobre muchas líneas tenues. SVG propio.",
+      "El contexto no se rotula ni llega a 3:1: la tabla desplegable trae todas las series con sus valores.",
+      "events: el pico anotado de Searching for Birds. projectedFrom: real y proyectado, como en las ilustraciones de Greenlock.",
+    ],
+  },
+  {
+    slug: "lab-distribution-chart",
+    family: "Lab",
+    name: "Distribución anotada",
+    category: "Gráficos",
+    description: "Curva de cuántos casos hay en cada valor, con casos concretos marcados sobre ella.",
+    files: ["components/ui/lab/distribution-chart.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<DistributionChart
+  title="Edad al alta"
+  points={[[60, 2], [70, 10], [80, 30], [90, 12], [100, 1]]}
+  annotations={[{ x: 72, label: "Paciente A" }]}
+  xLabel="Edad"
+  yLabel="Pacientes"
+/>`,
+    props: [
+      { name: "points", type: "[number, number][]", description: "Pares [valor, cantidad] ya calculados." },
+      { name: "annotations", type: "{ x: number; label: string }[]", description: "Casos marcados." },
+      { name: "xLabel / yLabel", type: "string", description: "Qué miden los ejes." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform t03): distribución con dos individuos anotados. SVG propio.",
+      "No estima densidades: recibe la curva calculada. Las anotaciones van también en una lista.",
+    ],
+  },
+  {
+    slug: "lab-category-wheel",
+    family: "Lab",
+    name: "Rueda de categorías",
+    category: "Gráficos",
+    description:
+      "Clases del mismo nivel alrededor de un centro que las nombra, con sectores iguales y leyenda numerada.",
+    files: ["components/ui/lab/category-wheel.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<CategoryWheel title="Tipos de alerta" categories={[{ label: "Signos vitales" }, { label: "Medicación" }]} />`,
+    props: [
+      { name: "title", type: "string", description: "Lo que las categorías tienen en común." },
+      { name: "categories", type: "{ label; description? }[]", description: "De 2 a 8." },
+      { name: "size", type: "number", default: "240", description: "Diámetro en px." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Forma de BioAge (platform t05); colores categóricos medidos en los capítulos de Voices.",
+      "Sectores iguales: distingue clases, no mide. Desde la sexta categoría los colores se repiten; el número no.",
+    ],
+  },
+  {
+    slug: "lab-lozenge",
+    family: "Lab",
+    name: "Lozenge y contador",
+    category: "Indicadores",
+    description: "Lozenge para atributos con significado (estado, prioridad) y contador solo para cantidades.",
+    files: ["components/ui/lab/lozenge.tsx", "lib/utils.ts"],
+    usage: `<LabLozenge tone="success">En curso</LabLozenge>
+<LabLozenge tone="warning" metric={3}>En riesgo</LabLozenge>
+Pendientes <LabCount value={12} />`,
+    props: [
+      {
+        name: "tone",
+        type: '"neutral" | "info" | "success" | "warning" | "danger"',
+        default: '"neutral"',
+        description: "Significado.",
+      },
+      { name: "icon", type: "ReactNode", description: "Lozenge: ícono de apoyo (oculto)." },
+      { name: "metric", type: "number", description: "Lozenge: métrica de apoyo; solo con tono semántico." },
+      { name: "value", type: "number", description: "Contador: la cantidad." },
+      { name: "signed / compact / bold", type: "boolean", description: "Contador: signo, abreviatura, énfasis." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Reglas de Atlassian (Lozenge y Badge, leídas el 2026-10-17); implementación y colores propios.",
+      "Separa atributo (lozenge, con texto) de cantidad (contador): un punto de color no debe hacer las dos cosas.",
+    ],
+  },
+  {
+    slug: "lab-notification",
+    family: "Lab",
+    name: "Notificación",
+    category: "Indicadores",
+    description:
+      "Inline, toast, con acción o callout, según cuánto debe interrumpir. Estado con ícono y texto, no solo color.",
+    files: ["components/ui/lab/notification.tsx", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<LabNotification status="warning" title="Turno sin cubrir" onClose={cerrar}>
+  Falta asignar la cama 12.
+</LabNotification>`,
+    props: [
+      {
+        name: "variant",
+        type: '"inline" | "toast" | "actionable" | "callout"',
+        default: '"inline"',
+        description: "Nivel de interrupción.",
+      },
+      { name: "status", type: '"info" | "success" | "warning" | "danger"', default: '"info"', description: "Estado." },
+      { name: "title", type: "string", description: "Corto, sin punto final." },
+      { name: "onClose", type: "() => void", description: "Muestra la ×; callout nunca se cierra." },
+      { name: "action", type: "{ label; onClick }", description: "Solo actionable: la única acción." },
+      { name: "timeout", type: "number", description: "Solo toast: ms hasta cerrarse." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Variantes y reglas de IBM Carbon (Notification > Guidelines, leídas el 2026-10-17); implementación propia.",
+      "Roles: error = alert, actionable = alertdialog con foco al aparecer, callout = note, el resto = status.",
+      "Un toast que se cierra solo debe tener su contenido disponible en otro lado (centro de notificaciones).",
+    ],
+  },
+  {
+    slug: "lab-proportion-split",
+    family: "Lab",
+    name: "Proporción partida",
+    category: "Gráficos",
+    description: "Un todo en dos o tres partes, cada una con su porcentaje y la lista de lo que contiene.",
+    files: ["components/ui/lab/proportion-split.tsx", "lib/lab/encodings.ts", "lib/utils.ts"],
+    usage: `<ProportionSplit
+  title="¿En qué se va el turno?"
+  parts={[{ label: "Registro", value: 47, items: ["Notas", "Indicaciones"] }, { label: "Atención directa", value: 53 }]}
+/>`,
+    props: [
+      { name: "title", type: "string", description: "Pregunta o título." },
+      { name: "parts", type: "{ label; value; items?: string[] }[]", description: "Dos o tres partes del mismo todo." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Meridian lo publica como imagen (con texto alternativo); evidencia en meridian-ai/captures/home--proporcion.",
+      "Allí los sectores no parecen dibujados en proporción; aquí el ángulo sale del valor y el porcentaje va como texto.",
+    ],
+  },
+  {
+    slug: "lab-feature-tabs",
+    family: "Lab",
+    name: "Lista que abre panel",
+    category: "Revelación",
+    description: "Lista de temas; el elegido se expande con su descripción y muestra su panel al lado.",
+    files: ["components/ui/lab/feature-tabs.tsx", "lib/utils.ts"],
+    usage: `<FeatureTabs label="Funciones" items={[{ id: "a", title: "Enriquecimiento", description: "…", panel: <Vista /> }]} />`,
+    props: [
+      { name: "items", type: "{ id; title; description?; panel }[]", description: "Temas y sus paneles." },
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      { name: "value / defaultValue", type: "string", description: "Controlado o no." },
+      { name: "onValueChange", type: "(id: string) => void", description: "Aviso al cambiar." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Meridian «Meridian features»: activo 260 px, inactivos 64 px, cambio por clic, sin rotación automática.",
+      "En el original son div sin roles ARIA; aquí es un tablist vertical con flechas, Inicio y Fin.",
+    ],
+  },
+  {
+    slug: "lab-chapter-card",
+    family: "Lab",
+    name: "Tarjeta de capítulo",
+    category: "Superficies",
+    description: "Imagen arriba y bloque de color con antetítulo, titular condensado y lista de secciones.",
+    files: ["components/ui/lab/chapter-card.tsx", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<ChapterCard index={2} title={"La tierra"} media={<img src="…" alt="" />} sections={[{ id: "2.1", title: "Raíces" }]} href="#" />`,
+    props: [
+      { name: "index", type: "number", description: "Número de capítulo; elige el color categórico." },
+      { name: "title", type: "string", description: "Titular; respeta saltos de línea." },
+      { name: "media", type: "ReactNode", description: "Imagen (object-fit cover)." },
+      { name: "sections", type: "{ id; title }[]", description: "Secciones del capítulo." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medida en Voices (overview, capítulo 2): 752 × 470, imagen 270 px, antetítulo 12/700 con 1,8 px, titular 64/48.",
+      "Voices escribe con el color de otro capítulo y 4 de 5 pares no llegan a 4,5:1; aquí el texto es el AA de cada color.",
+      "Titular en --font-lab-condensed (Bebas Neue, OFL) en lugar de Mango Grotesque. Hover no medido: no se reproduce.",
+    ],
+  },
+  {
+    slug: "lab-diverging-heatmap",
+    family: "Lab",
+    name: "Mapa de calor divergente",
+    category: "Gráficos",
+    description:
+      "Grilla de celdas: el color dice hacia qué lado va el valor y la opacidad, cuánto (tramos logarítmicos).",
+    files: ["components/ui/lab/diverging-heatmap.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<DivergingHeatmap title="Ingresos y egresos" rows={salas} cols={horas} values={valores} negativeLabel="Egresos" positiveLabel="Ingresos" />`,
+    props: [
+      { name: "rows / cols", type: "string[]", description: "Etiquetas de filas y columnas." },
+      { name: "values", type: "number[][]", description: "Negativo = un lado, positivo = el otro." },
+      { name: "negativeLabel / positiveLabel", type: "string", description: "Qué significa cada lado." },
+      {
+        name: "scheme",
+        type: '"accesible" | "voices"',
+        default: '"accesible"',
+        description: "Naranja/azul o el medido.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Leyenda medida en el portal de Voices: coral y verde, opacidades 0,15–0,85, cortes 100 / 1k / 10k / 100k / 1M+.",
+      "Por defecto naranja/azul: rojo contra verde es lo que peor distingue la deuteranopia. El medido es scheme=voices.",
+    ],
+  },
+  {
+    slug: "lab-bento-grid",
+    family: "Lab",
+    name: "Bento",
+    category: "Bloques",
+    description: "Tarjetas con brillo de dos anchos (2:3) que se alternan por fila; una columna en pantallas angostas.",
+    files: ["components/ui/lab/bento-grid.tsx", "components/ui/lab/lab-glow-card.tsx", "lib/utils.ts"],
+    usage: `<BentoGrid>
+  <BentoItem size="sm">…</BentoItem>
+  <BentoItem size="lg">…</BentoItem>
+</BentoGrid>`,
+    props: [
+      {
+        name: "size",
+        type: '"sm" | "lg" | "full"',
+        default: '"sm"',
+        description: "BentoItem: 2/5, 3/5 o fila completa.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Paradigm: 1240 px, separación 16 px, 440 px de alto, 498 / 726 alternando, radio 26 px, borde 0,5 s.",
+    ],
+  },
+  {
+    slug: "lab-scrolly-section",
+    family: "Lab",
+    name: "Scrollytelling",
+    category: "Bloques",
+    description: "Escena fija a un lado que cambia según el paso del relato que cruza el centro de la pantalla.",
+    files: ["components/ui/lab/scrolly-section.tsx", "lib/utils.ts"],
+    usage: `<ScrollySection steps={[{ id: "1", title: "…", body: "…", visual: <Grafico /> }]} />`,
+    props: [
+      { name: "steps", type: "{ id; title; body?; visual }[]", description: "Pasos del relato con su escena." },
+      { name: "onStepChange", type: "(id: string) => void", description: "Aviso al cambiar de paso." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Mecanismo de BioAge (platform, capturado por tramos); el fundido de 0,4 s es inferido de sus transiciones de opacidad.",
+      "Cada paso lleva su texto; las escenas inactivas son inert. Bajo 760 px cada escena va antes de su texto.",
+    ],
+  },
+  {
+    slug: "lab-time-scale",
+    family: "Lab",
+    name: "Línea de tiempo proporcional",
+    category: "Gráficos",
+    description:
+      "Hitos ubicados en proporción al tiempo; el elegido muestra su contenido. Los huecos dicen cuánto pasó.",
+    files: ["components/ui/lab/time-scale.tsx", "lib/utils.ts"],
+    usage: `<TimeScale label="Historia" events={[{ at: 2009, label: "2009", content: <p>…</p> }, { at: 2013, label: "2013", content: <p>…</p> }]} />`,
+    props: [
+      { name: "events", type: "{ at: number; label; content }[]", description: "Hitos; `at` en cualquier unidad." },
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      {
+        name: "minUnitWidth",
+        type: "number",
+        default: "40",
+        description: "px mínimos por unidad (Volume: 90 por año).",
+      },
+      { name: "value / defaultValue / onValueChange", type: "number", description: "Hito elegido." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medida en Volume Industries: 90 px por año exactos (2009 → 180, 2013 → 540, 2021 → 1260); rombo relleno en el activo.",
+      "Pestañas horizontales con flechas, Inicio y Fin. Con hitos juntos se desplaza en vez de encimar rótulos.",
+    ],
+  },
+  {
+    slug: "lab-hierarchy-cells",
+    family: "Lab",
+    name: "Jerarquía en celdas",
+    category: "Gráficos",
+    description:
+      "Un nivel del árbol como celdas de área proporcional; las celdas con hijos se abren y una miga de pan vuelve.",
+    files: ["components/ui/lab/hierarchy-cells.tsx", "lib/lab/graficos.ts", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<HierarchyCells root={{ id: "todo", label: "Ingresos", children: [{ id: "u", label: "Urgencia", value: 120 }] }} />`,
+    props: [
+      {
+        name: "root",
+        type: "{ id; label; value?; children? }",
+        description: "Árbol; los nodos con hijos suman solos.",
+      },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores." },
+      { name: "height", type: "number", default: "320", description: "Alto del área de celdas." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Familia Relación. Mecanismo de Searching for Birds (huevo en celdas: aves → formas → tipos), allí con Voronoi.",
+      "Aquí treemap squarified (Bruls et al., 2000), que compara mejor las áreas. Cada celda trae valor y % en texto.",
+    ],
+  },
+  {
+    slug: "lab-range-bars",
+    family: "Lab",
+    name: "Barras de rango",
+    category: "Gráficos",
+    description: "Cada fila es un intervalo sobre un eje con el cero marcado: un efecto incierto, no un número exacto.",
+    files: ["components/ui/lab/range-bars.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<RangeBars title="Efecto estimado" unit="%" ranges={[{ label: "Ventas", min: 30, max: 40 }, { label: "Clientes perdidos", min: -30, max: -20 }]} />`,
+    props: [
+      { name: "ranges", type: "{ label; min; max }[]", description: "Intervalos; pueden cruzar el cero." },
+      { name: "unit", type: "string", description: "Unidad tras el número." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Observado en Symbol Studio (+30–40 %, −20–30 %). Un rango comunica la incertidumbre que un número esconde.",
+      "Un solo color para todos: el signo lo dicen el cero y el texto; rojo para lo negativo lo leería como «malo».",
+    ],
+  },
+  {
+    slug: "lab-filtered-stat",
+    family: "Lab",
+    name: "Cifra por segmento",
+    category: "Gráficos",
+    description: "Una cifra grande y un selector que la cambia por segmento, para comparar sin cambiar de vista.",
+    files: ["components/ui/lab/filtered-stat.tsx", "lib/utils.ts"],
+    usage: `<FilteredStat title="Control al día" label="Servicio" unit="%" reference="todos" segments={[{ id: "todos", label: "Todos", value: 24 }, { id: "aps", label: "APS", value: 28 }]} />`,
+    props: [
+      {
+        name: "segments",
+        type: "{ id; label; value; detail?; note? }[]",
+        description: "Segmentos; `note` marca el botón con un punto y se muestra bajo la cifra.",
+      },
+      { name: "label", type: "string", description: "Nombre del selector para lectores de pantalla." },
+      { name: "unit", type: "string", description: "Unidad tras la cifra." },
+      { name: "reference", type: "string", description: "Segmento de referencia; se muestra al elegir otro." },
+      {
+        name: "value / defaultValue / onValueChange",
+        type: "string / string / (id) => void",
+        description: "Controlado o no.",
+      },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Adobe «Running on Experience» (Summary): píldora 830 × 43, botones 130 × 35, radio 17, 12 px versales con 4 px de interletra, transición 0,5 s cubic-bezier(0.19, 1, 0.22, 1).",
+      "Allí son div sin rol ni teclado y la nota abre un modal; aquí son radios nativos (flechas), la cifra se anuncia con aria-live y la nota va bajo la cifra.",
+      "`reference` es agregado: en el original hay que recordar la cifra general para comparar. El fundido de la cifra está observado en cuadros; su duración, inferida.",
+      "Pendiente: QA visual con más de seis segmentos y con etiquetas largas (la interletra de 4 px las ensancha).",
+    ],
+  },
+  {
+    slug: "lab-dot-nav",
+    family: "Lab",
+    name: "Navegación por puntos",
+    category: "Navegación",
+    description: "Una columna de puntos, uno por sección, que marca la sección visible y salta a cualquiera.",
+    files: ["components/ui/lab/dot-nav.tsx", "lib/utils.ts"],
+    usage: `<DotNav label="Secciones" sections={[{ id: "inicio", label: "Inicio" }, { id: "resumen", label: "Resumen" }]} className="fixed top-1/2 left-[15px] -translate-y-1/2" />`,
+    props: [
+      {
+        name: "sections",
+        type: "{ id; label }[]",
+        description: "Secciones en orden; `id` es el del elemento en la página.",
+      },
+      { name: "label", type: "string", description: "Nombre de la navegación." },
+      {
+        name: "current",
+        type: "string",
+        description: "Sección actual controlada; sin valor se calcula con el scroll.",
+      },
+      { name: "root", type: "RefObject<Element>", description: "Contenedor con scroll, si no es la ventana." },
+      {
+        name: "showCurrentLabel",
+        type: "boolean",
+        default: "true",
+        description: "Nombre de la sección actual girado sobre la columna.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Adobe «Running on Experience» (nav fija izquierda): píldora 42 px, radio 20; enlaces 24 × 24 cada 29 px; borde de 2 px en la actual; transición 0,5 s cubic-bezier(0.215, 0.61, 0.355, 1).",
+      "Allí los enlaces no tienen nombre accesible ni aria-current; aquí sí, y el nombre se ve con puntero o foco (el hover del original no se midió).",
+      "No se fija sola: la posición (fixed, borde) la pone quien la usa. Pendiente: QA con muchas secciones y en pantallas angostas, donde conviene ocultarla.",
+    ],
+  },
+  {
+    slug: "lab-radial-bars",
+    family: "Lab",
+    name: "Barras radiales",
+    category: "Gráficos",
+    description:
+      "Magnitud alrededor de un centro: barras que salen del centro o un ranking de marcas que gira desde las 12.",
+    files: ["components/ui/lab/radial-bars.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<RadialBars title="Menciones por tema" items={[{ label: "Acceso", value: 649 }, { label: "Espera", value: 512 }]} variant="ranking" />`,
+    props: [
+      { name: "items", type: "{ label; value }[]", description: "Ítems; en `ranking` se ordenan de mayor a menor." },
+      {
+        name: "variant",
+        type: '"bars" | "ranking"',
+        default: '"bars"',
+        description: "Barras desde el centro o marcas en anillo.",
+      },
+      { name: "unit", type: "string", description: "Unidad en la lista accesible." },
+      { name: "size", type: "number", default: "520", description: "Lado en px (se achica al ancho disponible)." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "`ranking` medido en el SVG de Searching for Birds: anillo de radio 180/900, desde −90° en sentido horario con ~25° de hueco, paso ∝ tamaño, rótulo de 18 a 9 px que se da vuelta en la mitad izquierda.",
+      "`bars` observado en Updata One (WebGL, sin DOM medible): el largo se mide desde el círculo interior; ancho fijo para no sugerir área.",
+      "Un solo color: en el original los colores de los huevos son decorativos. Pendiente: QA con rótulos largos y con más de 25 ítems; en pantallas de 390 px el texto escala a ~7 px (conviene mostrar la lista en su lugar).",
     ],
   },
 ];

@@ -1,7 +1,8 @@
 // Captura evidencia de una fuente de diseño autorizada (skill capturar-diseno, compuertas G0 y G1).
 //
 //   node scripts/capturar.mjs --fuente atlas --url https://… [--vista home] [--estado hover=hover:.btn]…
-//        [--dom ".btn, .card"] [--pagina-completa] [--autoriza "quién y para qué"] [--licencia "MIT"]
+//        [--dom ".btn, .card"] [--pagina-completa | --tramos 8] [--esperar ".grafico"] [--ocultar ".cookie-banner"]…
+//        [--autoriza "quién y para qué"] [--licencia "MIT"]
 //   node scripts/capturar.mjs --fuente kraa-figma --imagen ruta/a/captura.png [--vista home]
 //
 // Escribe en evidencia/<AAAA-MM-DD>-<fuente>/ (gitignored): captures/, dom/, evidence.json y SHA256SUMS.
@@ -12,6 +13,11 @@
 // - Contexto de navegador nuevo, sin storageState: nunca usa ni guarda la sesión del usuario. Si la página
 //   pide login (401/403, URL de acceso o campo de contraseña), marca blocked-auth, no captura y sale con 2.
 // - Por cada viewport y estado recarga la página, para que un estado no arrastre al siguiente.
+// - --tramos N captura N veces el viewport bajando con la rueda: para scrollytelling y secciones fijadas, donde
+//   una captura de página completa no muestra lo que el scroll va revelando.
+// - --esperar espera a que un selector sea visible (pantallas de carga). --ocultar esconde por CSS lo que tapa
+//   la captura (banners de cookies, chats): no hace clic ni acepta ni rechaza nada. Con --pagina-completa,
+//   antes de capturar recorre la página con scroll para que aparezca el contenido que se revela al entrar.
 // - El DOM es opcional y acotado: bounds y una lista fija de estilos computados de los elementos visibles
 //   que matchean --dom, más las variables CSS de :root. Nada de valores de formularios.
 // - Las tipografías se leen siempre (en reposo, en cada viewport): familias cargadas por document.fonts, archivos
@@ -75,6 +81,9 @@ const { values: args } = parseArgs({
     estado: { type: "string", multiple: true, default: [] },
     dom: { type: "string" },
     "pagina-completa": { type: "boolean", default: false },
+    esperar: { type: "string" },
+    ocultar: { type: "string", multiple: true, default: [] },
+    tramos: { type: "string", default: "1" },
     autoriza: { type: "string" },
     licencia: { type: "string" },
     salida: { type: "string", default: "evidencia" },
@@ -96,6 +105,10 @@ const estados = args.estado.map((e) => {
   }
 });
 if (args.imagen && (estados.length || args.dom)) fallar("--estado y --dom solo aplican a --url");
+args.tramos = Number(args.tramos);
+if (!Number.isInteger(args.tramos) || args.tramos < 1 || args.tramos > 40)
+  fallar("--tramos debe ser un entero de 1 a 40");
+if (args.tramos > 1 && args["pagina-completa"]) fallar("--tramos y --pagina-completa no se combinan");
 
 const dir = join(args.salida, `${fechaSantiago()}-${slug(args.fuente)}`);
 const rutaEvidencia = join(dir, "evidence.json");
@@ -192,6 +205,68 @@ async function leerTipografias(page) {
   }, SELECTOR_SEMANTICO);
 }
 
+/** Captura (imagen y, con --dom, estilos) en el estado y la posición de scroll actuales, y la registra. */
+async function capturarAqui(page, vp, nombreEstado, extra = {}) {
+  const archivo = `captures/${nombreCaptura(args.vista, nombreEstado, vp)}`;
+  await page.screenshot({ path: join(dir, archivo), fullPage: args["pagina-completa"], animations: "disabled" });
+  const datos = {
+    vista: slug(args.vista),
+    estado: nombreEstado,
+    viewport: { ...vp, dpr: 1 },
+    desconocido: ["movimiento (captura con animaciones desactivadas)"],
+  };
+  if (args.ocultar.length) datos.ocultos = args.ocultar;
+  if (extra.accionForzada) datos.accionForzada = true;
+  if (extra.tramo !== undefined) datos.tramo = extra.tramo;
+  if (args.dom) {
+    mkdirSync(join(dir, "dom"), { recursive: true });
+    const dom = await page.evaluate(
+      ({ selector, estilos, max }) => {
+        const raiz = getComputedStyle(document.documentElement);
+        const variables = Object.fromEntries(
+          [...raiz].filter((p) => p.startsWith("--")).map((p) => [p, raiz.getPropertyValue(p).trim()]),
+        );
+        const elementos = [...document.querySelectorAll(selector)]
+          .filter((el) => el.checkVisibility())
+          .slice(0, max)
+          .map((el) => {
+            const cs = getComputedStyle(el);
+            const r = el.getBoundingClientRect();
+            return {
+              tag: el.tagName.toLowerCase(),
+              clase: el.getAttribute("class"),
+              bounds: { x: r.x, y: r.y, width: r.width, height: r.height },
+              estilos: Object.fromEntries(estilos.map((p) => [p, cs.getPropertyValue(p)])),
+            };
+          });
+        return { selector, variables, elementos };
+      },
+      { selector: args.dom, estilos: ESTILOS, max: MAX_ELEMENTOS },
+    );
+    const recortar = (o) => Object.fromEntries(Object.entries(o).map(([p, v]) => [p, recortarValor(v)]));
+    dom.variables = recortar(dom.variables);
+    for (const el of dom.elementos) el.estilos = recortar(el.estilos);
+    const archivoDom = `dom/${nombreCaptura(args.vista, nombreEstado, vp, "json")}`;
+    writeFileSync(join(dir, archivoDom), `${JSON.stringify(dom, null, 2)}\n`);
+    datos.dom = archivoDom;
+  }
+  registrar(archivo, datos);
+}
+
+/** Baja por la página de a 80 % de pantalla y vuelve arriba, para disparar lo que se revela al hacer scroll. */
+async function recorrer(page) {
+  await page.evaluate(async () => {
+    const pausa = (ms) => new Promise((r) => setTimeout(r, ms));
+    for (let y = 0, pasos = 0; y < document.documentElement.scrollHeight && pasos < 60; pasos++) {
+      window.scrollTo(0, y);
+      await pausa(150);
+      y += Math.round(window.innerHeight * 0.8);
+    }
+    window.scrollTo(0, 0);
+    await pausa(400);
+  });
+}
+
 delete evidencia.incompleta;
 const browser = await chromium.launch(
   process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
@@ -225,6 +300,10 @@ try {
         codigo = 2;
         break;
       }
+      if (args.esperar) await page.locator(args.esperar).first().waitFor({ state: "visible", timeout: 20_000 });
+      if (args.ocultar.length)
+        await page.addStyleTag({ content: `${args.ocultar.join(", ")} { display: none !important; }` });
+      if (args["pagina-completa"]) await recorrer(page);
       if (!estado) {
         const { hojasIlegibles, ...crudas } = await leerTipografias(page);
         const cargados = archivosDeFuentes(pedidas);
@@ -262,48 +341,18 @@ try {
         );
         await page.waitForTimeout(300);
       }
-      const archivo = `captures/${nombreCaptura(args.vista, nombreEstado, vp)}`;
-      await page.screenshot({ path: join(dir, archivo), fullPage: args["pagina-completa"], animations: "disabled" });
-      const datos = {
-        vista: slug(args.vista),
-        estado: nombreEstado,
-        viewport: { ...vp, dpr: 1 },
-        desconocido: ["movimiento (captura con animaciones desactivadas)"],
-      };
-      if (accionForzada) datos.accionForzada = true;
-      if (args.dom) {
-        mkdirSync(join(dir, "dom"), { recursive: true });
-        const dom = await page.evaluate(
-          ({ selector, estilos, max }) => {
-            const raiz = getComputedStyle(document.documentElement);
-            const variables = Object.fromEntries(
-              [...raiz].filter((p) => p.startsWith("--")).map((p) => [p, raiz.getPropertyValue(p).trim()]),
-            );
-            const elementos = [...document.querySelectorAll(selector)]
-              .filter((el) => el.checkVisibility())
-              .slice(0, max)
-              .map((el) => {
-                const cs = getComputedStyle(el);
-                const r = el.getBoundingClientRect();
-                return {
-                  tag: el.tagName.toLowerCase(),
-                  clase: el.getAttribute("class"),
-                  bounds: { x: r.x, y: r.y, width: r.width, height: r.height },
-                  estilos: Object.fromEntries(estilos.map((p) => [p, cs.getPropertyValue(p)])),
-                };
-              });
-            return { selector, variables, elementos };
-          },
-          { selector: args.dom, estilos: ESTILOS, max: MAX_ELEMENTOS },
-        );
-        const recortar = (o) => Object.fromEntries(Object.entries(o).map(([p, v]) => [p, recortarValor(v)]));
-        dom.variables = recortar(dom.variables);
-        for (const el of dom.elementos) el.estilos = recortar(el.estilos);
-        const archivoDom = `dom/${nombreCaptura(args.vista, nombreEstado, vp, "json")}`;
-        writeFileSync(join(dir, archivoDom), `${JSON.stringify(dom, null, 2)}\n`);
-        datos.dom = archivoDom;
-      }
-      registrar(archivo, datos);
+      if (!estado && args.tramos > 1) {
+        // Scrollytelling: una captura del viewport por tramo, bajando con la rueda (funciona también con
+        // librerías de scroll suave, que ignoran scrollTo).
+        for (let t = 0; t < args.tramos; t++) {
+          if (t > 0) {
+            await page.mouse.move(vp.width / 2, vp.height / 2);
+            await page.mouse.wheel(0, Math.round(vp.height * 0.9));
+            await page.waitForTimeout(700);
+          }
+          await capturarAqui(page, vp, `reposo-t${String(t + 1).padStart(2, "0")}`, { tramo: t + 1 });
+        }
+      } else await capturarAqui(page, vp, nombreEstado, { accionForzada });
     }
     await context.close();
     if (codigo) break;

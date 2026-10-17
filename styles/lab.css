@@ -1,0 +1,201 @@
+/* Lab: familia neutra para la investigación de señales, magnitudes y revelación (Awwwards 2026-10,
+   evidencia en evidencia/2026-10-17-*). No copia la estética de ninguna fuente: tokens mínimos para
+   que lo que se compare sea el mecanismo, no el estilo. Los tokens viven en .lab para que un
+   contenedor pueda cambiarlos (por ejemplo, el acento). */
+
+@theme inline {
+  --color-lab-bg: var(--lab-bg);
+  --color-lab-surface: var(--lab-surface);
+  --color-lab-ink: var(--lab-ink);
+  --color-lab-on-ink: var(--lab-on-ink);
+  --color-lab-muted: var(--lab-muted);
+  --color-lab-line: var(--lab-line);
+  --color-lab-accent: var(--lab-accent);
+  --color-lab-accent-soft: var(--lab-accent-soft);
+  --color-lab-context: var(--lab-context);
+  --color-lab-info: var(--lab-info);
+  --color-lab-info-soft: var(--lab-info-soft);
+  --color-lab-success: var(--lab-success);
+  --color-lab-success-soft: var(--lab-success-soft);
+  --color-lab-warning: var(--lab-warning);
+  --color-lab-warning-soft: var(--lab-warning-soft);
+  --color-lab-danger: var(--lab-danger);
+  --color-lab-danger-soft: var(--lab-danger-soft);
+  --color-lab-cat-1: var(--lab-cat-1);
+  --color-lab-cat-1-text: var(--lab-cat-1-text);
+  --color-lab-cat-2: var(--lab-cat-2);
+  --color-lab-cat-2-text: var(--lab-cat-2-text);
+  --color-lab-cat-3: var(--lab-cat-3);
+  --color-lab-cat-3-text: var(--lab-cat-3-text);
+  --color-lab-cat-4: var(--lab-cat-4);
+  --color-lab-cat-4-text: var(--lab-cat-4-text);
+  --color-lab-cat-5: var(--lab-cat-5);
+  --color-lab-cat-5-text: var(--lab-cat-5-text);
+}
+
+@theme {
+  --font-lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Titulares condensados (capítulos de Voices usan Mango Grotesque, sin licencia verificada). Bebas Neue es
+     OFL y el banco ya la carga; en otro proyecto, sin ella, cae a una condensada del sistema. */
+  --font-lab-condensed: "Bebas Neue", "Oswald", "Arial Narrow", "Roboto Condensed", sans-serif;
+
+  --ease-lab-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Pulso de presencia: un anillo que se expande y se apaga. Solo con motion-safe. */
+  --animate-lab-pulse: lab-pulse 2s var(--ease-lab-out) infinite;
+  /* Medidos: la capa de fondo de BioAge gira una vuelta en 10 s lineal; la marquesina de logos de
+     Meridian recorre su ancho en 45 s. */
+  --animate-lab-rotate: lab-rotate 10s linear infinite;
+  --animate-lab-marquee: lab-marquee 45s linear infinite;
+
+  @keyframes lab-rotate {
+    to {
+      /* Solo rotate: el centrado va por la propiedad translate (utilidades -translate-*), que no se pisa. */
+      transform: rotate(1turn);
+    }
+  }
+
+  /* Las marcas crecen desde cero (Data GIF Maker, «Preview»: puntos a ~0,7 s, completas a ~1,75 s, leído en
+     cuadros; inferido). transform-box: fill-box en el elemento para que escale desde su propio origen. */
+  --animate-lab-grow: lab-grow 1.5s var(--ease-lab-out) both;
+
+  @keyframes lab-grow {
+    from {
+      transform: scale(0);
+    }
+  }
+
+  /* Fundido al cambiar un valor (Adobe «Running on Experience»: la cifra se funde al cambiar de industria; a
+     150 ms va por la mitad, leído en cuadros; la duración de 0,5 s es la del selector medido). */
+  --animate-lab-fade: lab-fade 0.5s var(--ease-lab-out) both;
+
+  @keyframes lab-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lab-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes lab-pulse {
+    from {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+}
+
+.lab {
+  /* Un solo acento con un solo significado: «esto es lo que importa aquí». */
+  --lab-bg: #f6f7f9;
+  --lab-surface: #ffffff;
+  --lab-ink: #14171c;
+  --lab-on-ink: #ffffff; /* texto sobre --lab-ink */
+  --lab-muted: #5b6270; /* 6,1:1 sobre --lab-surface */
+  --lab-line: #dfe3ea;
+  --lab-accent: #1d5bd8; /* 5,9:1 sobre --lab-surface; 5,0:1 sobre --lab-accent-soft */
+  --lab-accent-soft: #e3ecfd;
+  --lab-context: #b9c0cc; /* 1,8:1: solo contexto atenuado, nunca texto ni la única forma de leer un dato */
+
+  font-family: var(--font-lab-sans);
+  color: var(--lab-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Paletas medidas en las referencias: mismos componentes, otra estética, para comparar el mecanismo
+   con el estilo cambiado. <div className="lab" data-lab-palette="bioage">. */
+
+/* BioAge (bioagelabs.com/platform). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="bioage"] {
+  --lab-bg: #1c0835;
+  --lab-surface: #342059;
+  --lab-ink: #ffffff;
+  --lab-on-ink: #1c0835;
+  --lab-muted: #c0b3d0;
+  --lab-line: #503f70;
+  --lab-accent: #a56cff;
+  --lab-accent-soft: #462c74;
+  --lab-context: #655383;
+}
+
+/* Meridian (meridian-ai.com). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="meridian"] {
+  --lab-bg: #f7f7f7;
+  --lab-surface: #ffffff;
+  --lab-ink: #1e1e1e;
+  --lab-on-ink: #ffffff;
+  --lab-muted: #4b4b4b;
+  --lab-line: #e1e9e8;
+  --lab-accent: #07483d;
+  --lab-accent-soft: #c6e0d9;
+  --lab-context: #b5c8c5;
+}
+
+/* Paradigm (paradigm-solutions.io). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="paradigm"] {
+  --lab-bg: #010e16;
+  --lab-surface: #01121e;
+  --lab-ink: #e5e8ec;
+  --lab-on-ink: #01121e;
+  --lab-muted: #9ca4aa;
+  --lab-line: #1a2a35;
+  --lab-accent: #139bfd;
+  --lab-accent-soft: #042842;
+  --lab-context: #3a4852;
+}
+
+/* Voices from the Frontlines (africa.climatemobility.org). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="voices"] {
+  --lab-bg: #f3efe9;
+  --lab-surface: #ffffff;
+  --lab-ink: #000000;
+  --lab-on-ink: #ffffff;
+  --lab-muted: #575757;
+  --lab-line: #e8dce1;
+  --lab-accent: #a5104f;
+  --lab-accent-soft: #f1d9e3;
+  --lab-context: #d1bac4;
+}
+
+/* Estados (texto o ícono y fondo suave) y categóricas. Valores en lib/lab/semantica.ts. */
+.lab {
+  --lab-info: #1d5bd8;
+  --lab-info-soft: #e3ecfd;
+  --lab-success: #17703a;
+  --lab-success-soft: #dcf3e3;
+  --lab-warning: #8a5a00;
+  --lab-warning-soft: #fff1cc;
+  --lab-danger: #c42b1c;
+  --lab-danger-soft: #fde3e0;
+}
+.lab[data-lab-palette="bioage"],
+.lab[data-lab-palette="paradigm"] {
+  --lab-info: #7fb0ff;
+  --lab-info-soft: #14244a;
+  --lab-success: #5fd08b;
+  --lab-success-soft: #0f3320;
+  --lab-warning: #f2c14e;
+  --lab-warning-soft: #3a2c08;
+  --lab-danger: #ff8a80;
+  --lab-danger-soft: #45161a;
+}
+.lab {
+  --lab-cat-1: #e6503c;
+  --lab-cat-1-text: #000000;
+  --lab-cat-2: #068076;
+  --lab-cat-2-text: #ffffff;
+  --lab-cat-3: #001480;
+  --lab-cat-3-text: #ffffff;
+  --lab-cat-4: #fbd236;
+  --lab-cat-4-text: #000000;
+  --lab-cat-5: #f5a8c1;
+  --lab-cat-5-text: #000000;
+}

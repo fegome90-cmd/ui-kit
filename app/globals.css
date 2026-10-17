@@ -1,5 +1,5 @@
-/* Cuatro familias conviven: Ninja usa Tailwind (tokens en :root), REMI vive bajo .remi,
-   Kraa bajo .kraa-theme y REA bajo .rea-theme. Cada familia trae su propio reset acotado. */
+/* Cinco familias conviven: Ninja usa Tailwind (tokens en :root), REMI vive bajo .remi,
+   Kraa bajo .kraa-theme, REA bajo .rea-theme y Lab bajo .lab. Cada familia trae su propio reset acotado. */
 @import "tailwindcss";
 @import "@fontsource-variable/hanken-grotesk";
 @import "../styles/ninja.css";
@@ -10,3 +10,4 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 @import "../styles/rea.css";
+@import "../styles/lab.css";

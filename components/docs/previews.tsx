@@ -53,6 +53,7 @@ import { bySlug, type Family } from "@/lib/component-registry";
 import { DEMO_DOCUMENTS } from "@/lib/demo/kraa-docs";
 import { DEMO_FONT_CARDS, DEMO_HEADLINE_FONTS } from "@/lib/demo/ninja-fonts";
 import { DEFAULT_TYPOGRAPHY, type TypographyConfig } from "@/lib/kraa/kraa-model";
+import { LAB_PREVIEWS, LAB_THUMBS } from "./previews-lab";
 import { REA_PREVIEWS, REA_THUMBS } from "./previews-rea";
 
 function Row({ children, caption }: { children: ReactNode; caption?: string }) {
@@ -655,6 +656,8 @@ export const PREVIEWS: Record<string, () => ReactNode> = {
   "kraa-document-workspace": KraaWorkspacePreview,
   // REA (en previews-rea.tsx)
   ...REA_PREVIEWS,
+  // Lab (en previews-lab.tsx)
+  ...LAB_PREVIEWS,
 };
 
 /** Miniaturas para la grilla del índice; siempre estáticas e inertes. */
@@ -789,6 +792,7 @@ export const THUMBS: Record<string, ReactNode> = {
   "kraa-typography-settings": <span className="text-[13px] text-kraa-muted">Ajustes de lectura</span>,
   "kraa-document-workspace": <span className="text-[13px] text-kraa-muted">Espacio de trabajo</span>,
   ...REA_THUMBS,
+  ...LAB_THUMBS,
 };
 
 /**
@@ -816,6 +820,7 @@ export function FamilyScope({
   // Ninja hereda fuente y color del body en su demo; en el banco el body es del banco.
   // contents: el envoltorio solo aporta herencia, no caja.
   if (family === "Ninja") return <div className="contents font-sans text-foreground">{children}</div>;
+  if (family === "Lab") return <div className="lab w-full">{children}</div>;
   if (family === "REA")
     return (
       <ReaProvider surface={surface} style={surface ? { padding: 24, width: "100%" } : undefined}>

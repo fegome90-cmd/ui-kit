@@ -12,7 +12,7 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
 | REMI | Componentes genéricos del monitor REMI (`remi-monitor`) | CSS plano en `styles/remi.css` | `.remi` |
 | Ninja | `ninja-ui` v3 | Tailwind v4 + Radix + `cva`, tokens en `styles/ninja.css` | ninguno (`:root`) |
 | Kraa | `kraa-component-bank` v0.1.1 | CSS con tokens `--kraa-*` en `styles/kraa-theme.css` + Radix | `KraaProvider` (`.kraa-theme`) |
-| REA | `REA_Atlas_completo_v4` (2026-10-16) | CSS con tokens `--rea-*` en `styles/rea.css`, sin dependencias de UI | `ReaProvider` (`.rea-theme`) |
+| REA | `REA_Atlas_completo_v4` (2026-10-16) | Tailwind v4 + `cva` + `cn()`, tema en `styles/rea.css` | `ReaProvider` (`.rea-theme`) |
 
 - **REMI** solo trae lo genérico. Se quedaron en el monitor el punto de pendientes, el diálogo de escala,
   las indicaciones, los indicadores clínicos y `lib/pending`. `styles/remi.css` se extrajo una vez de los
@@ -23,6 +23,23 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
   referencias están en `docs/origen/rea-atlas/`.
 - **Ninja** y **Kraa** se copiaron tal cual. Solo cambiaron las rutas de import, el formato (Biome) y los
   ajustes de lint que se anotan junto al código. Los READMEs originales están en `docs/origen/`.
+
+## Convención (estilo shadcn)
+
+Ninja y REA siguen la convención; Kraa y REMI todavía usan CSS con clases propias y se migran después.
+
+- **Componentes con utilidades de Tailwind**: variantes con `cva`, clases combinadas con `cn()` (`lib/utils.ts`),
+  `data-slot` en la raíz y exportaciones con nombre. El código vive en el repo, no en un paquete.
+- **Ninja es el tema base** de shadcn: sus tokens (`--background`, `--primary`, `--radius-*`, breakpoints `sm`/`md`/…,
+  `font-sans`) son globales. Las demás familias no usan esas utilidades genéricas (`rounded-xl`, `md:`, `font-sans`):
+  usan sus tokens con prefijo o valores arbitrarios (`rounded-[0.75rem]`, `max-[960px]:`).
+- **Tokens por familia**: los valores viven acotados en el contenedor de la familia (p. ej. `.rea-theme`), porque
+  cambian con el tema o el acento. Se exponen a Tailwind con `@theme inline` (`--color-rea-ink: var(--rea-ink)` →
+  `bg-rea-ink`). Los valores fijos (fuentes, tamaños, curvas, animaciones) van en un `@theme` normal.
+- **Reset en `@layer base`**: así las utilidades siempre le ganan. En CSS solo queda lo que Tailwind no expresa
+  bien: keyframes y `@utility` puntuales (`rea-ruler`, `rea-grid-paper`, `rea-lift`).
+- **Tamaños propios en `cn()`**: cada `--text-*` nuevo se registra en `extendTailwindMerge` (`lib/utils.ts`). Si no,
+  `tailwind-merge` lo confunde con un color y lo descarta.
 
 ## Estructura
 
@@ -68,8 +85,9 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
 - `AnimatedHeadline` y `KraaReadingCanvas` renderizan su propio `h1`.
 - REA: `SlideNavigator` está en estado *candidate* y usa el azul FALP `#004990` como respaldo
   (`rights: review-required`). No se portaron el terreno WebGL ni el scrollytelling sticky del escenario.
-- REA: la copia decorativa de `ReaNav` usa `content: … / ""` para no leerse dos veces. En navegadores sin
-  soporte de texto alternativo en `content`, un lector de pantalla puede leerla.
+- REA: la copia decorativa de `ReaNav` usa `content: attr(data-label) / ""` para no leerse dos veces. Un navegador
+  sin soporte de texto alternativo en `content` descarta la declaración y no muestra la copia en hover.
+- Kraa y REMI aún no siguen la convención shadcn, y no hay `registry.json` para instalar con `npx shadcn add`.
 
 ## Licencias
 

@@ -45,7 +45,8 @@ export function ReaCommandPalette({
   return (
     <dialog
       ref={ref}
-      className="rea-palette"
+      data-slot="rea-command-palette"
+      className="fixed inset-x-0 top-[min(16vh,140px)] mx-auto my-0 max-h-[76vh] w-[min(92vw,610px)] border border-rea-line-strong bg-rea-bg p-0 text-rea-ink shadow-[0_25px_110px_rgb(0_0_0/0.3)] backdrop:bg-black/48 backdrop:backdrop-blur-[3px]"
       aria-label={label}
       onClose={() => onOpenChange(false)}
       onClick={(e) => {
@@ -56,7 +57,7 @@ export function ReaCommandPalette({
         if (e.key === "Escape") e.stopPropagation();
       }}
     >
-      <div className="rea-palette-head">
+      <div className="flex items-center gap-2.5 border-b border-rea-line px-5 py-4">
         <span aria-hidden="true">⌕</span>
         {/* type="text" y no "search": en Chrome el primer Escape de un campo search solo lo vacía,
             y la tecla visible promete cerrar. Además evita la × nativa duplicada. */}
@@ -64,34 +65,41 @@ export function ReaCommandPalette({
           ref={inputRef}
           type="text"
           enterKeyHint="search"
+          className="min-w-0 flex-1 border-0 bg-transparent text-base outline-none focus-visible:outline-none"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
           aria-label="Buscar comandos"
           aria-controls={listId}
         />
-        <span className="rea-keycap rea-note" aria-hidden="true">
+        <span
+          className="border border-rea-line px-1.5 py-[3px] font-rea-mono text-[0.66rem] font-medium text-rea-muted"
+          aria-hidden="true"
+        >
           ESC
         </span>
       </div>
-      <ul className="rea-palette-list" id={listId}>
+      <ul className="m-0 max-h-[60vh] list-none overflow-auto py-2" id={listId}>
         {shown.map((c) => (
           <li key={c.id}>
             <button
               type="button"
+              className="flex w-full items-center justify-between gap-4 border-0 bg-transparent px-5 py-3.5 text-left hover:bg-rea-bg-raised focus-visible:bg-rea-bg-raised"
               onClick={() => {
                 onOpenChange(false);
                 onSelect(c.id);
               }}
             >
-              <span>{c.label}</span>
-              {c.hint && <small>{c.hint}</small>}
+              <span className="text-[0.91rem]">{c.label}</span>
+              {c.hint && (
+                <small className="font-rea-mono text-[0.7rem] font-medium text-rea-muted uppercase">{c.hint}</small>
+              )}
             </button>
           </li>
         ))}
       </ul>
       {!shown.length && (
-        <p className="rea-palette-empty rea-note" role="status">
+        <p className="m-0 p-5 font-rea-mono text-[0.72rem] font-medium text-rea-muted uppercase" role="status">
           {emptyText}
         </p>
       )}

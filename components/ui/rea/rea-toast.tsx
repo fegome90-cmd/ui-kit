@@ -5,7 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 /** Aviso fijo abajo a la derecha. Siempre está en el DOM para que role="status" se anuncie. */
 export function ReaToast({ message }: { message: string | null }) {
   return (
-    <div className="rea-toast" role="status" aria-live="polite">
+    <div
+      data-slot="rea-toast"
+      className="fixed right-(--rea-gutter) bottom-6 z-100 max-w-[min(420px,90vw)] bg-rea-ink px-5 py-3.5 text-[0.81rem] text-rea-bg shadow-[0_14px_40px_rgb(0_0_0/0.18)] empty:hidden"
+      role="status"
+      aria-live="polite"
+    >
       {message ?? ""}
     </div>
   );

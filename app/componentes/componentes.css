@@ -616,21 +616,3 @@
 .cb-card-thumb .filter-cell {
   width: 210px;
 }
-
-/* Vistas previas de REA */
-.cb-rea-display {
-  margin: 0;
-  max-width: 24ch;
-  font-size: var(--rea-step-3);
-  font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-}
-.cb-rea-monogram {
-  width: 110px;
-  height: auto;
-}
-.cb-rea-thumb-mark {
-  width: 48px;
-  height: 28px;
-}

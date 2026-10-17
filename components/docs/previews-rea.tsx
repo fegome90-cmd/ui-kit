@@ -219,7 +219,7 @@ function MonogramPreview() {
       <div style={{ position: "relative", height: 220, overflow: "hidden", border: "1px solid var(--rea-line)" }}>
         <ReaPreloader key={run} duration={1400} onDone={onDone} />
         <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
-          <ReaMonogram key={`m-${run}`} label="Monograma de REA Atlas" className="cb-rea-monogram" />
+          <ReaMonogram key={`m-${run}`} label="Monograma de REA Atlas" className="h-auto w-[110px]" />
         </div>
       </div>
       <div style={stack}>
@@ -244,7 +244,11 @@ function GenWordsPreview() {
   const [run, setRun] = useState(0);
   return (
     <div style={column}>
-      <ReaGenWords key={run} text="A library of interfaces, motion and reusable systems." className="cb-rea-display" />
+      <ReaGenWords
+        key={run}
+        text="A library of interfaces, motion and reusable systems."
+        className="m-0 max-w-[24ch] text-rea-step-3 leading-[0.95] font-medium tracking-[-0.045em]"
+      />
       <div>
         <ReaButton size="sm" variant="ghost" arrow={null} onClick={() => setRun((r) => r + 1)}>
           Repetir
@@ -457,18 +461,14 @@ export const REA_THUMBS: Record<string, ReactNode> = {
   "rea-specimen-list": <strong style={{ fontSize: 22, letterSpacing: "-0.05em" }}>01 SlideNavigator ↗</strong>,
   "rea-inspector": <ReaNote tone="ink">Tipo · Fuente · QA</ReaNote>,
   "rea-command-palette": <ReaNote tone="ink">⌘K · Comandos</ReaNote>,
-  "rea-toast": (
-    <span className="rea-note" style={{ background: "var(--rea-ink)", color: "var(--rea-bg)", padding: "6px 10px" }}>
-      Aviso
-    </span>
-  ),
+  "rea-toast": <ReaNote className="bg-rea-ink px-2.5 py-1.5 text-rea-bg">Aviso</ReaNote>,
   "rea-scroll-progress": (
     <div style={{ width: 160 }}>
       <ReaScrollProgress value={0.42} />
     </div>
   ),
   "rea-grid-overlay": <ReaNote tone="accent">| | | | | | 12 col</ReaNote>,
-  "rea-monogram": <ReaMonogram className="cb-rea-thumb-mark" />,
+  "rea-monogram": <ReaMonogram className="h-7 w-12" />,
   "rea-gen-words": <span style={{ fontSize: 22, letterSpacing: "-0.04em" }}>A library of…</span>,
   "rea-wireline": (
     <span style={{ fontSize: 28, color: "transparent", WebkitTextStroke: "1px var(--rea-line-strong)" }}>Find</span>

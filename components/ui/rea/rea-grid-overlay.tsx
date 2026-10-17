@@ -15,16 +15,17 @@ export function ReaGridOverlay({
 }) {
   return (
     <div
-      className="rea-grid-overlay"
+      data-slot="rea-grid-overlay"
+      className="pointer-events-none fixed inset-0 z-90 px-(--rea-gutter) opacity-0 transition-opacity duration-400 ease-rea-out data-contained:absolute data-[visible=true]:opacity-100"
       data-visible={visible}
       data-contained={contained || undefined}
       aria-hidden="true"
       style={{ ["--rea-columns" as string]: columns }}
     >
-      <div className="rea-grid-overlay-inner">
+      <div className="grid h-full grid-cols-[repeat(var(--rea-columns),minmax(0,1fr))] gap-(--rea-col-gap)">
         {Array.from({ length: columns }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: cada columna es una posición fija de la retícula
-          <span key={`col-${i + 1}`} />
+          <span key={`col-${i + 1}`} className="border-x border-rea-accent/32 bg-rea-accent/9" />
         ))}
       </div>
     </div>

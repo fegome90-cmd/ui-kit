@@ -51,10 +51,8 @@ export function ReaCatalog({
   const current = visible.find((e) => e.id === selected) ?? visible[0];
 
   return (
-    <div className="rea-catalog" style={{ display: "grid", gap: 20 }}>
-      <div
-        style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between" }}
-      >
+    <div data-slot="rea-catalog" className="grid gap-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <ReaSearchBox label="Buscar en la biblioteca" value={query} onValueChange={setQuery} shortcut="⌘ K" />
         <ReaFilterGroup
           label="Filtrar por tipo"
@@ -84,9 +82,9 @@ export function ReaCatalog({
         emptyText="No hay elementos en esta colección con los filtros actuales. Ningún componente adicional ha sido inventado."
       />
       {current && (
-        <section aria-label={`${current.title}: detalles`} style={{ display: "grid", gap: 20 }}>
+        <section aria-label={`${current.title}: detalles`} className="grid gap-5">
           <ReaSectionHead title="Component inspector" aside={current.title} />
-          <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5">
             <ReaDetailRows rows={current.details} label="Detalles" />
             <ReaCodeBox code={current.code} title="Code / registry" badge="Ejemplo" onCopyResult={onCopyResult} />
           </div>

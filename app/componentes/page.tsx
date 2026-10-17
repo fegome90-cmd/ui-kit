@@ -7,7 +7,7 @@ const FAMILY_NOTES: Record<Family, string> = {
   REMI: "CSS plano extraído del monitor REMI, acotado bajo el contenedor .remi. Medidas a 1920×1080.",
   Ninja: "Estilo shadcn: Tailwind v4 + Radix + cva. Los tokens están en styles/ninja.css.",
   Kraa: "CSS con tokens --kraa-* y Radix. Todo va dentro de KraaProvider (.kraa-theme).",
-  REA: "Patrones de REA Atlas reescritos en React, con CSS y tokens --rea-*. Todo va dentro de ReaProvider (.rea-theme).",
+  REA: "Patrones de REA Atlas en React con Tailwind + cva + cn() y tokens --rea-*. Todo va dentro de ReaProvider (.rea-theme).",
 };
 
 export default function ComponentesIndex() {

@@ -3,13 +3,14 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { clamp } from "@/lib/rea/rea-utils";
 import { useReducedMotion } from "@/lib/rea/use-reduced-motion";
+import { cn } from "@/lib/utils";
 
 /**
  * Frase que se "compila" palabra por palabra (desenfoque → nítido) con un cursor de acento.
  * Ritmo del original: 75 ms por palabra y 220 ms extra tras puntuación.
  * El texto completo va en aria-label; las palabras sueltas no se leen.
  */
-export function ReaGenWords({
+function ReaGenWords({
   text,
   as: Tag = "p",
   start = 0.2,
@@ -34,14 +35,15 @@ export function ReaGenWords({
     });
   return (
     <Tag
-      className={["rea-gen-words", className].filter(Boolean).join(" ")}
+      data-slot="rea-gen-words"
+      className={className}
       aria-label={text}
       style={{ ["--rea-gen-start" as string]: `${start}s` } as CSSProperties}
     >
       {words.map(({ w, d, key }, i) => (
         <span key={key} aria-hidden="true">
           <span
-            className="rea-gen-word"
+            className="inline-block animate-rea-compile-word [animation-delay:calc(var(--rea-gen-start,0.2s)+var(--rea-word-delay,0s))]"
             style={{ ["--rea-word-delay" as string]: `${d.toFixed(3)}s` } as CSSProperties}
           >
             {w}
@@ -49,17 +51,24 @@ export function ReaGenWords({
           {i < words.length - 1 ? " " : null}
         </span>
       ))}
-      {caret && <span className="rea-gen-caret" aria-hidden="true" />}
+      {caret && (
+        <span
+          className="ml-[0.07em] inline-block h-[0.8em] w-[0.085em] animate-rea-cursor-blink bg-rea-accent align-[-0.08em]"
+          aria-hidden="true"
+        />
+      )}
     </Tag>
   );
 }
+
+const LINE = "block text-rea-step-4 leading-[1.05] font-medium tracking-[-0.064em] whitespace-nowrap";
 
 /**
  * Titular en contorno que se rellena de izquierda a derecha según el desplazamiento
  * (`progress` 0..1) o al pasar el puntero. Con movimiento reducido se muestra relleno.
  * El texto se lee una vez; las dos capas visuales son decorativas.
  */
-export function ReaWireline({
+function ReaWireline({
   text,
   measure,
   progress,
@@ -103,21 +112,36 @@ export function ReaWireline({
   return (
     <div
       ref={ref}
-      className={["rea-wireline-row", className].filter(Boolean).join(" ")}
+      data-slot="rea-wireline"
+      className={cn("group relative w-fit max-w-full", className)}
       style={{ ["--rea-scrub" as string]: `${value * 100}%` } as CSSProperties}
     >
-      <span className="rea-sr">{text}</span>
+      <span className="sr-only">{text}</span>
       {measure && (
-        <span className="rea-measure" aria-hidden="true">
+        <span
+          className="absolute -top-3.5 -right-0.5 font-rea-mono text-[0.65rem] whitespace-nowrap text-rea-accent-text"
+          aria-hidden="true"
+        >
           {measure}
         </span>
       )}
-      <span className="rea-wireline" data-layer="outline" aria-hidden="true">
+      <span
+        className={cn(LINE, "text-transparent [-webkit-text-stroke:1px_var(--rea-line-strong)]")}
+        aria-hidden="true"
+      >
         {text}
       </span>
-      <span className="rea-wireline" data-layer="fill" aria-hidden="true">
+      <span
+        className={cn(
+          LINE,
+          "absolute inset-0 w-fit text-rea-ink [clip-path:inset(-0.35em_calc(100%_-_var(--rea-scrub,0%))_-0.45em_0)] group-focus-within:[clip-path:inset(-0.35em_0_-0.45em_0)] group-hover:[clip-path:inset(-0.35em_0_-0.45em_0)]",
+        )}
+        aria-hidden="true"
+      >
         {text}
       </span>
     </div>
   );
 }
+
+export { ReaGenWords, ReaWireline };

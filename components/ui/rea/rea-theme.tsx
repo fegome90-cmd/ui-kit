@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 
 export type ReaTheme = "light" | "dark";
 export type ReaAccent = "blue" | "orange" | "lime";
@@ -25,7 +26,8 @@ export function ReaProvider({
   return (
     <ThemeContext.Provider value={value}>
       <div
-        className={["rea-theme", className].filter(Boolean).join(" ")}
+        data-slot="rea-provider"
+        className={cn("rea-theme", className)}
         data-rea-theme={theme}
         data-rea-accent={accent}
         data-rea-surface={surface || undefined}

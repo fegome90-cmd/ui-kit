@@ -16,16 +16,23 @@ export function ReaScrollProgress({
   const pct = clamp(Number.isFinite(value) ? value : 0, 0, 1) * 100;
   return (
     <div
-      className="rea-scroll-rule"
+      data-slot="rea-scroll-progress"
+      className="rea-ruler relative h-[7px]"
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(pct)}
     >
-      <span className="rea-scroll-bar" style={{ width: `${pct}%` }} />
+      <span
+        className="absolute bottom-0 left-0 h-0.5 bg-rea-accent transition-[width] duration-150 ease-linear"
+        style={{ width: `${pct}%` }}
+      />
       {showLabel && (
-        <span className="rea-scroll-tag" aria-hidden="true">
+        <span
+          className="absolute top-2.5 right-0 bg-rea-accent px-[0.35rem] py-[0.2rem] font-rea-mono text-[0.625rem] leading-none font-semibold text-rea-accent-ink"
+          aria-hidden="true"
+        >
           {pad2(pct)}%
         </span>
       )}

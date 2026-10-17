@@ -9,6 +9,7 @@ import { DistributionChart } from "@/components/ui/lab/distribution-chart";
 import { DivergingHeatmap } from "@/components/ui/lab/diverging-heatmap";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
 import { FeatureTabs } from "@/components/ui/lab/feature-tabs";
+import { FilteredStat } from "@/components/ui/lab/filtered-stat";
 import { HierarchyCells } from "@/components/ui/lab/hierarchy-cells";
 import { LabBackdrop, PATTERNS } from "@/components/ui/lab/lab-backdrop";
 import { LabGlowCard } from "@/components/ui/lab/lab-glow-card";
@@ -628,6 +629,30 @@ LAB_PREVIEWS["lab-range-bars"] = () => (
   </div>
 );
 
+LAB_PREVIEWS["lab-filtered-stat"] = () => (
+  <div className="w-full">
+    <FilteredStat
+      title="Pacientes con control al día (ficticio)"
+      label="Servicio"
+      unit="%"
+      reference="todos"
+      segments={[
+        { id: "todos", label: "Todos", value: 24, detail: "+11 puntos desde 2023" },
+        { id: "aps", label: "APS", value: 28, detail: "+9 puntos desde 2023" },
+        {
+          id: "urg",
+          label: "Urgencia",
+          value: 19,
+          detail: "+14 puntos desde 2023",
+          note: "Muestra chica: 86 pacientes. Leer con cautela.",
+        },
+        { id: "ped", label: "Pediatría", value: 31, detail: "+6 puntos desde 2023" },
+        { id: "mat", label: "Maternidad", value: 22, detail: "+3 puntos desde 2023" },
+      ]}
+    />
+  </div>
+);
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -775,5 +800,15 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
       <rect x="60" y="8" width="18" height="8" rx="4" className="fill-lab-accent" />
       <rect x="18" y="24" width="14" height="8" rx="4" className="fill-lab-accent" />
     </svg>
+  ),
+  "lab-filtered-stat": (
+    <span className="grid justify-items-center gap-[4px]">
+      <span className="text-[22px] font-bold leading-none text-lab-ink">24 %</span>
+      <span className="flex gap-[2px] rounded-full bg-lab-ink p-[2px]">
+        <span className="h-[8px] w-[20px] rounded-full bg-lab-surface" />
+        <span className="h-[8px] w-[20px]" />
+        <span className="h-[8px] w-[20px]" />
+      </span>
+    </span>
   ),
 };

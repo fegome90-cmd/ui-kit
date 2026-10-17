@@ -1753,6 +1753,39 @@ Pendientes <LabCount value={12} />`,
       "Un solo color para todos: el signo lo dicen el cero y el texto; rojo para lo negativo lo leería como «malo».",
     ],
   },
+  {
+    slug: "lab-filtered-stat",
+    family: "Lab",
+    name: "Cifra por segmento",
+    category: "Gráficos",
+    description: "Una cifra grande y un selector que la cambia por segmento, para comparar sin cambiar de vista.",
+    files: ["components/ui/lab/filtered-stat.tsx", "lib/utils.ts"],
+    usage: `<FilteredStat title="Control al día" label="Servicio" unit="%" reference="todos" segments={[{ id: "todos", label: "Todos", value: 24 }, { id: "aps", label: "APS", value: 28 }]} />`,
+    props: [
+      {
+        name: "segments",
+        type: "{ id; label; value; detail?; note? }[]",
+        description: "Segmentos; `note` marca el botón con un punto y se muestra bajo la cifra.",
+      },
+      { name: "label", type: "string", description: "Nombre del selector para lectores de pantalla." },
+      { name: "unit", type: "string", description: "Unidad tras la cifra." },
+      { name: "reference", type: "string", description: "Segmento de referencia; se muestra al elegir otro." },
+      {
+        name: "value / defaultValue / onValueChange",
+        type: "string / string / (id) => void",
+        description: "Controlado o no.",
+      },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Adobe «Running on Experience» (Summary): píldora 830 × 43, botones 130 × 35, radio 17, 12 px versales con 4 px de interletra, transición 0,5 s cubic-bezier(0.19, 1, 0.22, 1).",
+      "Allí son div sin rol ni teclado y la nota abre un modal; aquí son radios nativos (flechas), la cifra se anuncia con aria-live y la nota va bajo la cifra.",
+      "`reference` es agregado: en el original hay que recordar la cifra general para comparar. El fundido de la cifra está observado en cuadros; su duración, inferida.",
+      "Pendiente: QA visual con más de seis segmentos y con etiquetas largas (la interletra de 4 px las ensancha).",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

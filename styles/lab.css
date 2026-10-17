@@ -65,6 +65,16 @@
     }
   }
 
+  /* Fundido al cambiar un valor (Adobe «Running on Experience»: la cifra se funde al cambiar de industria; a
+     150 ms va por la mitad, leído en cuadros; la duración de 0,5 s es la del selector medido). */
+  --animate-lab-fade: lab-fade 0.5s var(--ease-lab-out) both;
+
+  @keyframes lab-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
   @keyframes lab-marquee {
     to {
       transform: translateX(-50%);

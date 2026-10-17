@@ -8,7 +8,9 @@ import { PresenceDot } from "./presence-dot";
 // Revelación: una señal mínima siempre visible y el detalle bajo demanda. Mecanismo observado en el
 // FAQ de Paradigm y en la lista con panel de Meridian (evidencia/2026-10-17-{paradigm,meridian-ai}).
 // Lo oculto sigue siendo recuperable: se abre con clic, Enter o Espacio (nunca solo con hover), el
-// botón anuncia aria-expanded y el detalle queda en el DOM con `hidden`.
+// botón anuncia aria-expanded y el detalle queda en el DOM. La apertura anima las filas de una grilla
+// de 0fr a 1fr en 0,3 s, como el acordeón de Meridian (grid-template-rows .3s, medido). Cerrado, el
+// detalle es inert y pasa a visibility: hidden al terminar la transición, para que el cierre se vea.
 
 type SignalDisclosureProps = Omit<React.ComponentProps<"div">, "title"> & {
   /** Lo que se ve siempre: qué hay detrás. */
@@ -68,14 +70,24 @@ function SignalDisclosure({
           )}
         />
       </button>
-      <section
-        id={`${id}-detalle`}
-        aria-label={typeof title === "string" ? title : undefined}
-        hidden={!open}
-        className="border-t border-lab-line px-[16px] py-[12px] pl-[48px] text-[14px] leading-[1.5] text-lab-ink"
+      <div
+        data-slot="signal-disclosure-panel"
+        inert={!open}
+        className={cn(
+          "grid [transition-property:grid-template-rows,visibility] duration-0 motion-safe:duration-300 motion-safe:ease-lab-out",
+          open ? "visible grid-rows-[1fr]" : "invisible grid-rows-[0fr]",
+        )}
       >
-        {children}
-      </section>
+        <section
+          id={`${id}-detalle`}
+          aria-label={typeof title === "string" ? title : undefined}
+          className="min-h-0 overflow-hidden"
+        >
+          <div className="border-t border-lab-line px-[16px] py-[12px] pl-[48px] text-[14px] leading-[1.5] text-lab-ink">
+            {children}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

@@ -70,6 +70,11 @@ const LIB_ITEMS = {
     title: "Utilidades REA",
     description: "Búsqueda sin tildes, pad2 y clamp.",
   },
+  "lib/lab/paletas.ts": {
+    name: "lab-paletas",
+    title: "Paletas Lab",
+    description: "Paletas medidas por rol, con su origen, y contraste WCAG.",
+  },
   "lib/lab/encodings.ts": {
     name: "lab-encodings",
     title: "Codificaciones Lab",

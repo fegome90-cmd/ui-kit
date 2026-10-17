@@ -7,6 +7,7 @@
   --color-lab-bg: var(--lab-bg);
   --color-lab-surface: var(--lab-surface);
   --color-lab-ink: var(--lab-ink);
+  --color-lab-on-ink: var(--lab-on-ink);
   --color-lab-muted: var(--lab-muted);
   --color-lab-line: var(--lab-line);
   --color-lab-accent: var(--lab-accent);
@@ -21,6 +22,23 @@
 
   /* Pulso de presencia: un anillo que se expande y se apaga. Solo con motion-safe. */
   --animate-lab-pulse: lab-pulse 2s var(--ease-lab-out) infinite;
+  /* Medidos: la capa de fondo de BioAge gira una vuelta en 10 s lineal; la marquesina de logos de
+     Meridian recorre su ancho en 45 s. */
+  --animate-lab-rotate: lab-rotate 10s linear infinite;
+  --animate-lab-marquee: lab-marquee 45s linear infinite;
+
+  @keyframes lab-rotate {
+    to {
+      /* Solo rotate: el centrado va por la propiedad translate (utilidades -translate-*), que no se pisa. */
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes lab-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 
   @keyframes lab-pulse {
     from {
@@ -39,6 +57,7 @@
   --lab-bg: #f6f7f9;
   --lab-surface: #ffffff;
   --lab-ink: #14171c;
+  --lab-on-ink: #ffffff; /* texto sobre --lab-ink */
   --lab-muted: #5b6270; /* 6,1:1 sobre --lab-surface */
   --lab-line: #dfe3ea;
   --lab-accent: #1d5bd8; /* 5,9:1 sobre --lab-surface; 5,0:1 sobre --lab-accent-soft */
@@ -48,4 +67,59 @@
   font-family: var(--font-lab-sans);
   color: var(--lab-ink);
   font-variant-numeric: tabular-nums;
+}
+
+/* Paletas medidas en las referencias: mismos componentes, otra estética, para comparar el mecanismo
+   con el estilo cambiado. <div className="lab" data-lab-palette="bioage">. */
+
+/* BioAge (bioagelabs.com/platform). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="bioage"] {
+  --lab-bg: #1c0835;
+  --lab-surface: #342059;
+  --lab-ink: #ffffff;
+  --lab-on-ink: #1c0835;
+  --lab-muted: #c0b3d0;
+  --lab-line: #503f70;
+  --lab-accent: #a56cff;
+  --lab-accent-soft: #462c74;
+  --lab-context: #655383;
+}
+
+/* Meridian (meridian-ai.com). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="meridian"] {
+  --lab-bg: #f7f7f7;
+  --lab-surface: #ffffff;
+  --lab-ink: #1e1e1e;
+  --lab-on-ink: #ffffff;
+  --lab-muted: #4b4b4b;
+  --lab-line: #e1e9e8;
+  --lab-accent: #07483d;
+  --lab-accent-soft: #c6e0d9;
+  --lab-context: #b5c8c5;
+}
+
+/* Paradigm (paradigm-solutions.io). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="paradigm"] {
+  --lab-bg: #010e16;
+  --lab-surface: #01121e;
+  --lab-ink: #e5e8ec;
+  --lab-on-ink: #01121e;
+  --lab-muted: #9ca4aa;
+  --lab-line: #1a2a35;
+  --lab-accent: #139bfd;
+  --lab-accent-soft: #042842;
+  --lab-context: #3a4852;
+}
+
+/* Voices from the Frontlines (africa.climatemobility.org). Valores y origen en lib/lab/paletas.ts. */
+.lab[data-lab-palette="voices"] {
+  --lab-bg: #f3efe9;
+  --lab-surface: #ffffff;
+  --lab-ink: #000000;
+  --lab-on-ink: #ffffff;
+  --lab-muted: #575757;
+  --lab-line: #e8dce1;
+  --lab-accent: #a5104f;
+  --lab-accent-soft: #f1d9e3;
+  --lab-context: #d1bac4;
 }

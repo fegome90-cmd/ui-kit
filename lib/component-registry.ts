@@ -1244,31 +1244,139 @@ useGridShortcut(() => setOn((v) => !v));
     notes: [
       "Mecanismo del FAQ de Paradigm y la lista con panel de Meridian (evidencia/2026-10-17-{paradigm,meridian-ai}).",
       "La expansión por hover de «Additional Information» solo está en video: no se reprodujo. Nunca abre solo con hover.",
+      "La apertura anima grid-template-rows en 0,3 s, medido en el acordeón de Meridian.",
       "Validar qué no debe ocultarse nunca: un dato crítico no va detrás de una revelación.",
     ],
   },
   {
     slug: "lab-backdrop",
     family: "Lab",
-    name: "Fondo con resplandor",
+    name: "Fondos",
     category: "Fondos",
-    description: "Superficie con un único resplandor del acento y viñeta. Decorativo: nunca codifica información.",
+    description:
+      "Cinco mecanismos de fondo medidos en las referencias (resplandor, lavado, aurora, viñeta y capa que gira), con los tokens de la paleta activa.",
     files: ["components/ui/lab/lab-backdrop.tsx", "lib/utils.ts"],
-    usage: `<LabBackdrop tone="deep" glow="corner" className="p-8">…</LabBackdrop>`,
+    usage: `<LabBackdrop pattern="aurora" tone="deep" className="p-8">…</LabBackdrop>`,
     props: [
-      { name: "tone", type: '"soft" | "deep"', default: '"soft"', description: "Fondo claro u oscuro." },
       {
-        name: "glow",
-        type: '"none" | "corner" | "center"',
-        default: '"corner"',
-        description: "Dónde cae el resplandor.",
+        name: "pattern",
+        type: '"glow" | "wash" | "aurora" | "vignette" | "rotating"',
+        default: '"glow"',
+        description: "BioAge (glow, rotating), Meridian (wash, aurora), Paradigm (vignette).",
       },
+      { name: "tone", type: '"soft" | "deep"', default: '"soft"', description: "Fondo o tinta de la paleta." },
+      { name: "glow", type: '"none" | "corner" | "center"', default: '"corner"', description: "Solo para glow." },
     ],
     status: "candidate",
-    provenance: "observed-image",
+    provenance: "measured-dom",
     notes: [
-      "Motivo de BioAge (fondo con un solo acento, evidencia/2026-10-17-bioage), rehecho con los tokens de Lab.",
-      "Revisar el contraste del texto sobre el resplandor en cada tono antes de pasar a stable.",
+      "Posiciones, paradas y tiempos medidos en el DOM (evidencia/2026-10-17-{bioage,meridian-ai,paradigm}); sin sus imágenes ni texturas.",
+      "rotating: BioAge gira una imagen propia; aquí gira un degradado cónico. Solo con motion-safe.",
+      "Revisar el contraste del texto sobre cada patrón y paleta antes de pasar a stable.",
+    ],
+  },
+  {
+    slug: "lab-palette",
+    family: "Lab",
+    name: "Paletas medidas",
+    category: "Tema",
+    description:
+      "Cinco paletas como tokens (neutra, BioAge, Meridian, Paradigm, Voices): mismos componentes, otra estética. Cada color dice si es medido o derivado.",
+    files: ["components/ui/lab/lab-palette.tsx", "lib/lab/paletas.ts", "lib/utils.ts"],
+    usage: `<LabScope palette="meridian" surface>
+  <StatRing value="2B" caption="…" />
+</LabScope>
+<LabPalette palette="meridian" />`,
+    props: [
+      {
+        name: "palette",
+        type: '"neutral" | "bioage" | "meridian" | "paradigm" | "voices"',
+        default: '"neutral"',
+        description: "Paleta que aplica LabScope o que muestra LabPalette.",
+      },
+      { name: "surface", type: "boolean", default: "false", description: "LabScope: pinta el fondo de la paleta." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Colores medidos por área y por texto en los sitios vivos; superficie, línea y atenuado se derivan componiendo valores medidos.",
+      "Un test exige AA (tinta, atenuado y texto sobre tinta a 4,5:1; acento como marca a 3:1) y que styles/lab.css coincida con los datos.",
+      "El acento de BioAge (4,1:1) no sirve para texto; en Paradigm se usa el cian #139bfd porque el azul de texto da 3,5:1.",
+    ],
+  },
+  {
+    slug: "lab-gradient-text",
+    family: "Lab",
+    name: "Texto con degradado",
+    category: "Tipografía",
+    description:
+      "Titular que va de la tinta al acento, recortado al texto. Sin soporte de background-clip queda en tinta.",
+    files: ["components/ui/lab/lab-gradient-text.tsx", "lib/utils.ts"],
+    usage: `<h1><LabGradientText>Engineering for Modern Enterprise</LabGradientText></h1>`,
+    props: [{ name: "…span", type: 'ComponentProps<"span">', description: "Props del span." }],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Degradado medido en los titulares de Paradigm (.word: radial 286,94 % 255,84 % en 43,93 % 53,96 %).",
+      "El extremo de acento puede bajar de 4,5:1: solo para titulares grandes.",
+    ],
+  },
+  {
+    slug: "lab-marquee",
+    family: "Lab",
+    name: "Marquesina",
+    category: "Movimiento",
+    description:
+      "Fila que se desplaza sin fin (45 s por vuelta), se pausa al pasar o enfocar y queda quieta con movimiento reducido.",
+    files: ["components/ui/lab/lab-marquee.tsx", "lib/utils.ts"],
+    usage: `<LabMarquee label="Clientes">
+  <span>Lightyear</span><span>Higro</span><span>Zurich</span>
+</LabMarquee>`,
+    props: [
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      { name: "duration", type: "number", default: "45", description: "Segundos por vuelta (medido: 45)." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en la fila de logos de Meridian (@keyframes scroll y nsLogosMarquee, 45 s, infinite).",
+      "La copia que cierra el bucle es aria-hidden e inert; con movimiento reducido desaparece y la fila se recorre con scroll.",
+    ],
+  },
+  {
+    slug: "lab-reveal-card",
+    family: "Lab",
+    name: "Tarjeta que se revela",
+    category: "Superficies",
+    description: "En reposo la imagen va en grises; al pasar o enfocar sube 2 px, gana sombra y toma color.",
+    files: ["components/ui/lab/lab-reveal-card.tsx", "lib/utils.ts"],
+    usage: `<LabRevealCard href="/capitulo-1" eyebrow="Capítulo 1" title="Cambios grandes" media={<img src="…" alt="" />} />`,
+    props: [
+      { name: "media", type: "ReactNode", description: "Imagen o ilustración; recibe el filtro." },
+      { name: "eyebrow", type: "string", description: "Etiqueta sobre el título." },
+      { name: "title", type: "string", description: "Título de la tarjeta." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Tiempos medidos en Voices from the Frontlines: transform 0,2 s, box-shadow 0,4 s, filter 0,5 s, grayscale(1) en reposo.",
+      "Que las tres transiciones formen una sola tarjeta es inferido. Con movimiento reducido no sube; el color cambia igual.",
+    ],
+  },
+  {
+    slug: "lab-glow-card",
+    family: "Lab",
+    name: "Tarjeta con brillo",
+    category: "Superficies",
+    description: "Borde de vidrio y un brillo del acento que sigue al puntero; con teclado se centra al enfocar.",
+    files: ["components/ui/lab/lab-glow-card.tsx", "lib/utils.ts"],
+    usage: `<LabGlowCard><h3>Low-Code</h3><p>…</p></LabGlowCard>`,
+    props: [{ name: "…div", type: 'ComponentProps<"div">', description: "Props del contenedor." }],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Medido en Paradigm: borde blanco al 6 %, drop-shadow del acento de 12 px y transiciones de 0,2 s.",
+      "Que el brillo siga al puntero sale de la ficha «Interactive Bento Grid» de Awwwards, que solo está en video: inferido.",
     ],
   },
 ];

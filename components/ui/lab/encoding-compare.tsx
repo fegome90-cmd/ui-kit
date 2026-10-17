@@ -66,7 +66,7 @@ function EncodingCompare({
               onClick={() => elegir(e)}
               className={cn(
                 "rounded-full px-[12px] py-[4px] text-[13px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lab-accent",
-                encoding === e ? "bg-lab-ink text-white" : "text-lab-muted",
+                encoding === e ? "bg-lab-ink text-lab-on-ink" : "text-lab-muted",
               )}
             >
               {ETIQUETAS[e]}

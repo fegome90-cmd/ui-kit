@@ -1,8 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { EncodingCompare } from "./encoding-compare";
-import { LabBackdrop } from "./lab-backdrop";
+import { LabBackdrop, PATTERNS } from "./lab-backdrop";
+import { LabGlowCard } from "./lab-glow-card";
+import { LabGradientText } from "./lab-gradient-text";
+import { LabMarquee } from "./lab-marquee";
+import { LabPalette, LabScope } from "./lab-palette";
+import { LabRevealCard } from "./lab-reveal-card";
 import { PresenceDot } from "./presence-dot";
 import { SignalDisclosure } from "./signal-disclosure";
 import { StatRing } from "./stat-ring";
@@ -54,13 +59,17 @@ describe("SignalDisclosure", () => {
     );
     const boton = screen.getByRole("button", { name: /Indicaciones nuevas/ });
     const detalle = screen.getByText("Ajuste de dosis");
+    const panel = detalle.closest("[data-slot=signal-disclosure-panel]");
     expect(boton).toHaveAttribute("aria-expanded", "false");
-    expect(detalle).not.toBeVisible();
-    expect(boton.getAttribute("aria-controls")).toBe(detalle.id);
+    // Cerrado: en el DOM, pero inerte (sin foco ni lector de pantalla) y sin altura.
+    expect(panel).toHaveAttribute("inert");
+    expect(panel?.className).toContain("grid-rows-[0fr]");
+    expect(boton.getAttribute("aria-controls")).toBe(detalle.closest("section")?.id);
 
     await user.click(boton);
     expect(boton).toHaveAttribute("aria-expanded", "true");
-    expect(detalle).toBeVisible();
+    expect(panel).not.toHaveAttribute("inert");
+    expect(panel?.className).toContain("grid-rows-[1fr]");
 
     boton.focus();
     await user.keyboard("{Enter}");
@@ -124,5 +133,76 @@ describe("LabBackdrop", () => {
     expect(a.querySelectorAll(":scope > [aria-hidden]")).toHaveLength(2);
     expect(b.querySelectorAll(":scope > [aria-hidden]")).toHaveLength(1);
     expect(a).toHaveTextContent("Dato");
+  });
+});
+
+describe("fondos", () => {
+  it.each(PATTERNS)("%s dibuja sus capas decorativas y deja el contenido encima", (pattern) => {
+    const { container } = render(<LabBackdrop pattern={pattern}>Dato</LabBackdrop>);
+    const raiz = container.querySelector("[data-slot=lab-backdrop]");
+    expect(raiz).toHaveAttribute("data-pattern", pattern);
+    expect(raiz?.querySelectorAll(":scope > [aria-hidden]").length).toBeGreaterThanOrEqual(2);
+    expect(raiz).toHaveTextContent("Dato");
+  });
+  it("rotating solo gira con motion-safe", () => {
+    const { container } = render(<LabBackdrop pattern="rotating" />);
+    expect(container.querySelector(".motion-safe\\:animate-lab-rotate")).not.toBeNull();
+  });
+});
+
+describe("paletas", () => {
+  it("LabScope aplica la paleta y la neutra no lleva atributo", () => {
+    const { container } = render(
+      <>
+        <LabScope palette="meridian" surface>
+          x
+        </LabScope>
+        <LabScope>y</LabScope>
+      </>,
+    );
+    const [a, b] = container.querySelectorAll("[data-slot=lab-scope]");
+    expect(a).toHaveAttribute("data-lab-palette", "meridian");
+    expect(a.className).toContain("bg-lab-bg");
+    expect(b).not.toHaveAttribute("data-lab-palette");
+    expect(b).toHaveClass("lab");
+  });
+  it("LabPalette lista los nueve roles con su origen", () => {
+    render(<LabPalette palette="bioage" />);
+    expect(screen.getAllByRole("listitem")).toHaveLength(9);
+    expect(screen.getByText("--lab-accent")).toBeInTheDocument();
+    expect(screen.getByText(/#a56cff · medido/)).toBeInTheDocument();
+    expect(screen.getByText(/#342059 · derivado/)).toBeInTheDocument();
+  });
+});
+
+describe("movimiento y superficies", () => {
+  it("LabMarquee: un grupo con nombre y la copia del bucle oculta e inerte", () => {
+    const { container } = render(
+      <LabMarquee label="Clientes">
+        <span>Higro</span>
+      </LabMarquee>,
+    );
+    expect(screen.getByRole("group", { name: "Clientes" })).toBeInTheDocument();
+    expect(screen.getAllByText("Higro")).toHaveLength(2);
+    const copia = container.querySelector("[aria-hidden][inert]");
+    expect(copia).toHaveTextContent("Higro");
+  });
+  it("LabGradientText solo vuelve transparente el texto con soporte de background-clip", () => {
+    render(<LabGradientText>Titular</LabGradientText>);
+    const el = screen.getByText("Titular");
+    expect(el.className).toContain("supports-[background-clip:text]:[-webkit-text-fill-color:transparent]");
+    expect(el.className).toContain("text-lab-ink");
+  });
+  it("LabRevealCard es un enlace con el título como nombre", () => {
+    render(<LabRevealCard href="/c1" eyebrow="Capítulo 1" title="Cambios grandes" media={<span>img</span>} />);
+    expect(screen.getByRole("link", { name: /Cambios grandes/ })).toHaveAttribute("href", "/c1");
+  });
+  it("LabGlowCard lleva el brillo a la posición del puntero", () => {
+    const { container } = render(<LabGlowCard>Low-Code</LabGlowCard>);
+    const card = container.querySelector("[data-slot=lab-glow-card]") as HTMLElement;
+    card.getBoundingClientRect = () => ({ left: 10, top: 20 }) as DOMRect;
+    fireEvent.pointerMove(card, { clientX: 60, clientY: 70 });
+    expect(card.style.getPropertyValue("--lab-glow-x")).toBe("50px");
+    expect(card.style.getPropertyValue("--lab-glow-y")).toBe("50px");
   });
 });

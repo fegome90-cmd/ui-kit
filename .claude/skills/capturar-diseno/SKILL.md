@@ -161,9 +161,9 @@ navegadores se instalan una vez con `npx playwright install chromium`). Para lo 
 
 Estados que no se provocan con un hover, focus o click (por ejemplo `disabled` que depende de datos, o tema
 oscuro con un toggle de varios pasos): captúralos con playwright-cli (`resize`, `screenshot --filename=…`) con el
-mismo nombre de archivo. Añade cada captura a `evidence.json` con su `fuente`, `viewport`, `fecha` y `sha256`,
-vinculada a ese mismo nombre de archivo, y corre `shasum -a 256 captures/* dom/* > SHA256SUMS` al terminar.
-Sin playwright-cli, esos estados quedan como «no observado» en el inventario.
+mismo nombre de archivo. Agrega cada captura a `evidence.json` con `fuente`, `viewport`, `fecha` y `sha256`, y
+corre `shasum -a 256 captures/* dom/* > SHA256SUMS` al terminar. Sin playwright-cli,
+esos estados quedan como «no observado» en el inventario.
 
 ## G2 — Inventario de candidatos
 

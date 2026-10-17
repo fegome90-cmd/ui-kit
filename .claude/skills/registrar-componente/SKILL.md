@@ -50,7 +50,7 @@ En `lib/component-registry.ts`, dentro del bloque de su familia (los comentarios
   slug: "rea-ejemplo",            // único; con prefijo de familia salvo en REMI
   family: "REA",
   name: "Ejemplo",                // en español; es el h1 de la página
-  category: "Superficies",        // una de CATEGORIES
+  category: "Superficies",        // una de CATEGORIES: el TIPO de componente, que ordena el banco
   description: "Qué hace y en qué se distingue, en una o dos frases.",
   files: ["components/ui/rea/rea-ejemplo.tsx"],   // lo que muestra la pestaña Código y lo que instala shadcn
   usage: `<ReaEjemplo … />`,

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CATEGORIES, COMPONENTS, FAMILIES } from "@/lib/component-registry";
+import { CATEGORIES, COMPONENTS } from "@/lib/component-registry";
 
 export function DocsNav() {
   const pathname = usePathname();
@@ -11,11 +11,13 @@ export function DocsNav() {
       <Link href="/componentes" className="cb-nav-link" aria-current={pathname === "/componentes" ? "page" : undefined}>
         Introducción
       </Link>
-      {FAMILIES.map((family) => (
-        <div key={family} className="cb-nav-group">
-          <h2>{family}</h2>
-          {CATEGORIES.flatMap((cat) =>
-            COMPONENTS.filter((c) => c.family === family && c.category === cat).map((c) => {
+      {CATEGORIES.map((cat) => {
+        const items = COMPONENTS.filter((c) => c.category === cat);
+        if (!items.length) return null;
+        return (
+          <div key={cat} className="cb-nav-group">
+            <h2>{cat}</h2>
+            {items.map((c) => {
               const href = `/componentes/${c.slug}`;
               return (
                 <Link
@@ -24,13 +26,13 @@ export function DocsNav() {
                   className="cb-nav-link"
                   aria-current={pathname === href ? "page" : undefined}
                 >
-                  {c.name}
+                  {c.name} <span className="cb-nav-family">{c.family}</span>
                 </Link>
               );
-            }),
-          )}
-        </div>
-      ))}
+            })}
+          </div>
+        );
+      })}
     </nav>
   );
 }

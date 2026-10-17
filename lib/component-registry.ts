@@ -58,18 +58,19 @@ export const provenanceOf = (c: ComponentDoc): Provenance => c.provenance ?? "so
 export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA"] as const;
 export type Family = (typeof FAMILIES)[number];
 
+/** Tipos de componente. El banco se navega por tipo; la familia es una etiqueta y un filtro. */
 export const CATEGORIES = [
   "Acciones",
   "Formularios",
-  "Indicadores",
-  "Barra de herramientas",
   "Navegación",
+  "Barra de herramientas",
+  "Indicadores",
   "Superficies",
   "Tipografía",
   "Movimiento",
+  "Iconografía",
   "Bloques",
   "Tema",
-  "Iconografía",
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 

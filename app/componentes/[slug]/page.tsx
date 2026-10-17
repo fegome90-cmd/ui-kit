@@ -44,7 +44,7 @@ async function ComponentDocPage({ params }: Props) {
   return (
     <article className="cb-article">
       <p className="cb-eyebrow">
-        {doc.family} · {doc.category}
+        {doc.category} · {doc.family}
         {statusOf(doc) === "candidate" && <span className="cb-status">Candidato</span>}
       </p>
       <h1>{doc.name}</h1>

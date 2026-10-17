@@ -1,7 +1,6 @@
-import Link from "next/link";
+import { ComponentIndex } from "@/components/docs/component-index";
 import { CodeBlock } from "@/components/docs/doc-tabs";
-import { Thumb } from "@/components/docs/previews";
-import { CATEGORIES, COMPONENTS, FAMILIES, type Family } from "@/lib/component-registry";
+import { FAMILIES, type Family } from "@/lib/component-registry";
 
 const FAMILY_NOTES: Record<Family, string> = {
   REMI: "Tailwind + cn() con la paleta --color-remi-* del monitor. Medidas a 1920×1080; la tipografía va bajo .remi.",
@@ -53,33 +52,11 @@ export default function ComponentesIndex() {
         </li>
       </ul>
 
-      {FAMILIES.map((family) => (
-        <section key={family}>
-          <h2 className="cb-h2">{family}</h2>
-          {CATEGORIES.map((cat) => {
-            const items = COMPONENTS.filter((c) => c.family === family && c.category === cat);
-            if (!items.length) return null;
-            return (
-              <section key={cat}>
-                <h3 className="cb-h3">{cat}</h3>
-                <div className="cb-grid">
-                  {items.map((c) => (
-                    <Link key={c.slug} href={`/componentes/${c.slug}`} className="cb-card">
-                      <div className="cb-card-thumb">
-                        <Thumb slug={c.slug} />
-                      </div>
-                      <div className="cb-card-body">
-                        <strong>{c.name}</strong>
-                        <span>{c.description}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </section>
-      ))}
+      <h2 className="cb-h2">Componentes por tipo</h2>
+      <p className="cb-lead">
+        El banco se ordena por tipo de componente. La familia indica de qué sistema de estilos viene y sirve de filtro.
+      </p>
+      <ComponentIndex />
     </article>
   );
 }

@@ -3,9 +3,12 @@
 Biblioteca personal de componentes de frontend, con banco de documentación en `/componentes`.
 Sigue el estilo shadcn: el código vive en el repo y se copia o importa, no es un paquete.
 
-## Familias
+## Tipos y familias
 
-Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
+El banco se navega **por tipo de componente**: acciones, formularios, navegación, indicadores, superficies,
+tipografía, movimiento, iconografía, bloques y tema (`CATEGORIES` en `lib/component-registry.ts`). La familia dice
+de qué sistema de estilos viene cada pieza y sirve de filtro en el índice. Cada familia conserva su propio sistema
+de estilos; conviven sin pisarse.
 
 | Familia | Origen | Estilos | Contenedor |
 |---|---|---|---|

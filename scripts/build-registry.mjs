@@ -43,7 +43,11 @@ const THEMES = {
       '@import "../styles/rea.css";',
     ],
   },
-  Lab: { css: ["styles/lab.css"], deps: [], imports: ['@import "../styles/lab.css";'] },
+  Lab: {
+    css: ["styles/lab.css"],
+    deps: ["@fontsource/bebas-neue"],
+    imports: ['@import "@fontsource/bebas-neue";', '@import "../styles/lab.css";'],
+  },
 };
 
 const themeName = (family) => `${family.toLowerCase()}-tokens`;

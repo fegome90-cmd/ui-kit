@@ -1,12 +1,13 @@
 "use client";
 
 import { CircleCheck, TriangleAlert } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 import { BentoGrid, BentoItem } from "@/components/ui/lab/bento-grid";
 import { CategoryWheel } from "@/components/ui/lab/category-wheel";
 import { ChapterCard } from "@/components/ui/lab/chapter-card";
 import { DistributionChart } from "@/components/ui/lab/distribution-chart";
 import { DivergingHeatmap } from "@/components/ui/lab/diverging-heatmap";
+import { DotNav } from "@/components/ui/lab/dot-nav";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
 import { FeatureTabs } from "@/components/ui/lab/feature-tabs";
 import { FilteredStat } from "@/components/ui/lab/filtered-stat";
@@ -653,6 +654,35 @@ LAB_PREVIEWS["lab-filtered-stat"] = () => (
   </div>
 );
 
+function DotNavPreview() {
+  const caja = useRef<HTMLDivElement>(null);
+  const base = useId().replace(/:/g, "");
+  const secciones = ["Inicio", "Resumen", "Evaluar", "Planificar", "Formar", "Competir", "Cerrar"].map((label, i) => ({
+    id: `${base}-s${i}`,
+    label,
+  }));
+  return (
+    <div className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-end gap-[20px]">
+      <DotNav label="Secciones del informe" sections={secciones} root={caja} />
+      <div ref={caja} className="h-[340px] overflow-y-auto rounded-[12px] border border-lab-line bg-lab-surface">
+        {secciones.map((s, i) => (
+          <section key={s.id} id={s.id} className="min-h-[300px] border-b border-lab-line p-[24px] outline-none">
+            <p className="m-0 text-[12px] font-semibold uppercase tracking-[3px] text-lab-muted">
+              {String(i + 1).padStart(2, "0")}
+            </p>
+            <h3 className="m-0 mt-[6px] text-[22px] font-semibold text-lab-ink">{s.label}</h3>
+            <p className="m-0 mt-[8px] max-w-[48ch] text-[14px] leading-[1.5] text-lab-muted">
+              Sección ficticia. Bajá con el scroll: el punto de la izquierda sigue a la sección que cruza el 40 % del
+              alto visible.
+            </p>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+LAB_PREVIEWS["lab-dot-nav"] = () => <DotNavPreview />;
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -809,6 +839,21 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
         <span className="h-[8px] w-[20px]" />
         <span className="h-[8px] w-[20px]" />
       </span>
+    </span>
+  ),
+  "lab-dot-nav": (
+    <span className="grid w-[22px] justify-items-center gap-[3px] rounded-full bg-lab-ink py-[6px]">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className={cn(
+            "grid size-[12px] place-items-center rounded-full border",
+            i === 1 ? "border-lab-on-ink" : "border-transparent",
+          )}
+        >
+          <span className="size-[3px] rounded-full bg-lab-on-ink" />
+        </span>
+      ))}
     </span>
   ),
 };

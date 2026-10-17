@@ -1786,6 +1786,42 @@ Pendientes <LabCount value={12} />`,
       "Pendiente: QA visual con más de seis segmentos y con etiquetas largas (la interletra de 4 px las ensancha).",
     ],
   },
+  {
+    slug: "lab-dot-nav",
+    family: "Lab",
+    name: "Navegación por puntos",
+    category: "Navegación",
+    description: "Una columna de puntos, uno por sección, que marca la sección visible y salta a cualquiera.",
+    files: ["components/ui/lab/dot-nav.tsx", "lib/utils.ts"],
+    usage: `<DotNav label="Secciones" sections={[{ id: "inicio", label: "Inicio" }, { id: "resumen", label: "Resumen" }]} className="fixed top-1/2 left-[15px] -translate-y-1/2" />`,
+    props: [
+      {
+        name: "sections",
+        type: "{ id; label }[]",
+        description: "Secciones en orden; `id` es el del elemento en la página.",
+      },
+      { name: "label", type: "string", description: "Nombre de la navegación." },
+      {
+        name: "current",
+        type: "string",
+        description: "Sección actual controlada; sin valor se calcula con el scroll.",
+      },
+      { name: "root", type: "RefObject<Element>", description: "Contenedor con scroll, si no es la ventana." },
+      {
+        name: "showCurrentLabel",
+        type: "boolean",
+        default: "true",
+        description: "Nombre de la sección actual girado sobre la columna.",
+      },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medido en Adobe «Running on Experience» (nav fija izquierda): píldora 42 px, radio 20; enlaces 24 × 24 cada 29 px; borde de 2 px en la actual; transición 0,5 s cubic-bezier(0.215, 0.61, 0.355, 1).",
+      "Allí los enlaces no tienen nombre accesible ni aria-current; aquí sí, y el nombre se ve con puntero o foco (el hover del original no se midió).",
+      "No se fija sola: la posición (fixed, borde) la pone quien la usa. Pendiente: QA con muchas secciones y en pantallas angostas, donde conviene ocultarla.",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

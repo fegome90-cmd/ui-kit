@@ -54,9 +54,17 @@ evidencia/<AAAA-MM-DD>-<fuente>/
    no la exportas.
 4. Verifica la licencia: repo con `LICENSE`, términos del sitio o permiso explícito del dueño. Si no está clara,
    pregunta antes de seguir. Anota la licencia (o «sin licencia, solo referencia») en `evidence.json`.
+   La licencia responde **dos preguntas distintas**; no las mezcles:
+   - **¿Se puede estudiar?** El banco es personal y de estudio (lo dice el README). Una licencia de uso personal,
+     de prueba (*free to try*) o «solo referencia» alcanza para capturar y analizar: la evidencia queda en
+     `evidencia/`, fuera de git. Esto es lo que decide si hay G1.
+   - **¿Se puede versionar?** El repo es público en GitHub: todo lo que se commitea se redistribuye. Código,
+     assets o archivos de fuente entran solo si la licencia permite redistribuir (MIT, OFL…). Si no, se estudian
+     pero no se commitean, y en el banco se usa una alternativa libre (como Aeonik en el README).
+
    Las **tipografías tienen licencia propia**, distinta de la del sitio: después de G1, completa `licencia` en
-   cada familia de `evidence.json` → `tipografias` (OFL, comercial, del sistema…). Una familia sin licencia de
-   redistribución no entra al banco: se reemplaza por una libre equivalente y se anota en el inventario.
+   cada familia de `evidence.json` → `tipografias` (OFL, comercial, trial personal, del sistema…) y aplica las
+   mismas dos preguntas.
 5. **Plantillas compradas.** Una plantilla de marketplace (temas de WordPress, Webflow, Framer, kits de UI…) se
    compra para usarla, no para redistribuirla: sus licencias suelen cubrir un producto final. Este banco publica
    un registry que cualquiera instala, así que redistribuye. Lee la licencia concreta de la plantilla; si no
@@ -68,7 +76,8 @@ evidencia/<AAAA-MM-DD>-<fuente>/
 7. Si la familia tiene un sistema canónico (tokens o manual de marca), léelo primero. Una captura no redefine
    tokens: a lo sumo propone uno nuevo, que el usuario aprueba.
 
-Si G0 no pasa, no hay G1.
+Si no se puede ni estudiar (acceso bloqueado o licencia que prohíbe incluso el uso personal), no hay G1. Si se
+puede estudiar pero no versionar, G1 sigue y la restricción se anota en el inventario.
 
 ## G1 — Capturar
 
@@ -114,8 +123,10 @@ navegadores se instalan una vez con `npx playwright install chromium`). Para lo 
      Cada familia trae sus `roles` según la etiqueta del texto (`titular`: `h1–h6`; `cuerpo`: `p`, `li`…;
      `interfaz`: `button`, `a`, `input`, `label`…; `otro`: `span`, `div` y lo ambiguo), y `evidence.json` →
      `rolesTipograficos` resume qué familias cubre cada rol. Un rol vacío usa una genérica o del sistema.
-     Si avisa de hojas de otro origen ilegibles (CSS sin CORS), los `@font-face` de esas hojas faltan: revisa
-     sus archivos en la pestaña de red con playwright-cli.
+     Además, `archivosDeFuentes` lista toda fuente que la página pidió por red, sin query: cubre las
+     `@font-face` de hojas de otro origen (que el navegador no deja leer, y por eso el script avisa) y las que el
+     sitio baja con `fetch` y registra con la API `FontFace`. Un archivo en esa lista sin familia en `archivos`
+     viene de una de esas dos vías.
    - `--pagina-completa` captura la página entera en vez del viewport.
    - Sale con **2** y marca `blocked-auth` si G0 falla (401/403, redirección a login o campo de contraseña
      visible): no captura nada. Usa un navegador sin sesión; nunca toca la del usuario.

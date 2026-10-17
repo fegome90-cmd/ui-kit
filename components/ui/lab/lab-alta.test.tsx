@@ -14,6 +14,11 @@ describe("TimeScale", () => {
     // 2009 → 0 %, 2013 → 4/12, 2014 → 5/12, 2021 → 100 %.
     expect(left.map((l) => Number.parseFloat(l).toFixed(2))).toEqual(["0.00", "33.33", "41.67", "100.00"]);
   });
+  it("sin minUnitWidth no fija ancho mínimo (timestamps en ms no inflan la línea)", () => {
+    const ms = [Date.UTC(2020, 0, 1), Date.UTC(2021, 0, 1)].map((at) => ({ at, label: String(at), content: null }));
+    render(<TimeScale label="Historia" events={ms} />);
+    expect(screen.getByRole("tablist", { name: "Historia" }).style.minWidth).toBe("");
+  });
   it("ordena por tiempo, fija el ancho mínimo y cambia con teclado", async () => {
     const user = userEvent.setup();
     const desordenados = [events[3], events[0], events[2], events[1]];

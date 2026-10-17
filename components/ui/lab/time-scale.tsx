@@ -21,7 +21,8 @@ type TimeScaleProps = Omit<React.ComponentProps<"div">, "onChange"> & {
   events: Hito[];
   /** Nombre del grupo para lectores de pantalla. */
   label: string;
-  /** Ancho mínimo en px por unidad de `at` (Volume: 90 px por año). */
+  /** Ancho mínimo en px por unidad de `at` (Volume: 90 px por año). Sin valor, la línea ocupa el ancho
+   * disponible; con timestamps en ms, la unidad es el milisegundo. */
   minUnitWidth?: number;
   value?: number;
   defaultValue?: number;
@@ -77,7 +78,7 @@ function TimeScale({
           role="tablist"
           aria-label={label}
           className="relative h-[56px]"
-          style={{ minWidth: minUnitWidth === undefined ? undefined : `${rango * minUnitWidth}px` }}
+          style={minUnitWidth ? { minWidth: `${rango * minUnitWidth}px` } : undefined}
         >
           <span aria-hidden className="absolute top-[11px] right-0 left-0 h-px bg-lab-line" />
           {hitos.map((h, i) => {

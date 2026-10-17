@@ -1706,7 +1706,7 @@ Pendientes <LabCount value={12} />`,
       {
         name: "minUnitWidth",
         type: "number",
-        description: "px mínimos por unidad (Volume: 90 por año).",
+        description: "px mínimos por unidad de at (Volume: 90 por año). Sin valor, ocupa el ancho disponible.",
       },
       { name: "value / defaultValue / onValueChange", type: "number", description: "Hito elegido." },
     ],

@@ -22,7 +22,37 @@ export interface ComponentDoc {
   usage: string;
   props: PropDoc[];
   notes?: string[];
+  /** Madurez. Sin valor: "stable". Un "candidate" explica en `notes` qué le falta. */
+  status?: Status;
+  /** De dónde sale la implementación. Sin valor: "source-code". */
+  provenance?: Provenance;
 }
+
+/**
+ * stable: verificado y listo para instalar. candidate: se publica, pero tiene QA visual,
+ * derechos o comportamiento pendientes.
+ */
+export const STATUSES = ["stable", "candidate"] as const;
+export type Status = (typeof STATUSES)[number];
+
+/**
+ * Taxonomía de G2 en docs/origen/rea-atlas/design-to-registry-workflow/SKILL.md.
+ * source-code: copiado o reescrito desde código del origen. measured-dom: medido en el DOM de
+ * una página autorizada. observed-image: reconstruido desde capturas, sin DOM. inferred: sin
+ * evidencia directa.
+ */
+export const PROVENANCES = ["source-code", "measured-dom", "observed-image", "inferred"] as const;
+export type Provenance = (typeof PROVENANCES)[number];
+
+export const PROVENANCE_LABELS: Record<Provenance, string> = {
+  "source-code": "Código fuente del origen",
+  "measured-dom": "Medido en el DOM",
+  "observed-image": "Reconstruido desde capturas",
+  inferred: "Inferido",
+};
+
+export const statusOf = (c: ComponentDoc): Status => c.status ?? "stable";
+export const provenanceOf = (c: ComponentDoc): Provenance => c.provenance ?? "source-code";
 
 /** Origen del componente. Cada familia trae su propio sistema de estilos. */
 export const FAMILIES = ["REMI", "Ninja", "Kraa", "REA"] as const;
@@ -768,8 +798,9 @@ export const COMPONENTS: ComponentDoc[] = [
       { name: "onChange", type: "(index: number) => void", description: "Siempre recibe un índice válido." },
       { name: "showPosition", type: "boolean", default: "true", description: "Muestra «n / total»." },
     ],
+    status: "candidate",
     notes: [
-      "Estado candidate: QA visual pendiente. Usa el azul FALP #004990 como respaldo (rights: review-required).",
+      "QA visual pendiente. Usa el azul FALP #004990 como respaldo (rights: review-required).",
       "Los atajos globales son del presentador, no del componente.",
     ],
   },

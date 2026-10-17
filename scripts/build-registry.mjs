@@ -13,7 +13,7 @@
 // - cn() va como item propio (ui-kit-utils): extiende tailwind-merge con las escalas
 //   tipográficas de las familias; el `utils` estándar de shadcn las descartaría.
 import { readFileSync, writeFileSync } from "node:fs";
-import { COMPONENTS } from "../lib/component-registry.ts";
+import { COMPONENTS, provenanceOf, statusOf } from "../lib/component-registry.ts";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 const versions = { ...pkg.dependencies, ...pkg.devDependencies };
@@ -182,8 +182,9 @@ for (const [family, theme] of Object.entries(THEMES)) {
   });
 }
 
-// Un item por entrada del banco.
+// Un item por entrada del banco. meta lleva la madurez y la procedencia al proyecto que instala.
 for (const c of COMPONENTS) {
+  const meta = { status: statusOf(c), provenance: provenanceOf(c) };
   const files = c.files.filter(isComponentFile);
   if (!files.length) {
     // Recetas que viven solo en el tema (p. ej. rea-hover-lift): el item instala el tema.
@@ -194,6 +195,7 @@ for (const c of COMPONENTS) {
       description: c.description,
       registryDependencies: [ref(themeName(c.family))],
       files: [],
+      meta,
     });
     continue;
   }
@@ -205,6 +207,7 @@ for (const c of COMPONENTS) {
     categories: [c.family.toLowerCase(), c.category.toLowerCase()],
     ...itemFor(c.slug, files, c.family),
     files: files.map((f) => ({ path: f, type: fileType(f), target: fileTarget(f) })),
+    meta,
   });
 }
 

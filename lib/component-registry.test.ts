@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATEGORIES, COMPONENTS, FAMILIES } from "./component-registry";
+import { CATEGORIES, COMPONENTS, FAMILIES, provenanceOf, statusOf } from "./component-registry";
 
 const listSources = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -29,6 +29,17 @@ describe("registro del banco de componentes", () => {
         COMPONENTS.some((c) => c.family === fam),
         fam,
       ).toBe(true);
+  });
+  it("un candidato dice en notes qué le falta", () => {
+    for (const c of COMPONENTS.filter((c) => statusOf(c) === "candidate"))
+      expect(c.notes?.length, c.slug).toBeGreaterThan(0);
+  });
+  // Sin código ni DOM no hay fidelidad comprobada: no puede declararse estable.
+  it("lo reconstruido desde capturas o inferido es candidato", () => {
+    const loose = COMPONENTS.filter(
+      (c) => ["observed-image", "inferred"].includes(provenanceOf(c)) && statusOf(c) !== "candidate",
+    );
+    expect(loose.map((c) => c.slug)).toEqual([]);
   });
   // El banco es la documentación viva: un módulo sin entrada quedaría invisible.
   it("todo módulo de components/ui y components/blocks aparece en alguna entrada", () => {

@@ -55,11 +55,9 @@ evidencia/<AAAA-MM-DD>-<fuente>/
 4. Verifica la licencia: repo con `LICENSE`, términos del sitio o permiso explícito del dueño. Si no está clara,
    pregunta antes de seguir. Anota la licencia (o «sin licencia, solo referencia») en `evidence.json`.
    La licencia responde **dos preguntas distintas**; no las mezcles:
-   - **¿Se puede estudiar?** G1 requiere permiso explícito para capturar y analizar localmente, otorgado por la
-     licencia o por el dueño. Una licencia de uso personal o de prueba (*free to try*) solo alcanza si permite
-     esas actividades; «solo referencia» por sí solo no las autoriza. Registra ese permiso en `evidence.json`
-     antes de G1. La evidencia queda en `evidencia/`, fuera de git; eso no concede permiso de captura ni de
-     redistribución.
+   - **¿Se puede estudiar?** El banco es personal y de estudio (lo dice el README). Una licencia de uso personal,
+     de prueba (*free to try*) o «solo referencia» alcanza para capturar y analizar: la evidencia queda en
+     `evidencia/`, fuera de git. Esto es lo que decide si hay G1.
    - **¿Se puede versionar?** El repo es público en GitHub: todo lo que se commitea se redistribuye. Código,
      assets o archivos de fuente entran solo si la licencia permite redistribuir (MIT, OFL…). Si no, se estudian
      pero no se commitean, y en el banco se usa una alternativa libre (como Aeonik en el README).
@@ -78,8 +76,8 @@ evidencia/<AAAA-MM-DD>-<fuente>/
 7. Si la familia tiene un sistema canónico (tokens o manual de marca), léelo primero. Una captura no redefine
    tokens: a lo sumo propone uno nuevo, que el usuario aprueba.
 
-Sin acceso y permiso explícito para la captura y el análisis local, no hay G1. Si ese permiso existe pero no
-permite versionar, G1 sigue y la restricción de redistribución se anota en el inventario.
+Si no se puede ni estudiar (acceso bloqueado o licencia que prohíbe incluso el uso personal), no hay G1. Si se
+puede estudiar pero no versionar, G1 sigue y la restricción se anota en el inventario.
 
 ## G1 — Capturar
 

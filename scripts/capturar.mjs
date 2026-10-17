@@ -121,6 +121,8 @@ const fuente = args.url ? { kind: "url", uri: args.url } : { kind: "image", uri:
 if (!evidencia.fuentes.some((f) => f.kind === fuente.kind && f.uri === fuente.uri)) evidencia.fuentes.push(fuente);
 evidencia.autoriza = args.autoriza ?? evidencia.autoriza;
 evidencia.licencia = args.licencia ?? evidencia.licencia;
+// Cada corrida parte de cero (también con --imagen, que termina antes del navegador): un bloqueo anterior
+// no debe quedar marcado si esta captura funciona.
 delete evidencia.incompleta;
 evidencia.estado = "ok";
 delete evidencia.bloqueo;
@@ -270,10 +272,6 @@ async function recorrer(page) {
   });
 }
 
-// Cada corrida parte de cero: un bloqueo anterior no debe quedar marcado si esta captura funciona.
-delete evidencia.incompleta;
-delete evidencia.bloqueo;
-evidencia.estado = "ok";
 const browser = await chromium.launch(
   process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
 );

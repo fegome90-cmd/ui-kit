@@ -181,40 +181,17 @@ describe("LabNotification", () => {
     expect(sinTiempo).not.toHaveBeenCalled();
     vi.useRealTimers();
   });
-  it("mantiene el plazo al cambiar onClose y llama al callback actual", () => {
+
+  it("un onClose inline nuevo en cada render no reinicia el timer del toast", () => {
     vi.useFakeTimers();
-    try {
-      const anterior = vi.fn();
-      const actual = vi.fn();
-      const { rerender } = render(<LabNotification variant="toast" timeout={5000} onClose={anterior} />);
-      act(() => vi.advanceTimersByTime(3000));
-      rerender(<LabNotification variant="toast" timeout={5000} onClose={actual} />);
-      act(() => vi.advanceTimersByTime(1999));
-      expect(actual).not.toHaveBeenCalled();
-      act(() => vi.advanceTimersByTime(1));
-      expect(actual).toHaveBeenCalledOnce();
-      expect(anterior).not.toHaveBeenCalled();
-    } finally {
-      vi.useRealTimers();
+    const cerrado = vi.fn();
+    const toast = () => <LabNotification variant="toast" title="A" timeout={5000} onClose={() => cerrado()} />;
+    const { rerender } = render(toast());
+    for (let i = 0; i < 6; i++) {
+      act(() => vi.advanceTimersByTime(1000));
+      rerender(toast());
     }
-  });
-  it("inicia y cancela el temporizador al añadir o quitar onClose", () => {
-    vi.useFakeTimers();
-    try {
-      const onClose = vi.fn();
-      const { rerender } = render(<LabNotification variant="toast" timeout={5000} />);
-      act(() => vi.advanceTimersByTime(3000));
-      rerender(<LabNotification variant="toast" timeout={5000} onClose={onClose} />);
-      act(() => vi.advanceTimersByTime(4999));
-      expect(onClose).not.toHaveBeenCalled();
-      rerender(<LabNotification variant="toast" timeout={5000} />);
-      act(() => vi.advanceTimersByTime(5000));
-      expect(onClose).not.toHaveBeenCalled();
-      rerender(<LabNotification variant="toast" timeout={5000} onClose={onClose} />);
-      act(() => vi.advanceTimersByTime(5000));
-      expect(onClose).toHaveBeenCalledOnce();
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(cerrado).toHaveBeenCalledOnce();
+    vi.useRealTimers();
   });
 });

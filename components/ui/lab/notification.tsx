@@ -89,15 +89,18 @@ function LabNotification({
     if (variant === "actionable") ref.current?.focus();
   }, [variant]);
 
+  // onClose suele llegar inline (identidad nueva en cada render del padre): el timer usa el último por ref
+  // y solo se reinicia si cambian variant, timeout o si hay cierre.
+  const cerrar = React.useRef(onClose);
   React.useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
-
+    cerrar.current = onClose;
+  });
+  const conCierre = !!onClose;
   React.useEffect(() => {
-    if (variant !== "toast" || !timeout || !hasOnClose) return;
-    const t = window.setTimeout(() => onCloseRef.current?.(), timeout);
+    if (variant !== "toast" || !timeout || !conCierre) return;
+    const t = window.setTimeout(() => cerrar.current?.(), timeout);
     return () => window.clearTimeout(t);
-  }, [variant, timeout, hasOnClose]);
+  }, [variant, timeout, conCierre]);
 
   const rol =
     variant === "callout"

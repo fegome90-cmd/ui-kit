@@ -74,7 +74,7 @@ export const ICON_VIEWBOX: Partial<Record<IconName, string>> = {
 };
 
 // QR medido sobre la captura: marcos de 3 px con hueco de 3 px (sin punto central).
-export const QR_SVG = `<svg class="qr" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+export const QR_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 <path fill-rule="evenodd" fill="currentColor" d="M1 1.5h9v9H1Zm3 3v3h3v-3ZM13 1.5h9v9h-9Zm3 3v3h3v-3ZM1 13.5h9v9H1Zm3 3v3h3v-3Z"/>
 <path fill="currentColor" d="M13 13.5h4V15h3v-1.5h2v5h-.8v1H18v-1h-2.8v4H13Z"/>
 <path fill="currentColor" opacity=".6" d="M18 20.8h1.6v1.4H18Zm3 0h1.6v1.4H21Z"/></svg>`;

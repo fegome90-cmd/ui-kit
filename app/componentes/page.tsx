@@ -4,7 +4,7 @@ import { Thumb } from "@/components/docs/previews";
 import { CATEGORIES, COMPONENTS, FAMILIES, type Family } from "@/lib/component-registry";
 
 const FAMILY_NOTES: Record<Family, string> = {
-  REMI: "CSS plano extraído del monitor REMI, acotado bajo el contenedor .remi. Medidas a 1920×1080.",
+  REMI: "Tailwind + cn() con la paleta --color-remi-* del monitor. Medidas a 1920×1080; la tipografía va bajo .remi.",
   Ninja: "Estilo shadcn: Tailwind v4 + Radix + cva. Los tokens están en styles/ninja.css.",
   Kraa: "Tailwind + cva + cn() con tokens --kraa-* y Radix. Todo va dentro de KraaProvider (.kraa-theme).",
   REA: "Patrones de REA Atlas en React con Tailwind + cva + cn() y tokens --rea-*. Todo va dentro de ReaProvider (.rea-theme).",

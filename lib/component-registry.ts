@@ -57,7 +57,7 @@ export const COMPONENTS: ComponentDoc[] = [
     props: [
       { name: "label", type: "string", description: "Obligatorio: tooltip y nombre accesible." },
       { name: "children", type: "ReactNode", description: "El ícono." },
-      { name: "className", type: "string", default: '"mini-button"', description: "Clase visual." },
+      { name: "className", type: "string", description: "Clases extra; se combinan con cn()." },
       { name: "...rest", type: "ButtonHTMLAttributes", description: "onClick, disabled, etc." },
     ],
   },
@@ -145,6 +145,7 @@ export const COMPONENTS: ComponentDoc[] = [
         type: '{ kind: "print" | "save" | "refresh"; label; onClick? }[]',
         description: "Botones en orden.",
       },
+      { name: "className", type: "string", description: "Posición; en el monitor iba absoluta en la cabecera." },
     ],
   },
   {
@@ -158,6 +159,11 @@ export const COMPONENTS: ComponentDoc[] = [
     props: [
       { name: "time", type: "string | null", description: "Hora; null muestra el texto alternativo." },
       { name: "fallback", type: "string", default: '"Vista sintética lista"', description: "Texto sin hora." },
+      {
+        name: "className",
+        type: "string",
+        description: "Posición y tamaño; en el monitor iba desplazado en la cabecera.",
+      },
     ],
   },
   {

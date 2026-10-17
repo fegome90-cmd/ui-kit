@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { ArrowCircle } from "./kit-icons";
 
+const PAGER_BTN =
+  "flex w-8 cursor-pointer items-center justify-center border-0 bg-none p-0 disabled:cursor-default not-disabled:hover:bg-remi-blue-hover";
+
 /* Navegación: paginador azul, resumen de registros y pestañas con estado. */
 
 /** Paginador "1 de N" con flechas en círculo. */
@@ -16,14 +19,24 @@ export function Pager({
   onNext?: () => void;
 }) {
   return (
-    <nav className="pager" aria-label="Paginación">
-      <button type="button" aria-label="Página anterior" disabled={page <= 1} onClick={onPrev}>
+    <nav
+      data-slot="pager"
+      className="inline-flex h-[26px] items-stretch overflow-hidden rounded-[4px] bg-remi-blue text-[12px] font-bold text-white shadow-[0_2px_4px_#0003]"
+      aria-label="Paginación"
+    >
+      <button type="button" className={PAGER_BTN} aria-label="Página anterior" disabled={page <= 1} onClick={onPrev}>
         <ArrowCircle dir="left" />
       </button>
-      <span aria-current="page">
+      <span className="flex items-center border-x border-remi-pager-line px-4" aria-current="page">
         {page} de {total}
       </span>
-      <button type="button" aria-label="Página siguiente" disabled={page >= total} onClick={onNext}>
+      <button
+        type="button"
+        className={PAGER_BTN}
+        aria-label="Página siguiente"
+        disabled={page >= total}
+        onClick={onNext}
+      >
         <ArrowCircle dir="right" />
       </button>
     </nav>
@@ -33,7 +46,7 @@ export function Pager({
 /** "Mostrando 1 a 6 de 6". */
 export function RangeSummary({ from, to, total }: { from: number; to: number; total: number }) {
   return (
-    <p className="range-summary">
+    <p data-slot="range-summary" className="m-0 text-[11px] text-remi-tab-text">
       Mostrando {from} a {to} de {total}
     </p>
   );
@@ -57,14 +70,14 @@ export function StatusTabs({
   onChange: (id: string) => void;
 }) {
   return (
-    <div className="status-tabs" role="tablist">
+    <div data-slot="status-tabs" className="flex flex-wrap items-end border-b border-remi-tab-border" role="tablist">
       {tabs.map((t) => (
         <button
           key={t.id}
           type="button"
           role="tab"
           aria-selected={t.id === active}
-          className="status-tab"
+          className="-mr-px inline-flex h-[26px] cursor-pointer items-center gap-[3px] border border-b-0 border-remi-tab-border bg-remi-tab px-[9px] text-[11px] font-bold text-remi-tab-text aria-selected:-mb-px aria-selected:h-[27px] aria-selected:bg-white aria-selected:pb-px"
           onClick={() => onChange(t.id)}
         >
           {t.done && (
@@ -98,7 +111,13 @@ export function SoftButton({
   disabled?: boolean;
 }) {
   return (
-    <button type="button" className="soft-button" onClick={onClick} disabled={disabled}>
+    <button
+      type="button"
+      data-slot="soft-button"
+      className="h-6 cursor-pointer border-0 bg-remi-blue px-3.5 text-[12px] font-bold text-white disabled:cursor-default disabled:bg-remi-soft-disabled"
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

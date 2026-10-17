@@ -29,7 +29,7 @@ describe("vistas previas del banco", () => {
         <Preview slug="kraa-button" />
       </>,
     );
-    expect(container.querySelector(".remi .blue-button")).not.toBeNull();
+    expect(container.querySelector(".remi [data-slot=blue-button]")).not.toBeNull();
     expect(container.querySelector(".kraa-theme [data-slot=kraa-button]")).not.toBeNull();
   });
 });

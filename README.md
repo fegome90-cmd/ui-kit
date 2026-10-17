@@ -9,14 +9,15 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
 
 | Familia | Origen | Estilos | Contenedor |
 |---|---|---|---|
-| REMI | Componentes genéricos del monitor REMI (`remi-monitor`) | CSS plano en `styles/remi.css` | `.remi` |
+| REMI | Componentes genéricos del monitor REMI (`remi-monitor`) | Tailwind v4 + `cn()`, paleta `--color-remi-*` en `styles/remi.css` | `.remi` |
 | Ninja | `ninja-ui` v3 | Tailwind v4 + Radix + `cva`, tokens en `styles/ninja.css` | ninguno (`:root`) |
 | Kraa | `kraa-component-bank` v0.1.1 | Tailwind v4 + `cva` + `cn()` + Radix, tema en `styles/kraa-theme.css` | `KraaProvider` (`.kraa-theme`) |
 | REA | `REA_Atlas_completo_v4` (2026-10-16) | Tailwind v4 + `cva` + `cn()`, tema en `styles/rea.css` | `ReaProvider` (`.rea-theme`) |
 
 - **REMI** solo trae lo genérico. Se quedaron en el monitor el punto de pendientes, el diálogo de escala,
-  las indicaciones, los indicadores clínicos y `lib/pending`. `styles/remi.css` se extrajo una vez de los
-  estilos del monitor con `scripts/extract-remi-css.mjs`, y desde entonces se edita a mano.
+  las indicaciones, los indicadores clínicos y `lib/pending`. Las medidas son las del monitor a
+  1920×1080. La posición de `ToolPill` y `UpdateStatus` dentro de la cabecera del monitor no viaja con el
+  componente: se fija con `className`.
 - **REA**: `SlideNavigator` se copió del paquete y el resto se reescribió en React a partir de
   `site-concept.html` (paleta ⌘K, filtros, índice, inspector, aviso, progreso, retícula, preloader, textos en
   movimiento, escenario, cabecera y catálogo). La investigación, la skill `design-to-registry-workflow` y las
@@ -29,7 +30,7 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
 
 ## Convención (estilo shadcn)
 
-Ninja, REA y Kraa siguen la convención; REMI todavía usa CSS con clases propias y se migra después.
+Las cuatro familias siguen la convención.
 
 - **Componentes con utilidades de Tailwind**: variantes con `cva`, clases combinadas con `cn()` (`lib/utils.ts`),
   `data-slot` en la raíz y exportaciones con nombre. El código vive en el repo, no en un paquete.
@@ -82,7 +83,6 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
 
 - `UpdateStatus` (REMI) muestra el mismo triángulo verde con y sin hora: un estado sin verificar se ve como
   "bien". Viene así del monitor.
-- REMI usa colores fijos en vez de tokens; `--remi-*` se declaran pero ningún componente los usa todavía.
 - Ninja mantiene el contraste del original (coral 3,4:1). La clase `theme-aa` lo lleva a AA.
 - Los bloques de Ninja tienen textos en inglés ("Filter typefaces", "Font shape").
 - `AnimatedHeadline` y `KraaReadingCanvas` renderizan su propio `h1`.
@@ -90,7 +90,9 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
   (`rights: review-required`). No se portaron el terreno WebGL ni el scrollytelling sticky del escenario.
 - REA: la copia decorativa de `ReaNav` usa `content: attr(data-label) / ""` para no leerse dos veces. Un navegador
   sin soporte de texto alternativo en `content` descarta la declaración y no muestra la copia en hover.
-- REMI aún no sigue la convención shadcn, y no hay `registry.json` para instalar con `npx shadcn add`.
+- No hay `registry.json` para instalar los componentes con `npx shadcn add`.
+- REMI: los íconos toman su tamaño natural del `viewBox` (1 unidad = 1 px de la captura); `size` los fuerza
+  a un cuadrado.
 - Kraa: los portales (menú de acciones, hoja móvil) replican `.kraa-theme` con `useKraaTheme`, porque salen del
   árbol del proveedor.
 

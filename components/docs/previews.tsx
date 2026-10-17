@@ -58,7 +58,7 @@ import { REA_PREVIEWS, REA_THUMBS } from "./previews-rea";
 function Row({ children, caption }: { children: ReactNode; caption?: string }) {
   return (
     <figure className="cb-variant">
-      <div className="cell-items">{children}</div>
+      <div className="flex min-h-[50px] items-center justify-center leading-none">{children}</div>
       {caption && <figcaption>{caption}</figcaption>}
     </figure>
   );
@@ -674,9 +674,12 @@ export const THUMBS: Record<string, ReactNode> = {
       value="all"
       onChange={() => {}}
       options={[{ value: "all", label: "Todos" }]}
+      className="w-[210px]"
     />
   ),
-  "filter-input": <FilterInput label="Responsable" placeholder="Nombre" value="" onChange={() => {}} />,
+  "filter-input": (
+    <FilterInput label="Responsable" placeholder="Nombre" value="" onChange={() => {}} className="w-[210px]" />
+  ),
   "toggle-switch": <ToggleSwitch label="" checked onChange={() => {}} />,
   "tool-pill": (
     <ToolPill
@@ -687,7 +690,7 @@ export const THUMBS: Record<string, ReactNode> = {
       ]}
     />
   ),
-  "update-status": <UpdateStatus time="14:02" />,
+  "update-status": <UpdateStatus time="14:02" className="text-[13px]" />,
   "dark-button": <DarkButton>Firmar</DarkButton>,
   pager: <Pager page={1} total={1} />,
   "status-tabs": (
@@ -801,7 +804,9 @@ export function FamilyScope({
   surface?: boolean;
   children: ReactNode;
 }) {
-  if (family === "REMI") return <div className="remi">{children}</div>;
+  // w-full: dentro de la columna centrada del banco, el contenedor se encogería a su contenido
+  // y las grillas auto-fill (íconos) quedarían en una sola columna.
+  if (family === "REMI") return <div className="remi w-full">{children}</div>;
   if (family === "Kraa")
     return (
       <KraaProvider theme="light" style={{ background: "transparent" }}>
@@ -833,7 +838,7 @@ export function Preview({ slug }: { slug: string }) {
 export function Thumb({ slug }: { slug: string }) {
   return (
     <FamilyScope family={bySlug(slug)?.family}>
-      <div className="cell-items" inert>
+      <div className="flex min-h-[50px] items-center justify-center gap-2 leading-none" inert>
         {THUMBS[slug]}
       </div>
     </FamilyScope>

@@ -308,10 +308,20 @@ function ReaTerrain({
   const { theme, accent } = useReaTheme();
   const [ready, setReady] = React.useState(false);
   const recolorear = React.useRef<() => void>(() => {});
+  // La media query se sigue en vivo: al cruzar el umbral (ensanchar o achicar), el terreno arranca o se limpia.
+  const [cumple, setCumple] = React.useState(false);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia(media);
+    setCumple(mq.matches);
+    const on = () => setCumple(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [media]);
 
   React.useEffect(() => {
     const canvas = ref.current;
-    if (!canvas || reduced || !window.matchMedia(media).matches) return;
+    if (!canvas || reduced || !cumple) return;
     const colores = () => {
       const cs = getComputedStyle(canvas);
       return { ink: cs.getPropertyValue("--rea-ink"), accent: cs.getPropertyValue("--rea-accent") };
@@ -325,7 +335,7 @@ function ReaTerrain({
       recolorear.current = () => {};
       setReady(false);
     };
-  }, [reduced, media, interactive]);
+  }, [reduced, cumple, interactive]);
 
   // El tema o el acento cambian los tokens del contenedor: se releen sin rearmar el terreno.
   // biome-ignore lint/correctness/useExhaustiveDependencies: theme y accent son el disparador.

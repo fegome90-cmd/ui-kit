@@ -164,4 +164,24 @@ describe("ReaTerrain", () => {
     expect(canvas).toHaveAttribute("aria-hidden", "true");
     expect(canvas).not.toHaveAttribute("data-ready");
   });
+
+  it("sigue los cambios de la media query y deja de escucharlos al desmontar", () => {
+    const add = vi.fn();
+    const remove = vi.fn();
+    const spy = vi.spyOn(window, "matchMedia").mockImplementation(
+      (query) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: add,
+          removeEventListener: remove,
+        }) as unknown as MediaQueryList,
+    );
+    const { unmount } = render(<ReaTerrain media="(min-width: 900px)" />);
+    expect(add).toHaveBeenCalledWith("change", expect.any(Function));
+    const on = add.mock.calls.find(([tipo]) => tipo === "change")?.[1];
+    unmount();
+    expect(remove).toHaveBeenCalledWith("change", on);
+    spy.mockRestore();
+  });
 });

@@ -525,14 +525,15 @@ LAB_PREVIEWS["lab-bento-grid"] = () => (
 LAB_PREVIEWS["lab-scrolly-section"] = () => (
   <div className="w-full">
     <p className="m-0 mb-[16px] text-[13px] text-lab-muted">
-      Bajá con el scroll: la escena de la izquierda sigue al paso del centro.
+      Bajá con el scroll: la escena de la izquierda sigue al paso del centro. La escena es decorativa: los datos también
+      van en el texto de cada paso.
     </p>
     <ScrollySection
       steps={[
         {
           id: "cifra",
           title: "Dos mil millones de personas",
-          body: "Primero, la magnitud (ficticio).",
+          body: "Primero, la magnitud: 2 mil millones de personas (ficticio).",
           visual: (
             <div className="grid size-full place-items-center">
               <StatRing size="lg" tone="accent" value="2B" caption="Cifra en anillo" />
@@ -542,7 +543,7 @@ LAB_PREVIEWS["lab-scrolly-section"] = () => (
         {
           id: "series",
           title: "El riesgo crece con la edad",
-          body: "Después, la secuencia.",
+          body: "Después, la secuencia: de los 40 a los 80 años, el riesgo cardiovascular sube de 2 a 38 y el de diabetes, de 3 a 19.",
           visual: (
             <div className="grid size-full place-items-center">
               <SeriesChart
@@ -558,7 +559,7 @@ LAB_PREVIEWS["lab-scrolly-section"] = () => (
         {
           id: "categorias",
           title: "Y no es una sola causa",
-          body: "Al final, las categorías.",
+          body: "Al final, las cuatro causas: A, B, C y D.",
           visual: (
             <div className="grid size-full place-items-center">
               <CategoryWheel

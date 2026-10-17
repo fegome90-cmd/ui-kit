@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { DotNav, seccionVisible } from "./dot-nav";
 import { FilteredStat, textoCifra } from "./filtered-stat";
+import { altoMontante, ProcessSteps } from "./process-steps";
 import { ordenRanking, RadialBars } from "./radial-bars";
 
 describe("FilteredStat", () => {
@@ -124,5 +125,26 @@ describe("RadialBars", () => {
     expect([...container.querySelectorAll("text")].map((t) => t.textContent)[0]).toBe("1 · A");
     expect(screen.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["A: 100 u", "B: 50 u", "C: 25 u"]);
     expect(ordenRanking(items).map((i) => i.puesto)).toEqual([1, 2, 3]);
+  });
+});
+
+describe("ProcessSteps: escalera", () => {
+  const steps = [{ title: "Diagnóstico" }, { title: "Tratamiento" }, { title: "Seguimiento" }];
+  it("cada montante es más bajo y cada peldaño más ancho que el anterior", () => {
+    const { container } = render(<ProcessSteps variant="staircase" steps={steps} />);
+    const alto = [...container.querySelectorAll<HTMLElement>("[data-riser]")].map((e) => e.style.height);
+    expect(alto).toEqual(["166px", "115px", "64px"]);
+    const crecer = [...container.querySelectorAll<HTMLElement>("li")].map((e) => e.style.flexGrow);
+    expect(crecer).toEqual(["2", "3", "4"]);
+    expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("1. Diagnóstico");
+  });
+  it("marca la etapa en curso", () => {
+    render(<ProcessSteps variant="staircase" steps={steps} current={2} />);
+    expect(screen.getAllByRole("listitem")[2]).toHaveAttribute("aria-current", "step");
+    expect(screen.getByText("En curso")).toBeInTheDocument();
+  });
+  it("con una sola etapa usa el alto mayor", () => {
+    expect(altoMontante(0, 1)).toBe(166);
+    expect(altoMontante(4, 5)).toBe(64);
   });
 });

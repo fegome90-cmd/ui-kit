@@ -329,6 +329,11 @@ LAB_PREVIEWS["lab-process-steps"] = () => (
   <div className="grid w-full gap-[28px]">
     <ProcessSteps steps={ETAPAS.slice(0, 3)} />
     <ProcessSteps steps={ETAPAS} variant="timeline" current={1} />
+    <ProcessSteps
+      className="max-w-[560px]"
+      variant="staircase"
+      steps={[{ title: "Diagnóstico" }, { title: "Tratamiento" }, { title: "Seguimiento" }]}
+    />
   </div>
 );
 LAB_PREVIEWS["lab-series-chart"] = () => (

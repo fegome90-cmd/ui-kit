@@ -1392,7 +1392,7 @@ useGridShortcut(() => setOn((v) => !v));
     name: "Etapas",
     category: "Gráficos",
     description:
-      "Las etapas de un proceso en orden, como chevrones o como línea con puntos. La etapa en curso es opcional.",
+      "Las etapas de un proceso en orden: chevrones, línea con puntos o escalera de etapas que acumulan. La etapa en curso es opcional.",
     files: ["components/ui/lab/process-steps.tsx", "lib/utils.ts"],
     usage: `<ProcessSteps
   variant="timeline"
@@ -1401,7 +1401,12 @@ useGridShortcut(() => setOn((v) => !v));
 />`,
     props: [
       { name: "steps", type: "{ title: string; description?: ReactNode }[]", description: "Etapas en orden." },
-      { name: "variant", type: '"chevrons" | "timeline"', default: '"chevrons"', description: "BioAge o Meridian." },
+      {
+        name: "variant",
+        type: '"chevrons" | "timeline" | "staircase"',
+        default: '"chevrons"',
+        description: "BioAge, Meridian o Symbol Studio.",
+      },
       { name: "current", type: "number", description: "Índice de la etapa en curso; sin valor, solo el orden." },
     ],
     status: "candidate",
@@ -1409,6 +1414,7 @@ useGridShortcut(() => setOn((v) => !v));
     notes: [
       "Chevrones de BioAge (platform t06) y línea con puntos de Meridian, desde capturas.",
       "Una etapa no es el estado actual: solo `current` destaca una, con aria-current=step, relleno y el texto «En curso».",
+      "`staircase` medida en el DOM de Symbol Studio: números de 32 px arriba, montantes de 166/118/64 px con 40 px de acento, peldaño de 4 px, peldaños que se ensanchan. Pensada para 3–5 etapas; el estado `current` es agregado.",
     ],
   },
   {

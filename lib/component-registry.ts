@@ -1061,6 +1061,36 @@ useGridShortcut(() => setOn((v) => !v));
     notes: ["Receta de autoría ilustrativa del paquete REA: no está extraída ni verificada 1:1."],
   },
   {
+    slug: "rea-terrain",
+    family: "REA",
+    name: "Terreno topográfico",
+    category: "Fondos",
+    description:
+      "Curvas de nivel de un ruido fractal que derivan al cargar y levantan una colina en acento bajo el puntero. WebGL2 con respaldo Canvas 2D.",
+    files: ["components/ui/rea/rea-terrain.tsx", "lib/rea/use-reduced-motion.ts"],
+    usage: `<ReaProvider surface>
+  <section className="relative isolate min-h-[480px]">
+    <ReaTerrain />
+    <h1>…</h1>
+  </section>
+</ReaProvider>`,
+    props: [
+      { name: "interactive", type: "boolean", default: "true", description: "Si el puntero levanta la colina." },
+      {
+        name: "media",
+        type: "string",
+        default: '"(pointer: fine) and (min-width: 900px)"',
+        description: "Media query que habilita el terreno, como en el original.",
+      },
+    ],
+    status: "candidate",
+    notes: [
+      "Portado de initTerrain e initTerrain2D de site-concept.html v4 (docs/origen/rea-atlas/reference).",
+      "Falta compararlo lado a lado con site-concept.html. El propio original ya era aproximado respecto del sitio de referencia (DIFF-1VS1, fila 20).",
+      "Decorativo: aria-hidden. Con movimiento reducido no se dibuja; el contenedor necesita relative isolate.",
+    ],
+  },
+  {
     slug: "rea-specimen-stage",
     family: "REA",
     name: "Escenario de muestras",

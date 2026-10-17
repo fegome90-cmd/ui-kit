@@ -270,6 +270,10 @@ async function recorrer(page) {
   });
 }
 
+// Cada corrida parte de cero: un bloqueo anterior no debe quedar marcado si esta captura funciona.
+delete evidencia.incompleta;
+delete evidencia.bloqueo;
+evidencia.estado = "ok";
 const browser = await chromium.launch(
   process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
 );

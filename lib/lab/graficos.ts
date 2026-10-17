@@ -115,3 +115,70 @@ export function tramoLog(v: number): number {
 
 /** Opacidad de cada tramo, medida en la leyenda de Voices. */
 export const OPACIDAD_TRAMO = [0, 0.15, 0.3, 0.5, 0.68, 0.85] as const;
+
+export interface Celda {
+  i: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * Treemap «squarified» (Bruls, Huizing y van Wijk, 2000): reparte el rectángulo en celdas de área
+ * proporcional a cada valor, buscando que sean lo más cuadradas posible para poder compararlas. Devuelve
+ * las celdas en el orden de entrada (`i` es el índice original). Valores ≤ 0 o no finitos no ocupan área.
+ */
+export function squarify(valores: ReadonlyArray<number>, x: number, y: number, w: number, h: number): Celda[] {
+  const items = valores
+    .map((v, i) => ({ i, v: Number.isFinite(v) && v > 0 ? v : 0 }))
+    .filter((it) => it.v > 0)
+    .sort((a, b) => b.v - a.v);
+  const total = items.reduce((s, it) => s + it.v, 0);
+  if (!total || w <= 0 || h <= 0) return [];
+  const escalaArea = (w * h) / total;
+  const areas = items.map((it) => ({ i: it.i, a: it.v * escalaArea }));
+  const res: Celda[] = [];
+  let r = { x, y, w, h };
+  const peor = (fila: { a: number }[], lado: number) => {
+    const s = fila.reduce((acc, f) => acc + f.a, 0);
+    const max = Math.max(...fila.map((f) => f.a));
+    const min = Math.min(...fila.map((f) => f.a));
+    return Math.max((lado * lado * max) / (s * s), (s * s) / (lado * lado * min));
+  };
+  const colocar = (fila: { i: number; a: number }[]) => {
+    const s = fila.reduce((acc, f) => acc + f.a, 0);
+    if (r.w >= r.h) {
+      // Columna a la izquierda, de alto completo.
+      const ancho = s / r.h;
+      let yy = r.y;
+      for (const f of fila) {
+        const alto = f.a / ancho;
+        res.push({ i: f.i, x: r.x, y: yy, w: ancho, h: alto });
+        yy += alto;
+      }
+      r = { x: r.x + ancho, y: r.y, w: r.w - ancho, h: r.h };
+    } else {
+      // Fila arriba, de ancho completo.
+      const alto = s / r.w;
+      let xx = r.x;
+      for (const f of fila) {
+        const ancho = f.a / alto;
+        res.push({ i: f.i, x: xx, y: r.y, w: ancho, h: alto });
+        xx += ancho;
+      }
+      r = { x: r.x, y: r.y + alto, w: r.w, h: r.h - alto };
+    }
+  };
+  let fila: { i: number; a: number }[] = [];
+  for (const it of areas) {
+    const lado = Math.min(r.w, r.h);
+    if (!fila.length || peor([...fila, it], lado) <= peor(fila, lado)) fila.push(it);
+    else {
+      colocar(fila);
+      fila = [it];
+    }
+  }
+  if (fila.length) colocar(fila);
+  return res.sort((a, b) => a.i - b.i);
+}

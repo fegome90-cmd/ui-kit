@@ -1678,6 +1678,78 @@ Pendientes <LabCount value={12} />`,
       "Cada paso lleva su texto; las escenas inactivas son inert. Bajo 760 px cada escena va antes de su texto.",
     ],
   },
+  {
+    slug: "lab-time-scale",
+    family: "Lab",
+    name: "Línea de tiempo proporcional",
+    category: "Gráficos",
+    description:
+      "Hitos ubicados en proporción al tiempo; el elegido muestra su contenido. Los huecos dicen cuánto pasó.",
+    files: ["components/ui/lab/time-scale.tsx", "lib/utils.ts"],
+    usage: `<TimeScale label="Historia" events={[{ at: 2009, label: "2009", content: <p>…</p> }, { at: 2013, label: "2013", content: <p>…</p> }]} />`,
+    props: [
+      { name: "events", type: "{ at: number; label; content }[]", description: "Hitos; `at` en cualquier unidad." },
+      { name: "label", type: "string", description: "Nombre del grupo para lectores de pantalla." },
+      {
+        name: "minUnitWidth",
+        type: "number",
+        default: "40",
+        description: "px mínimos por unidad (Volume: 90 por año).",
+      },
+      { name: "value / defaultValue / onValueChange", type: "number", description: "Hito elegido." },
+    ],
+    status: "candidate",
+    provenance: "measured-dom",
+    notes: [
+      "Medida en Volume Industries: 90 px por año exactos (2009 → 180, 2013 → 540, 2021 → 1260); rombo relleno en el activo.",
+      "Pestañas horizontales con flechas, Inicio y Fin. Con hitos juntos se desplaza en vez de encimar rótulos.",
+    ],
+  },
+  {
+    slug: "lab-hierarchy-cells",
+    family: "Lab",
+    name: "Jerarquía en celdas",
+    category: "Gráficos",
+    description:
+      "Un nivel del árbol como celdas de área proporcional; las celdas con hijos se abren y una miga de pan vuelve.",
+    files: ["components/ui/lab/hierarchy-cells.tsx", "lib/lab/graficos.ts", "lib/lab/semantica.ts", "lib/utils.ts"],
+    usage: `<HierarchyCells root={{ id: "todo", label: "Ingresos", children: [{ id: "u", label: "Urgencia", value: 120 }] }} />`,
+    props: [
+      {
+        name: "root",
+        type: "{ id; label; value?; children? }",
+        description: "Árbol; los nodos con hijos suman solos.",
+      },
+      { name: "format", type: "(v: number) => string", description: "Formato de valores." },
+      { name: "height", type: "number", default: "320", description: "Alto del área de celdas." },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Familia Relación. Mecanismo de Searching for Birds (huevo en celdas: aves → formas → tipos), allí con Voronoi.",
+      "Aquí treemap squarified (Bruls et al., 2000), que compara mejor las áreas. Cada celda trae valor y % en texto.",
+    ],
+  },
+  {
+    slug: "lab-range-bars",
+    family: "Lab",
+    name: "Barras de rango",
+    category: "Gráficos",
+    description: "Cada fila es un intervalo sobre un eje con el cero marcado: un efecto incierto, no un número exacto.",
+    files: ["components/ui/lab/range-bars.tsx", "lib/lab/graficos.ts", "lib/utils.ts"],
+    usage: `<RangeBars title="Efecto estimado" unit="%" ranges={[{ label: "Ventas", min: 30, max: 40 }, { label: "Clientes perdidos", min: -30, max: -20 }]} />`,
+    props: [
+      { name: "ranges", type: "{ label; min; max }[]", description: "Intervalos; pueden cruzar el cero." },
+      { name: "unit", type: "string", description: "Unidad tras el número." },
+      { name: "title", type: "string", description: "Título." },
+    ],
+    status: "candidate",
+    provenance: "observed-image",
+    notes: [
+      "Observado en Symbol Studio (+30–40 %, −20–30 %). Un rango comunica la incertidumbre que un número esconde.",
+      "Un solo color para todos: el signo lo dicen el cero y el texto; rojo para lo negativo lo leería como «malo».",
+    ],
+  },
 ];
 
 export const bySlug = (slug: string) => COMPONENTS.find((c) => c.slug === slug);

@@ -9,6 +9,7 @@ import { DistributionChart } from "@/components/ui/lab/distribution-chart";
 import { DivergingHeatmap } from "@/components/ui/lab/diverging-heatmap";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
 import { FeatureTabs } from "@/components/ui/lab/feature-tabs";
+import { HierarchyCells } from "@/components/ui/lab/hierarchy-cells";
 import { LabBackdrop, PATTERNS } from "@/components/ui/lab/lab-backdrop";
 import { LabGlowCard } from "@/components/ui/lab/lab-glow-card";
 import { LabGradientText } from "@/components/ui/lab/lab-gradient-text";
@@ -20,11 +21,14 @@ import { LabNotification } from "@/components/ui/lab/notification";
 import { PresenceDot } from "@/components/ui/lab/presence-dot";
 import { ProcessSteps } from "@/components/ui/lab/process-steps";
 import { ProportionSplit } from "@/components/ui/lab/proportion-split";
+import { RangeBars } from "@/components/ui/lab/range-bars";
 import { ScrollySection } from "@/components/ui/lab/scrolly-section";
 import { SeriesChart } from "@/components/ui/lab/series-chart";
 import { SignalDisclosure } from "@/components/ui/lab/signal-disclosure";
 import { StatRing } from "@/components/ui/lab/stat-ring";
+import { TimeScale } from "@/components/ui/lab/time-scale";
 import { PALETAS, PALETAS_LAB, type PaletaLab } from "@/lib/lab/paletas";
+import { cn } from "@/lib/utils";
 
 // Datos ficticios: ilustran el mecanismo, no son datos clínicos.
 const TURNOS = [
@@ -553,6 +557,68 @@ LAB_PREVIEWS["lab-scrolly-section"] = () => (
   </div>
 );
 
+LAB_PREVIEWS["lab-time-scale"] = () => (
+  <div className="w-full">
+    <TimeScale
+      label="Historia del servicio (ficticio)"
+      minUnitWidth={48}
+      events={[2009, 2013, 2014, 2016, 2018, 2021].map((a) => ({
+        at: a,
+        label: String(a),
+        content: (
+          <p className="m-0 text-[15px] text-lab-ink">
+            <strong>{a}</strong>: hito ficticio. Entre 2009 y 2013 pasaron 4 años; entre 2013 y 2014, uno.
+          </p>
+        ),
+      }))}
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-hierarchy-cells"] = () => (
+  <div className="w-full max-w-[640px]">
+    <HierarchyCells
+      root={{
+        id: "todo",
+        label: "Ingresos del mes (ficticio)",
+        children: [
+          {
+            id: "urg",
+            label: "Urgencia",
+            children: [
+              { id: "u1", label: "Adultos", value: 420 },
+              { id: "u2", label: "Pediatría", value: 180 },
+              { id: "u3", label: "Maternidad", value: 90 },
+            ],
+          },
+          {
+            id: "prog",
+            label: "Programados",
+            children: [
+              { id: "p1", label: "Cirugía", value: 260 },
+              { id: "p2", label: "Medicina", value: 140 },
+            ],
+          },
+          { id: "tras", label: "Traslados", value: 75 },
+          { id: "otros", label: "Otros", value: 30 },
+        ],
+      }}
+    />
+  </div>
+);
+LAB_PREVIEWS["lab-range-bars"] = () => (
+  <div className="w-full max-w-[600px]">
+    <RangeBars
+      title="Efecto estimado de una intervención (ficticio)"
+      unit="%"
+      ranges={[
+        { label: "Adherencia", min: 30, max: 40 },
+        { label: "Reingresos", min: -30, max: -20 },
+        { label: "Tiempo de espera", min: -5, max: 10 },
+      ]}
+    />
+  </div>
+);
+
 export const LAB_THUMBS: Record<string, ReactNode> = {
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
@@ -672,5 +738,33 @@ export const LAB_THUMBS: Record<string, ReactNode> = {
     <span className="flex items-center gap-[6px] text-[11px] text-lab-muted">
       <span className="size-[28px] rounded-[6px] bg-lab-accent-soft" /> 01 / 03 ↓
     </span>
+  ),
+  "lab-time-scale": (
+    <span className="relative block h-[16px] w-[110px] border-b border-lab-line">
+      {[0, 44, 55, 77, 99].map((x, i) => (
+        <span
+          key={x}
+          className={cn(
+            "absolute top-[9px] size-[8px] rotate-45 border border-lab-ink",
+            i === 0 ? "bg-lab-ink" : "bg-lab-surface",
+          )}
+          style={{ left: x }}
+        />
+      ))}
+    </span>
+  ),
+  "lab-hierarchy-cells": (
+    <span className="grid h-[44px] w-[90px] grid-cols-[3fr_2fr] grid-rows-2 gap-[2px]">
+      <span className="row-span-2" style={{ background: "var(--lab-cat-1)" }} />
+      <span style={{ background: "var(--lab-cat-2)" }} />
+      <span style={{ background: "var(--lab-cat-3)" }} />
+    </span>
+  ),
+  "lab-range-bars": (
+    <svg aria-hidden viewBox="0 0 90 40" className="h-[40px]">
+      <line x1="45" x2="45" y1="0" y2="40" className="stroke-lab-ink" />
+      <rect x="60" y="8" width="18" height="8" rx="4" className="fill-lab-accent" />
+      <rect x="18" y="24" width="14" height="8" rx="4" className="fill-lab-accent" />
+    </svg>
   ),
 };

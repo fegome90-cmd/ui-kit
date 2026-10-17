@@ -7,6 +7,7 @@ import {
   marcasEje,
   polar,
   sectores,
+  squarify,
   tramoLog,
   trazoArea,
   trazoLinea,
@@ -98,5 +99,27 @@ describe("geometría de gráficos", () => {
     ]);
     expect(tramoLog(-1500)).toBe(-3);
     expect(tramoLog(Number.NaN)).toBe(0);
+  });
+
+  it("squarify conserva el área, queda dentro del rectángulo y respeta el orden de entrada", () => {
+    const vals = [6, 6, 4, 3, 2, 2, 1];
+    const c = squarify(vals, 0, 0, 600, 400);
+    const total = vals.reduce((a, b) => a + b, 0);
+    expect(c.map((x) => x.i)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    for (const x of c) {
+      expect(x.w * x.h).toBeCloseTo((vals[x.i] / total) * 600 * 400, 4);
+      expect(x.x).toBeGreaterThanOrEqual(-1e-9);
+      expect(x.y).toBeGreaterThanOrEqual(-1e-9);
+      expect(x.x + x.w).toBeLessThanOrEqual(600 + 1e-6);
+      expect(x.y + x.h).toBeLessThanOrEqual(400 + 1e-6);
+    }
+    const peorAspecto = Math.max(...c.map((x) => Math.max(x.w / x.h, x.h / x.w)));
+    expect(peorAspecto).toBeLessThan(3);
+  });
+
+  it("squarify ignora ceros y negativos y no rompe con nada", () => {
+    expect(squarify([5, 0, -2, Number.NaN], 0, 0, 100, 100).map((x) => x.i)).toEqual([0]);
+    expect(squarify([], 0, 0, 100, 100)).toEqual([]);
+    expect(squarify([1], 0, 0, 0, 100)).toEqual([]);
   });
 });

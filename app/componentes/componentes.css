@@ -20,7 +20,9 @@
     Roboto,
     sans-serif;
 }
-.cb-shell code {
+/* Fuera de las vistas previas: dentro, el estilo de <code> lo decide el componente (este CSS no tiene
+   capa y le ganaría a sus utilidades de Tailwind). */
+.cb-shell code:not(.cb-preview code) {
   font:
     12.5px / 1.5 ui-monospace,
     SFMono-Regular,

@@ -26,6 +26,7 @@ import { basename, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { chromium } from "@playwright/test";
 import {
+  archivosDeFuentes,
   fechaSantiago,
   fusionarTipografias,
   lineasSha256,
@@ -35,6 +36,7 @@ import {
   recortarValor,
   resumirTipografias,
   rolesTipograficos,
+  SELECTOR_SEMANTICO,
   slug,
   VIEWPORTS,
 } from "../lib/captura.ts";
@@ -148,7 +150,7 @@ if (args.imagen) {
 /** Lee en la página lo necesario para resumirTipografias. Las hojas de otro origen sin CORS no se pueden leer. */
 async function leerTipografias(page) {
   await page.evaluate(() => document.fonts.ready);
-  return page.evaluate(() => {
+  return page.evaluate((selectorSemantico) => {
     const caras = [...document.fonts].map((f) => ({
       family: f.family,
       weight: f.weight,
@@ -177,11 +179,17 @@ async function leerTipografias(page) {
     for (const el of document.body.querySelectorAll("*")) {
       const conTexto = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
       if (!conTexto || !el.checkVisibility()) continue;
-      const u = { pila: getComputedStyle(el).fontFamily, tag: el.tagName.toLowerCase(), role: el.getAttribute("role") };
+      // El rol sale del ancestro semántico más cercano (o del propio elemento): un span dentro de un h1 es titular.
+      const sem = el.closest(selectorSemantico) ?? el;
+      const u = {
+        pila: getComputedStyle(el).fontFamily,
+        tag: sem.tagName.toLowerCase(),
+        role: sem.getAttribute("role"),
+      };
       usadas.set(`${u.pila}|${u.tag}|${u.role}`, u);
     }
     return { caras, reglas, usadas: [...usadas.values()], hojasIlegibles };
-  });
+  }, SELECTOR_SEMANTICO);
 }
 
 delete evidencia.incompleta;
@@ -193,8 +201,15 @@ try {
   for (const vp of VIEWPORTS) {
     const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 1 });
     const page = await context.newPage();
+    // Peticiones de la página, para sacar las fuentes. `performance` no sirve: Chrome omite las que pide una hoja
+    // de otro origen.
+    const pedidas = [];
+    page.on("request", (r) => pedidas.push({ url: r.url(), tipo: r.resourceType() }));
     for (const estado of [null, ...estados]) {
-      const resp = await page.goto(args.url, { waitUntil: "networkidle" });
+      // `load` y no `networkidle`: un sitio con analítica o conexiones abiertas nunca queda en silencio. Se da un
+      // margen corto para que termine lo que cargue después.
+      const resp = await page.goto(args.url, { waitUntil: "load" });
+      await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {});
       const bloqueo = motivoBloqueo({
         status: resp?.status() ?? null,
         urlFinal: page.url(),
@@ -212,12 +227,21 @@ try {
       }
       if (!estado) {
         const { hojasIlegibles, ...crudas } = await leerTipografias(page);
+        const cargados = archivosDeFuentes(pedidas);
         const archivoTipos = `dom/${slug(args.vista)}--tipografias.json`;
         const rutaTipos = join(dir, archivoTipos);
         const previas = existsSync(rutaTipos) ? JSON.parse(readFileSync(rutaTipos, "utf8")).familias : [];
         const familias = fusionarTipografias(previas, resumirTipografias(crudas));
         mkdirSync(join(dir, "dom"), { recursive: true });
-        writeFileSync(rutaTipos, `${JSON.stringify({ vista: slug(args.vista), hojasIlegibles, familias }, null, 2)}\n`);
+        const previosCargados = existsSync(rutaTipos)
+          ? (JSON.parse(readFileSync(rutaTipos, "utf8")).archivosCargados ?? [])
+          : [];
+        const archivosCargados = [...new Set([...previosCargados, ...cargados])].sort();
+        writeFileSync(
+          rutaTipos,
+          `${JSON.stringify({ vista: slug(args.vista), hojasIlegibles, archivosCargados, familias }, null, 2)}\n`,
+        );
+        evidencia.archivosDeFuentes = [...new Set([...(evidencia.archivosDeFuentes ?? []), ...cargados])].sort();
         evidencia.tipografias = fusionarTipografias(evidencia.tipografias ?? [], familias);
         evidencia.rolesTipograficos = rolesTipograficos(evidencia.tipografias);
         if (hojasIlegibles)

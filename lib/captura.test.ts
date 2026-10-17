@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  archivosDeFuentes,
   fechaSantiago,
   fusionarTipografias,
   lineasSha256,
@@ -11,6 +12,7 @@ import {
   resumirTipografias,
   rolDe,
   rolesTipograficos,
+  SELECTOR_SEMANTICO,
   sinQuery,
   slug,
   VIEWPORTS,
@@ -163,5 +165,27 @@ describe("captura de diseño", () => {
     expect(recortarValor(`url("data:image/png;base64,${"A".repeat(5000)}")`)).toBe('url("data:image/png (embebida)")');
     const largo = recortarValor("x".repeat(400));
     expect(largo).toBe(`${"x".repeat(300)}… (+100)`);
+  });
+
+  it("SELECTOR_SEMANTICO cubre los tres roles y los role ARIA", () => {
+    const partes = SELECTOR_SEMANTICO.split(",");
+    for (const x of ["h1", "h6", "p", "li", "button", "a", "label", "[role=heading]", "[role=button]"])
+      expect(partes, x).toContain(x);
+    expect(partes).not.toContain("span");
+    expect(partes).not.toContain("div");
+  });
+
+  it("archivosDeFuentes toma peticiones font y fetch con extensión, sin query ni duplicados", () => {
+    expect(
+      archivosDeFuentes([
+        { url: "https://x.cl/app.js", tipo: "script" },
+        { url: "https://x.cl/f/mori.woff2?v=3", tipo: "fetch" },
+        { url: "https://x.cl/f/mori.woff2?v=4", tipo: "font" },
+        { url: "https://x.cl/f/viejo.TTF", tipo: "xhr" },
+        { url: "https://use.typekit.net/af/abc/l?primer=1&fvd=n4", tipo: "font" },
+        { url: "https://x.cl/estilos.css", tipo: "stylesheet" },
+        { url: "https://x.cl/woff2-guia.html", tipo: "document" },
+      ]),
+    ).toEqual(["https://use.typekit.net/af/abc/l", "https://x.cl/f/mori.woff2", "https://x.cl/f/viejo.TTF"]);
   });
 });

@@ -87,6 +87,21 @@ const TITULARES = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 const CUERPO = new Set(["p", "li", "blockquote", "dd", "dt", "td", "th", "figcaption", "caption", "cite", "q"]);
 const INTERFAZ = new Set(["button", "a", "input", "label", "select", "option", "textarea", "summary", "legend"]);
 
+/**
+ * Selector CSS de los elementos que fijan un rol. El script busca con `closest()` el más cercano a cada texto, así
+ * un `<span>` dentro de un `<h1>` cuenta como titular.
+ */
+export const SELECTOR_SEMANTICO = [
+  ...TITULARES,
+  ...INTERFAZ,
+  ...CUERPO,
+  "[role=heading]",
+  "[role=button]",
+  "[role=link]",
+  "[role=tab]",
+  "[role=menuitem]",
+].join(",");
+
 /** Rol de un elemento por su etiqueta y su atributo `role`. Lo ambiguo (span, div, strong…) queda como «otro». */
 export function rolDe(tag: string, role: string | null = null): Rol {
   const t = tag.toLowerCase();
@@ -195,6 +210,19 @@ export function resumirTipografias(c: TipografiasCrudas): Tipografia[] {
     t.roles.sort(porRol);
   }
   return [...por.values()].sort((a, b) => a.familia.localeCompare(b.familia));
+}
+
+/**
+ * Archivos de fuente que la página pidió por red, sin query ni duplicados. Cuenta toda petición de tipo `font`
+ * (aunque no tenga extensión, como las de Typekit) y cualquier otra con extensión de fuente: hay sitios que bajan
+ * el archivo con `fetch` y lo registran con la API `FontFace`. Cubre además las `@font-face` de hojas de otro
+ * origen, que el navegador no deja leer.
+ */
+export function archivosDeFuentes(pedidas: ReadonlyArray<{ url: string; tipo: string }>): string[] {
+  const fuentes = pedidas
+    .filter((p) => p.tipo === "font" || /\.(woff2?|ttf|otf|eot)([?#]|$)/i.test(p.url))
+    .map((p) => sinQuery(p.url));
+  return [...new Set(fuentes)].sort();
 }
 
 /** Suma lo de otra vista a la corrida sin perder la `licencia` que alguien ya anotó a mano. */

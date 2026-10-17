@@ -530,7 +530,7 @@ export const COMPONENTS: ComponentDoc[] = [
     category: "Tema",
     description:
       "KraaProvider envuelve el contenido en .kraa-theme con tema claro u oscuro. Todo componente Kraa debe ir dentro.",
-    files: ["components/ui/kraa/kraa-theme.tsx", "lib/kraa/kraa-utils.ts"],
+    files: ["components/ui/kraa/kraa-theme.tsx", "lib/utils.ts"],
     usage: `<KraaProvider theme="dark">
   <KraaButton>Hola</KraaButton>
 </KraaProvider>`,
@@ -545,7 +545,7 @@ export const COMPONENTS: ComponentDoc[] = [
     name: "Botón",
     category: "Acciones",
     description: "Botón discreto con variantes surface, accent y danger, y tamaños icon y row.",
-    files: ["components/ui/kraa/kraa-button.tsx", "lib/kraa/kraa-utils.ts"],
+    files: ["components/ui/kraa/kraa-button.tsx", "lib/utils.ts"],
     usage: `<KraaButton variant="accent">Compartir</KraaButton>`,
     props: [
       {
@@ -562,13 +562,13 @@ export const COMPONENTS: ComponentDoc[] = [
     family: "Kraa",
     name: "Campos",
     category: "Formularios",
-    description: "Primitivas de formulario: FieldGroup, Field, FieldSet, FieldLegend y FieldLabel.",
-    files: ["components/ui/kraa/kraa-field.tsx", "lib/kraa/kraa-utils.ts"],
+    description: "Primitivas de formulario: FieldGroup, Field, FieldSet, FieldLegend, FieldLabel y Select.",
+    files: ["components/ui/kraa/kraa-field.tsx", "lib/utils.ts"],
     usage: `<KraaFieldSet>
   <KraaFieldLegend>Tipografía</KraaFieldLegend>
   <KraaField>
     <KraaFieldLabel htmlFor="f">Familia</KraaFieldLabel>
-    <select id="f" className="kraa-select">…</select>
+    <KraaSelect id="f">…</KraaSelect>
   </KraaField>
 </KraaFieldSet>`,
     props: [{ name: "...props", type: "props nativas", description: "Cada parte envuelve su elemento nativo." }],
@@ -579,7 +579,7 @@ export const COMPONENTS: ComponentDoc[] = [
     name: "Búsqueda",
     category: "Formularios",
     description: "Input de búsqueda con lupa y etiqueta accesible oculta.",
-    files: ["components/ui/kraa/kraa-search-input.tsx", "lib/kraa/kraa-utils.ts"],
+    files: ["components/ui/kraa/kraa-search-input.tsx", "lib/utils.ts"],
     usage: `<KraaSearchInput value={q} onValueChange={setQ} />`,
     props: [
       { name: "label", type: "string", default: '"Buscar documentos"', description: "Nombre accesible." },
@@ -593,7 +593,11 @@ export const COMPONENTS: ComponentDoc[] = [
     name: "Ítem de documento",
     category: "Navegación",
     description: "Botón con título, extracto y metadatos de un documento. El seleccionado lleva aria-current.",
-    files: ["components/ui/kraa/kraa-document-list-item.tsx", "lib/kraa/kraa-model.ts"],
+    files: [
+      "components/ui/kraa/kraa-document-list-item.tsx",
+      "components/ui/kraa/kraa-avatar.tsx",
+      "lib/kraa/kraa-model.ts",
+    ],
     usage: `<KraaDocumentListItem document={doc} selected onClick={() => abrir(doc.id)} />`,
     props: [
       { name: "document", type: "DocumentItem", description: "Datos del documento." },
@@ -606,7 +610,7 @@ export const COMPONENTS: ComponentDoc[] = [
     name: "Deslizador",
     category: "Formularios",
     description: "Slider de 28 px de alto con valores debajo; admite un valor o un rango.",
-    files: ["components/ui/kraa/kraa-range-slider.tsx", "lib/kraa/kraa-utils.ts"],
+    files: ["components/ui/kraa/kraa-range-slider.tsx", "lib/utils.ts"],
     usage: `<KraaRangeSlider label="Tamaño" min={12} max={40} value={[16]} onValueChange={setSize} />`,
     props: [
       { name: "label", type: "string", description: "Nombre accesible (agrega mínimo/máximo en rangos)." },
@@ -632,7 +636,7 @@ export const COMPONENTS: ComponentDoc[] = [
     name: "Fila de miembro",
     category: "Indicadores",
     description: "Avatar (imagen o iniciales), nombre, metadato y rol. Si la imagen falla, muestra las iniciales.",
-    files: ["components/ui/kraa/kraa-member-role-row.tsx"],
+    files: ["components/ui/kraa/kraa-member-role-row.tsx", "components/ui/kraa/kraa-avatar.tsx"],
     usage: `<KraaMemberRoleRow name="Ana Ruiz" role="Editora" meta="ana@ejemplo.test" />`,
     props: [
       { name: "name / role", type: "string", description: "Texto principal y rol." },

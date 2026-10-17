@@ -11,7 +11,7 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
 |---|---|---|---|
 | REMI | Componentes genéricos del monitor REMI (`remi-monitor`) | CSS plano en `styles/remi.css` | `.remi` |
 | Ninja | `ninja-ui` v3 | Tailwind v4 + Radix + `cva`, tokens en `styles/ninja.css` | ninguno (`:root`) |
-| Kraa | `kraa-component-bank` v0.1.1 | CSS con tokens `--kraa-*` en `styles/kraa-theme.css` + Radix | `KraaProvider` (`.kraa-theme`) |
+| Kraa | `kraa-component-bank` v0.1.1 | Tailwind v4 + `cva` + `cn()` + Radix, tema en `styles/kraa-theme.css` | `KraaProvider` (`.kraa-theme`) |
 | REA | `REA_Atlas_completo_v4` (2026-10-16) | Tailwind v4 + `cva` + `cn()`, tema en `styles/rea.css` | `ReaProvider` (`.rea-theme`) |
 
 - **REMI** solo trae lo genérico. Se quedaron en el monitor el punto de pendientes, el diálogo de escala,
@@ -21,12 +21,15 @@ Cada familia conserva su propio sistema de estilos; conviven sin pisarse.
   `site-concept.html` (paleta ⌘K, filtros, índice, inspector, aviso, progreso, retícula, preloader, textos en
   movimiento, escenario, cabecera y catálogo). La investigación, la skill `design-to-registry-workflow` y las
   referencias están en `docs/origen/rea-atlas/`.
-- **Ninja** y **Kraa** se copiaron tal cual. Solo cambiaron las rutas de import, el formato (Biome) y los
-  ajustes de lint que se anotan junto al código. Los READMEs originales están en `docs/origen/`.
+- **Ninja** se copió tal cual: solo cambiaron las rutas de import, el formato (Biome) y los ajustes de lint que
+  se anotan junto al código.
+- **Kraa** conserva su API y sus valores, pero las clases CSS propias pasaron a utilidades de Tailwind. Su `cx()`
+  se reemplazó por `cn()`, y se agregaron `KraaSelect` y `KraaAvatar` en lugar de `.kraa-select` y `.kraa-avatar`.
+  Los READMEs originales están en `docs/origen/`.
 
 ## Convención (estilo shadcn)
 
-Ninja y REA siguen la convención; Kraa y REMI todavía usan CSS con clases propias y se migran después.
+Ninja, REA y Kraa siguen la convención; REMI todavía usa CSS con clases propias y se migra después.
 
 - **Componentes con utilidades de Tailwind**: variantes con `cva`, clases combinadas con `cn()` (`lib/utils.ts`),
   `data-slot` en la raíz y exportaciones con nombre. El código vive en el repo, no en un paquete.
@@ -87,7 +90,9 @@ npm run ci           # pipeline completo (scripts/ci.sh); lo usa el hook pre-pus
   (`rights: review-required`). No se portaron el terreno WebGL ni el scrollytelling sticky del escenario.
 - REA: la copia decorativa de `ReaNav` usa `content: attr(data-label) / ""` para no leerse dos veces. Un navegador
   sin soporte de texto alternativo en `content` descarta la declaración y no muestra la copia en hover.
-- Kraa y REMI aún no siguen la convención shadcn, y no hay `registry.json` para instalar con `npx shadcn add`.
+- REMI aún no sigue la convención shadcn, y no hay `registry.json` para instalar con `npx shadcn add`.
+- Kraa: los portales (menú de acciones, hoja móvil) replican `.kraa-theme` con `useKraaTheme`, porque salen del
+  árbol del proveedor.
 
 ## Licencias
 

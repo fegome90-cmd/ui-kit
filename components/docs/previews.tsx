@@ -17,6 +17,7 @@ import {
   KraaFieldLabel,
   KraaFieldLegend,
   KraaFieldSet,
+  KraaSelect,
 } from "@/components/ui/kraa/kraa-field";
 import { KraaMemberRoleRow } from "@/components/ui/kraa/kraa-member-role-row";
 import { KraaRangeSlider } from "@/components/ui/kraa/kraa-range-slider";
@@ -613,10 +614,10 @@ export const PREVIEWS: Record<string, () => ReactNode> = {
       <KraaFieldGroup>
         <KraaField>
           <KraaFieldLabel htmlFor="kraa-f">Familia</KraaFieldLabel>
-          <select id="kraa-f" className="kraa-select" defaultValue="inter">
+          <KraaSelect id="kraa-f" defaultValue="inter">
             <option value="inter">Inter</option>
             <option value="serif">Serif</option>
-          </select>
+          </KraaSelect>
         </KraaField>
       </KraaFieldGroup>
     </KraaFieldSet>
@@ -758,7 +759,7 @@ export const THUMBS: Record<string, ReactNode> = {
   // Kraa
   "kraa-theme": <KraaButton variant="surface">Tema</KraaButton>,
   "kraa-button": <KraaButton variant="accent">Acento</KraaButton>,
-  "kraa-field": <span className="kraa-label">Familia</span>,
+  "kraa-field": <span className="text-[13px] text-kraa-muted">Familia</span>,
   "kraa-search-input": <KraaSearchInput />,
   "kraa-document-list-item": <KraaDocumentListItem document={DEMO_DOCUMENTS[1]} />,
   "kraa-range-slider": (
@@ -780,10 +781,10 @@ export const THUMBS: Record<string, ReactNode> = {
   // biome-ignore lint/a11y/useValidAriaRole: role es una prop de KraaMemberRoleRow (texto del rol), no un rol ARIA
   "kraa-member-role-row": <KraaMemberRoleRow name="Ana Ruiz" role="Editora" />,
   "kraa-document-actions": <KraaButton size="icon">•••</KraaButton>,
-  "kraa-document-sidebar": <span className="kraa-label">Documentos</span>,
+  "kraa-document-sidebar": <span className="text-[13px] text-kraa-muted">Documentos</span>,
   "kraa-reading-canvas": <span style={{ fontSize: 28 }}>Notas</span>,
-  "kraa-typography-settings": <span className="kraa-label">Ajustes de lectura</span>,
-  "kraa-document-workspace": <span className="kraa-label">Espacio de trabajo</span>,
+  "kraa-typography-settings": <span className="text-[13px] text-kraa-muted">Ajustes de lectura</span>,
+  "kraa-document-workspace": <span className="text-[13px] text-kraa-muted">Espacio de trabajo</span>,
   ...REA_THUMBS,
 };
 

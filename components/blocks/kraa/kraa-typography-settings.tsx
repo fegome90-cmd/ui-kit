@@ -7,10 +7,13 @@ import {
   KraaFieldLabel,
   KraaFieldLegend,
   KraaFieldSet,
+  KraaSelect,
 } from "@/components/ui/kraa/kraa-field";
 import { KraaRangeSlider } from "@/components/ui/kraa/kraa-range-slider";
 import { KraaToggleGroup } from "@/components/ui/kraa/kraa-toggle-group";
 import { DEFAULT_TYPOGRAPHY, FONT_FAMILIES, normalizeTypography, type TypographyConfig } from "@/lib/kraa/kraa-model";
+
+const CAPTION = "font-kraa-ui text-[11px] leading-normal text-kraa-muted";
 export type KraaTypographySettingsProps = {
   value: TypographyConfig;
   onValueChange: (value: TypographyConfig) => void;
@@ -25,20 +28,25 @@ export function KraaTypographySettings({
     v = normalizeTypography(value);
   const change = (next: Partial<TypographyConfig>) => onValueChange(normalizeTypography({ ...v, ...next }));
   return (
-    <section className="kraa-typography-settings" aria-labelledby={`${id}-title`}>
-      <header className="kraa-settings-head">
-        <h2 id={`${id}-title`}>Ajustes de lectura</h2>
+    <section
+      data-slot="kraa-typography-settings"
+      className="rounded-[24px] bg-kraa-surface-soft p-6"
+      aria-labelledby={`${id}-title`}
+    >
+      <header className="mb-7 flex items-center justify-between gap-4 max-[700px]:items-start">
+        <h2 id={`${id}-title`} className="text-xl">
+          Ajustes de lectura
+        </h2>
         <KraaButton onClick={() => onValueChange({ ...DEFAULT_TYPOGRAPHY })}>Restablecer</KraaButton>
       </header>
-      <div className="kraa-settings-grid">
+      <div className="grid grid-cols-[minmax(200px,260px)_minmax(0,1fr)] gap-10 max-[700px]:grid-cols-1 max-[700px]:gap-6">
         <KraaFieldSet>
           <KraaFieldLegend>Tipografía</KraaFieldLegend>
           <KraaFieldGroup>
             <KraaField>
               <KraaFieldLabel htmlFor={`${id}-font`}>Familia</KraaFieldLabel>
-              <select
+              <KraaSelect
                 id={`${id}-font`}
-                className="kraa-select"
                 value={v.font}
                 onChange={(e) => change({ font: e.target.value as TypographyConfig["font"] })}
               >
@@ -46,7 +54,7 @@ export function KraaTypographySettings({
                 <option value="serif">Domine · fallback Georgia</option>
                 <option value="mono">Monaspace · fallback monospace</option>
                 {licensedSuisseAvailable && <option value="suisse">SuisseIntl · licencia propia</option>}
-              </select>
+              </KraaSelect>
             </KraaField>
             <KraaField>
               <KraaFieldLabel>Tamaño</KraaFieldLabel>
@@ -95,12 +103,15 @@ export function KraaTypographySettings({
             </KraaField>
           </KraaFieldGroup>
         </KraaFieldSet>
-        <section className="kraa-settings-preview" aria-label="Muestra tipográfica">
-          <p className="kraa-caption">VISTA PREVIA</p>
+        <section
+          className="min-w-0 self-start rounded-[16px] bg-kraa-surface-soft p-5 [overflow-wrap:anywhere]"
+          aria-label="Muestra tipográfica"
+        >
+          <p className={CAPTION}>VISTA PREVIA</p>
           <p style={{ fontFamily: FONT_FAMILIES[v.font], fontSize: v.size, lineHeight: v.lineHeight }}>
             Una página tranquila para escribir, mirar de nuevo y encontrar lo que importa.
           </p>
-          <p className="kraa-caption">
+          <p className={CAPTION}>
             {v.size} px · {v.lineHeight} de interlineado · {v.width} px de ancho
           </p>
         </section>

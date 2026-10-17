@@ -30,6 +30,6 @@ describe("vistas previas del banco", () => {
       </>,
     );
     expect(container.querySelector(".remi .blue-button")).not.toBeNull();
-    expect(container.querySelector(".kraa-theme .kraa-button")).not.toBeNull();
+    expect(container.querySelector(".kraa-theme [data-slot=kraa-button]")).not.toBeNull();
   });
 });

@@ -27,6 +27,13 @@ export function DocsNav() {
       <Link href="/componentes" className="cb-nav-link" aria-current={pathname === "/componentes" ? "page" : undefined}>
         Introducción
       </Link>
+      <Link
+        href="/componentes/explorar"
+        className="cb-nav-link"
+        aria-current={pathname === "/componentes/explorar" ? "page" : undefined}
+      >
+        Explorar
+      </Link>
       {GROUPS.map((g) => {
         const enGrupo = COMPONENTS.filter((c) => (g.categories as readonly string[]).includes(c.category));
         if (!enGrupo.length) return null;

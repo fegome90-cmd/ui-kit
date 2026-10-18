@@ -659,3 +659,104 @@
     justify-content: center;
   }
 }
+
+/* Explorador: búsqueda y filtros (piezas REA dentro de su contenedor) y resultados */
+.cb-article-wide {
+  max-width: 1080px;
+}
+.cb-explorer-bar {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--cb-line);
+  border-radius: 10px;
+}
+.cb-explorer-filter {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: start;
+  gap: 10px;
+}
+.cb-explorer-filter > span {
+  padding-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cb-muted);
+}
+.cb-explorer-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 4px;
+}
+.cb-explorer-status p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--cb-muted);
+}
+.cb-explorer-clear {
+  padding: 5px 12px;
+  border: 1px solid var(--cb-line);
+  border-radius: 6px;
+  background: var(--cb-bg);
+  color: var(--cb-fg);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.cb-explorer-clear:hover {
+  background: var(--cb-soft);
+}
+.cb-explorer-clear:focus-visible {
+  outline: 2px solid var(--cb-accent);
+  outline-offset: 2px;
+}
+.cb-explorer-empty {
+  margin-top: 12px;
+}
+@media (max-width: 860px) {
+  .cb-explorer-filter {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .cb-explorer-filter > span {
+    padding-top: 0;
+  }
+}
+
+/* Botón de la paleta ⌘K (la paleta es de REA y va dentro de su contenedor) */
+.cb-palette {
+  margin-bottom: 12px;
+}
+.cb-palette-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 8px 7px 10px;
+  border: 1px solid var(--cb-line);
+  border-radius: 6px;
+  background: var(--cb-bg);
+  color: var(--cb-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.cb-palette-trigger:hover {
+  color: var(--cb-fg);
+  border-color: var(--cb-muted);
+}
+.cb-palette-trigger:focus-visible {
+  outline: 2px solid var(--cb-accent);
+  outline-offset: 1px;
+}
+.cb-palette-trigger kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--cb-line);
+  border-radius: 4px;
+  font:
+    11px ui-monospace,
+    Menlo,
+    monospace;
+}

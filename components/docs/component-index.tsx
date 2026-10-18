@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { Thumb } from "@/components/docs/previews";
-import { COMPONENTS, FAMILIES, type Family, GROUPS, statusOf } from "@/lib/component-registry";
+import { ComponentCard } from "@/components/docs/component-card";
+import { COMPONENTS, FAMILIES, type Family, GROUPS } from "@/lib/component-registry";
 
 /** Índice del banco agrupado por grupo y tipo de componente; la familia es una etiqueta y un filtro. */
 export function ComponentIndex() {
@@ -40,19 +39,7 @@ export function ComponentIndex() {
                   {g.categories.length > 1 && <h3 className="cb-h3">{cat}</h3>}
                   <div className="cb-grid">
                     {items.map((c) => (
-                      <Link key={c.slug} href={`/componentes/${c.slug}`} className="cb-card" data-family={c.family}>
-                        <div className="cb-card-thumb">
-                          <Thumb slug={c.slug} />
-                        </div>
-                        <div className="cb-card-body">
-                          <strong>{c.name}</strong>
-                          <span>{c.description}</span>
-                          <em className="cb-tag">
-                            {c.family}
-                            {statusOf(c) === "candidate" && " · candidato"}
-                          </em>
-                        </div>
-                      </Link>
+                      <ComponentCard key={c.slug} c={c} />
                     ))}
                   </div>
                 </section>

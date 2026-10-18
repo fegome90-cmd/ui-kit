@@ -43,3 +43,8 @@ npm-debug.log*
 .playwright-cli/
 # ajustes locales de Claude Code (permisos de cada máquina)
 /.claude/settings.local.json
+# skills de terceros instaladas localmente, sin licencia de redistribución verificada (el lock queda solo en esta máquina)
+/.agents/
+/skills-lock.json
+/.claude/skills/design-taste-frontend
+/.claude/skills/playwright-cli

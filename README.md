@@ -3,6 +3,8 @@
 Biblioteca personal de componentes de frontend, con banco de documentación en `/componentes`.
 Sigue el estilo shadcn: el código vive en el repo y se copia o importa, no es un paquete.
 
+Para diseñar, construir, documentar y revisar un componente, sigue la [guía de trabajo](docs/guia-de-trabajo.md).
+
 ## Tipos y familias
 
 El banco se navega **por tipo de componente**: acciones, formularios, navegación, indicadores, gráficos,
@@ -74,6 +76,9 @@ styles/                   CSS de cada familia y fuentes de muestra
 
 Si falta alguno de los tres pasos, los tests fallan: un módulo sin entrada en el registro, o una entrada sin
 vista previa, no pasa.
+
+Antes de dar un componente por terminado, revisa la lista de control de la
+[guía de trabajo](docs/guia-de-trabajo.md#11-revisar): tokens, estados, accesibilidad, movimiento y anchos.
 
 ## Instalar en otro proyecto (registry shadcn)
 

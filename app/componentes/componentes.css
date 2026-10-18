@@ -760,3 +760,138 @@
     Menlo,
     monospace;
 }
+
+/* Portada */
+.cb-home-hero h1 {
+  font-size: 44px;
+  letter-spacing: -0.8px;
+}
+.cb-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+.cb-home-hint {
+  font-size: 13px;
+  color: var(--cb-muted);
+}
+.cb-home-hint kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--cb-line);
+  border-radius: 4px;
+  font:
+    11px ui-monospace,
+    Menlo,
+    monospace;
+}
+.cb-home-stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 28px;
+  padding: 24px;
+  border: 1px solid var(--cb-line);
+  border-radius: 12px;
+}
+.cb-home-rings {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+.cb-home-maturity {
+  width: 100%;
+  max-width: 640px;
+  margin: 0;
+}
+.cb-home-family h3 {
+  margin: 0;
+  font-size: 20px;
+}
+.cb-home-family p {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: var(--cb-muted);
+  text-wrap: pretty;
+}
+.cb-home-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cb-home-thumbs .cb-card-thumb {
+  border-radius: 8px;
+}
+.cb-home-more {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cb-accent);
+}
+.cb-home-sample {
+  width: 240px;
+}
+.cb-home-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cb-home-groups a {
+  display: grid;
+  gap: 4px;
+  height: 100%;
+  padding: 16px;
+  border: 1px solid var(--cb-line);
+  border-radius: 10px;
+  color: var(--cb-fg);
+  text-decoration: none;
+}
+.cb-home-groups a:hover {
+  border-color: var(--cb-muted);
+}
+.cb-home-groups a:focus-visible {
+  outline: 2px solid var(--cb-accent);
+  outline-offset: 2px;
+}
+.cb-home-groups span {
+  font-size: 13px;
+  color: var(--cb-muted);
+}
+.cb-home-groups em {
+  font-size: 12px;
+  font-style: normal;
+  color: var(--cb-accent);
+}
+.cb-home-panel {
+  display: grid;
+  gap: 4px;
+}
+/* El panel de FeatureTabs es oscuro: el texto y el código en línea heredan su color claro. */
+.cb-home-panel p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: inherit;
+}
+.cb-home-panel p code {
+  background: rgb(255 255 255 / 0.14);
+  color: inherit;
+}
+@media (max-width: 860px) {
+  .cb-home-hero h1 {
+    font-size: 34px;
+  }
+  .cb-home-stats {
+    gap: 18px;
+    padding: 16px;
+  }
+}
+.cb-home-steps {
+  padding: 20px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}

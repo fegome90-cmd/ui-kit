@@ -77,6 +77,27 @@ export const CATEGORIES = [
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 
+/**
+ * Segundo nivel de la taxonomía: agrupa las categorías para la barra lateral y los filtros. Cada categoría
+ * pertenece a un solo grupo (lo exige un test), en el orden de CATEGORIES dentro del grupo.
+ */
+export const GROUPS = [
+  { id: "acciones", name: "Acciones y formularios", categories: ["Acciones", "Formularios", "Barra de herramientas"] },
+  { id: "navegacion", name: "Navegación", categories: ["Navegación"] },
+  { id: "datos", name: "Datos", categories: ["Indicadores", "Gráficos"] },
+  { id: "contenido", name: "Contenido", categories: ["Revelación", "Superficies", "Bloques"] },
+  { id: "expresion", name: "Expresión visual", categories: ["Fondos", "Tipografía", "Movimiento", "Iconografía"] },
+  { id: "fundamentos", name: "Fundamentos", categories: ["Tema"] },
+] as const satisfies readonly { id: string; name: string; categories: readonly Category[] }[];
+export type Group = (typeof GROUPS)[number];
+export type GroupId = Group["id"];
+
+export const groupOf = (category: Category): Group => {
+  const g = GROUPS.find((g) => (g.categories as readonly Category[]).includes(category));
+  if (!g) throw new Error(`La categoría ${category} no tiene grupo`);
+  return g;
+};
+
 export const COMPONENTS: ComponentDoc[] = [
   // ---------- REMI (CSS plano bajo .remi) ----------
   {

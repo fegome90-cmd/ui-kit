@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATEGORIES, COMPONENTS, FAMILIES, provenanceOf, statusOf } from "./component-registry";
+import { CATEGORIES, COMPONENTS, FAMILIES, GROUPS, groupOf, provenanceOf, statusOf } from "./component-registry";
 
 const listSources = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -29,6 +29,17 @@ describe("registro del banco de componentes", () => {
         COMPONENTS.some((c) => c.family === fam),
         fam,
       ).toBe(true);
+  });
+  it("cada categoría está en exactamente un grupo, y los grupos siguen el orden de CATEGORIES", () => {
+    const enGrupos = GROUPS.flatMap((g) => [...g.categories]);
+    expect([...enGrupos].sort()).toEqual([...CATEGORIES].sort());
+    expect(new Set(enGrupos).size).toBe(enGrupos.length);
+    expect(new Set(GROUPS.map((g) => g.id)).size).toBe(GROUPS.length);
+    for (const g of GROUPS) {
+      const orden = g.categories.map((c) => CATEGORIES.indexOf(c));
+      expect(orden, g.id).toEqual([...orden].sort((a, b) => a - b));
+    }
+    expect(groupOf("Gráficos").id).toBe("datos");
   });
   it("un candidato dice en notes qué le falta", () => {
     for (const c of COMPONENTS.filter((c) => statusOf(c) === "candidate"))

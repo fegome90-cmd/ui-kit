@@ -13,7 +13,23 @@ export function createGsapDriver(host: SceneHost): MotionDriver {
   const id = `uikit-motion-${++instance}`;
   const ctx = gsap.context(() => {}, host.root);
   const originals = new Map<Element, string | null>();
+  const restoreStyles: (() => void)[] = [];
   let timeline: gsap.core.Timeline | undefined;
+  const preserveInline = (element: HTMLElement, properties: readonly string[]) => {
+    const saved = properties.map((property) => ({
+      property,
+      value: element.style.getPropertyValue(property),
+      priority: element.style.getPropertyPriority(property),
+    }));
+    restoreStyles.push(() => {
+      for (const { property, value, priority } of saved) {
+        if (value) element.style.setProperty(property, value, priority);
+        else element.style.removeProperty(property);
+      }
+      // El siguiente gesto debe volver a leer el transform restaurado, no el cache del tween.
+      if (properties.includes("transform") && element._gsap) element._gsap.uncache = 1;
+    });
+  };
   const surface = () => host.root.querySelector<HTMLElement>('[data-motion-role="detail-surface"]');
   const remember = (el: Element) => {
     if (!originals.has(el)) originals.set(el, el.getAttribute("data-flip-id"));
@@ -40,6 +56,7 @@ export function createGsapDriver(host: SceneHost): MotionDriver {
     timeline.eventCallback("onComplete", null);
     timeline.progress(1);
     timeline.kill();
+    for (const restore of restoreStyles.splice(0)) restore();
     // Todos los tweens hijos finalizaron; liberar referencias por instancia sin revertir el layout.
     ctx.clear();
     timeline = undefined;
@@ -73,10 +90,18 @@ export function createGsapDriver(host: SceneHost): MotionDriver {
         const seconds = frame.durationMs / 1000;
         const fade = Math.min(frame.durationMs, frame.reduced ? MOTION.reducedRevealMs : MOTION.revealMs) / 1000;
         if (frame.kind === "enter" && !frame.reduced) {
+          preserveInline(host.root, ["transform", "transform-origin", "translate", "rotate", "scale", "opacity"]);
+          const baseY = Number(gsap.getProperty(host.root, "y")) || 0;
+          const baseOpacity = Number(gsap.getProperty(host.root, "opacity"));
           tl.fromTo(
             host.root,
-            { opacity: 0, y: MOTION.enterY },
-            { opacity: 1, y: 0, duration: seconds, ease: MOTION.easeName, clearProps: "opacity,transform" },
+            { opacity: 0, y: baseY + MOTION.enterY },
+            {
+              opacity: Number.isFinite(baseOpacity) ? baseOpacity : 1,
+              y: baseY,
+              duration: seconds,
+              ease: MOTION.easeName,
+            },
             0,
           );
         } else if (!frame.reduced && frame.kind !== "content") {
@@ -106,13 +131,22 @@ export function createGsapDriver(host: SceneHost): MotionDriver {
             );
           }
         }
-        if (body.length && frame.kind !== "close")
-          tl.fromTo(
-            body,
-            { opacity: 0 },
-            { opacity: 1, duration: fade, ease: frame.reduced ? "none" : MOTION.easeName, clearProps: "opacity" },
-            Math.max(0, seconds - fade),
-          );
+        if (body.length && frame.kind !== "close") {
+          for (const element of body) {
+            preserveInline(element, ["opacity"]);
+            const baseOpacity = Number(gsap.getProperty(element, "opacity"));
+            tl.fromTo(
+              element,
+              { opacity: 0 },
+              {
+                opacity: Number.isFinite(baseOpacity) ? baseOpacity : 1,
+                duration: fade,
+                ease: frame.reduced ? "none" : MOTION.easeName,
+              },
+              Math.max(0, seconds - fade),
+            );
+          }
+        }
         // Mantiene el contrato temporal aunque no haya superficies animables.
         tl.to({}, { duration: seconds }, 0);
       });

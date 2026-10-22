@@ -192,10 +192,15 @@ export function createSceneController(host: SceneHost, options: SceneOptions = {
     } catch (error) {
       dropDriver(error);
     }
-    if (next.view === "detail" && !hasTarget(next.targetId)) {
-      return Promise.resolve({ requestId: id, status: "failed", reason: "missing-target", recoverTo: OVERVIEW });
-    }
-    if (!entering && !dirty && unchanged && key === contentKey)
+    // Un host puede crear el target al aplicar el nuevo contenido. La validación definitiva
+    // ocurre después de ese commit; una petición idéntica solo se omite si sigue siendo válida.
+    if (
+      !entering &&
+      !dirty &&
+      unchanged &&
+      key === contentKey &&
+      (next.view === "overview" || hasTarget(next.targetId))
+    )
       return Promise.resolve({ requestId: id, status: "completed" });
     const stamp = activity;
     const active = doc.activeElement;

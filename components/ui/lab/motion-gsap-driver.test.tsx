@@ -60,6 +60,40 @@ afterEach(() => {
 });
 
 describe("driver GSAP real: identidad y limpieza", () => {
+  it.each(["natural", "settle", "destroy"] as const)(
+    "entrada %s conserva la geometría base y los estilos inline con su prioridad",
+    (finish) => {
+      const fixture = createHost();
+      fixture.root.style.setProperty("transform", "matrix(0.75, 0, 0, 0.75, 20, 12)", "important");
+      fixture.root.style.setProperty("opacity", "0.7", "important");
+      const originalTransform = fixture.root.style.getPropertyValue("transform");
+      const baseline = new Set(gsap.globalTimeline.getChildren(false, false, true));
+      const done = vi.fn();
+      fixture.driver.play(
+        undefined,
+        { from: OVERVIEW, to: OVERVIEW, kind: "enter", durationMs: MOTION.enterMs, reduced: false },
+        done,
+      );
+      const timeline = gsap.globalTimeline.getChildren(false, false, true).find((child) => !baseline.has(child));
+      expect(timeline).toBeDefined();
+      timeline?.progress(0);
+      expect(Number(gsap.getProperty(fixture.root, "x"))).toBeCloseTo(20);
+      expect(Number(gsap.getProperty(fixture.root, "y"))).toBeCloseTo(12 + MOTION.enterY);
+      expect(Number(gsap.getProperty(fixture.root, "scaleX"))).toBeCloseTo(0.75);
+      timeline?.progress(0.99);
+      expect(Number(gsap.getProperty(fixture.root, "opacity"))).toBeCloseTo(0.7, 2);
+      if (finish === "natural") timeline?.progress(1);
+      else fixture.driver[finish]();
+      expect(fixture.root.style.getPropertyValue("transform")).toBe(originalTransform);
+      expect(fixture.root.style.getPropertyPriority("transform")).toBe("important");
+      expect(fixture.root.style.getPropertyValue("opacity")).toBe("0.7");
+      expect(fixture.root.style.getPropertyPriority("opacity")).toBe("important");
+      expect(fixture.coordinateRoot.style.transform).toBe("scale(0.75)");
+      fixture.driver.destroy();
+      expect(fixture.root.style.getPropertyValue("transform")).toBe(originalTransform);
+      expect(fixture.root.style.getPropertyValue("opacity")).toBe("0.7");
+    },
+  );
   it("restaura data-flip-id originales y conserva el transform del coordinateRoot", () => {
     const fixture = createHost();
     const snapshot = fixture.driver.capture(openFrame);

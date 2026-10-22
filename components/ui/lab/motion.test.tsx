@@ -163,6 +163,69 @@ describe("FocusExpand: commit, intención y foco", () => {
     expect(button).toHaveFocus();
   });
 
+  it("selecciona un objetivo válido del nuevo dataset aunque no existía antes del commit", async () => {
+    const fixture = driverFixture();
+    const change = vi.fn();
+    const { rerender } = render(
+      <FocusExpand
+        label="Objetivos"
+        items={items}
+        value="a"
+        contentKey="anterior"
+        onValueChange={change}
+        loadDriver={fixture.loadDriver}
+      />,
+    );
+    await driverReady(fixture);
+    rerender(
+      <FocusExpand
+        label="Objetivos"
+        items={[{ id: "c", title: "Objetivo C", content: "Contenido C nuevo" }]}
+        value="c"
+        contentKey="nuevo"
+        onValueChange={change}
+        origin="deck-forward"
+        loadDriver={fixture.loadDriver}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("region", { name: "Objetivo C" })).toHaveTextContent("Contenido C nuevo"),
+    );
+    expect(screen.getByRole("button", { name: /Objetivo C/ })).toHaveAttribute("aria-expanded", "true");
+    expect(change).not.toHaveBeenCalled();
+    expect(fixture.frames.at(-1)?.to).toEqual({ view: "detail", targetId: "c" });
+  });
+
+  it("un observador de fallo puede iniciar otra intención sin que la recuperación antigua la sustituya", async () => {
+    const ref = createRef<FocusExpandHandle>();
+    let replacement: Promise<TransitionResult> | undefined;
+    const change = vi.fn();
+    render(
+      <FocusExpand
+        ref={ref}
+        label="Objetivos"
+        items={items}
+        loadDriver={false}
+        onValueChange={change}
+        onTransitionResult={(result) => {
+          if (result.status === "failed")
+            replacement = ref.current?.transitionTo({ view: "detail", targetId: "b" }, { origin: "direct" });
+        }}
+      />,
+    );
+    let failed: Promise<TransitionResult> | undefined;
+    act(() => {
+      failed = ref.current?.transitionTo({ view: "detail", targetId: "ausente" }, { origin: "direct" });
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    await expect(failed).resolves.toMatchObject({ status: "failed", reason: "missing-target" });
+    await expect(replacement).resolves.toMatchObject({ status: "completed" });
+    expect(screen.getByRole("region", { name: "Objetivo B" })).toBeVisible();
+    expect(change).not.toHaveBeenCalledWith(null);
+  });
+
   it("resuelve todas las solicitudes rápidas y no confirma el commit abortado", async () => {
     const ref = createRef<FocusExpandHandle>();
     render(<FocusExpand ref={ref} label="Objetivos" items={items} loadDriver={false} />);
@@ -199,7 +262,7 @@ describe("FocusExpand: commit, intención y foco", () => {
     expect(errors).not.toHaveBeenCalled();
   });
 
-  it("una recuperación fallida antigua no sustituye una intención más reciente", async () => {
+  it("una solicitud aún sin validar no recupera overview sobre una intención más reciente", async () => {
     const ref = createRef<FocusExpandHandle>();
     const resultObserver = vi.fn();
     render(
@@ -215,7 +278,7 @@ describe("FocusExpand: commit, intención y foco", () => {
       failed = ref.current?.transitionTo({ view: "detail", targetId: "ausente" }, { origin: "direct" });
       latest = ref.current?.transitionTo({ view: "detail", targetId: "b" }, { origin: "direct" });
     });
-    await expect(failed).resolves.toMatchObject({ status: "failed" });
+    await expect(failed).resolves.toMatchObject({ status: "superseded" });
     await expect(latest).resolves.toMatchObject({ status: "completed" });
     expect(screen.getByRole("region", { name: "Objetivo B" })).toBeVisible();
     expect(resultObserver).toHaveBeenCalledOnce();
@@ -277,6 +340,35 @@ describe("FocusExpand: commit, intención y foco", () => {
 });
 
 describe("SceneEnter y StepReveal", () => {
+  it("una entrada durante carga usa el estado estable y no se reproduce tarde después de interactuar", async () => {
+    const fixture = driverFixture();
+    let resolveDriver!: (driver: MotionDriver) => void;
+    const loading = new Promise<MotionDriver>((resolve) => {
+      resolveDriver = resolve;
+    });
+    const loadDriver = vi.fn(() => loading);
+    const ref = createRef<SceneEnterHandle>();
+    render(
+      <SceneEnter ref={ref} origin="deck-forward" loadDriver={loadDriver}>
+        <button type="button">Operar durante la carga</button>
+      </SceneEnter>,
+    );
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const button = screen.getByRole("button", { name: "Operar durante la carga" });
+    expect(button.closest("[data-motion-phase]")).toHaveAttribute("data-motion-phase", "idle");
+    expect(button).toBeVisible();
+    fireEvent.pointerDown(button);
+    await act(async () => {
+      resolveDriver(fixture.driver);
+      await loading;
+    });
+    expect(fixture.driver.play).not.toHaveBeenCalled();
+    act(() => ref.current?.enter("deck-forward"));
+    await waitFor(() => expect(fixture.frames.at(-1)?.kind).toBe("enter"));
+    expect(fixture.driver.play).toHaveBeenCalledOnce();
+  });
   it("SSR parte de contenido legible y estable, sin consultar preferencias durante el render", () => {
     const media = vi.spyOn(window, "matchMedia");
     const html = renderToString(

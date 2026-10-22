@@ -39,9 +39,9 @@ Para HTML sin React, usa el mismo controlador y driver con un host DOM. El consu
 
 | Verificación | Resultado observado |
 |---|---|
-| `make check` | Lint, tipos y 339 pruebas correctos |
-| Controlador y driver | 62 pruebas de interrupciones, promesas, foco, aislamiento, fallback, geometría transformada y limpieza |
-| Adaptadores React y bloque | 14 pruebas, incluidos commits, StrictMode, cambios de contenido y fallos obsoletos |
+| `make check` | Lint, tipos y 345 pruebas correctos |
+| Controlador y driver | 65 pruebas de interrupciones, promesas, foco, aislamiento, fallback, geometría transformada y limpieza |
+| Adaptadores React y bloque | 17 pruebas, incluidos commits, StrictMode, cambios de contenido y fallos obsoletos |
 | Registry | 117 items generados y validados con shadcn |
 | Build de producción | Next.js compila y genera las rutas del catálogo |
 | Proyecto React externo | 11 items materializados desde los JSON publicados; TypeScript y bundle independientes correctos; sin imports al repo ni a las fixtures del catálogo |
@@ -53,6 +53,12 @@ El CLI de instalación resolvió el registry e instaló sus dependencias, pero s
 El preview administrado de Next.js no arrancó porque el entorno le agrega `--host`, argumento que esa versión de Next no acepta. La comprobación visual se hizo en el proyecto React independiente. No se ejecutó la suite E2E de Playwright del catálogo ni la CI completa con cobertura. La consola del navegador no mostró errores propios de la aplicación; sí hubo mensajes de la extensión del entorno.
 
 Quedan pendientes Safari, lector de pantalla, dispositivo táctil real, impresión real, la matriz completa de escalas y zoom y mediciones de frames/tareas largas. No se afirma 60 FPS ni se da por aprobada E5. Los tiempos de la propuesta siguen siendo parámetros iniciales.
+
+## Revisión de consolidación
+
+La revisión posterior corrigió tres defectos reproducidos: un target creado por el nuevo contenido se validaba contra el DOM anterior; un observador de fallo podía iniciar una nueva transición y recibir después una recuperación obsoleta; la entrada podía borrar el transform y la opacidad propios del consumidor. La validación ocurre tras el commit, la recuperación revalida la solicitud vigente y el driver restaura los valores inline y sus prioridades al completar, asentar o destruir una entrada.
+
+Se añadieron seis regresiones. La entrada inicial sigue siendo estable e instantánea mientras carga el driver; su llegada no reproduce una animación tardía. Una repetición explícita sí puede usar el motor una vez disponible. Esta política evita que una carga pendiente oculte contenido que ya se está operando.
 
 ## GSAP
 

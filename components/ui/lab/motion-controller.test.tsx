@@ -497,7 +497,7 @@ describe("foco y fallos recuperables", () => {
       reason: "missing-target",
       recoverTo: OVERVIEW,
     });
-    expect(fixture.host.applyState).not.toHaveBeenCalled();
+    expect(fixture.host.applyState).toHaveBeenCalledOnce();
   });
 
   it("target eliminado después del commit falla al terminar la animación", async () => {
@@ -584,7 +584,7 @@ describe("foco y fallos recuperables", () => {
   );
 
   it.each(["ausente", "desconectado", "hidden", "inert"])(
-    "target %s devuelve missing-target sin aplicar estado",
+    "target %s sigue devolviendo missing-target tras el commit sin reproducir y permite volver",
     async (condition) => {
       const fixture = createHost();
       let targetId = "a";
@@ -592,14 +592,21 @@ describe("foco y fallos recuperables", () => {
       if (condition === "desconectado") fixture.a.remove();
       if (condition === "hidden") fixture.a.hidden = true;
       if (condition === "inert") fixture.a.setAttribute("inert", "");
-      const controller = start(fixture.host);
+      const motion = createDriver();
+      const controller = start(fixture.host, { loadDriver: async () => motion.driver });
+      await flush();
       await expect(controller.transitionTo(detail(targetId), { origin: "pointer" })).resolves.toMatchObject({
         status: "failed",
         reason: "missing-target",
         recoverTo: OVERVIEW,
       });
-      expect(fixture.host.applyState).not.toHaveBeenCalled();
+      expect(fixture.host.applyState).toHaveBeenCalledOnce();
+      expect(motion.driver.play).not.toHaveBeenCalled();
       expect(fixture.root).toHaveAttribute("data-motion-phase", "idle");
+      await expect(controller.transitionTo(OVERVIEW, { origin: "direct" })).resolves.toMatchObject({
+        status: "completed",
+      });
+      expect(fixture.root).toHaveAttribute("data-view", "overview");
     },
   );
 

@@ -168,6 +168,8 @@ function FocusExpand({
       Promise.resolve({ requestId: 0, status: "destroyed" } as const));
     if (!mounted.current || epoch !== transitionEpoch.current) return result;
     latest.current.onTransitionResult?.(result);
+    // El observador puede iniciar otra transición de forma síncrona.
+    if (!mounted.current || epoch !== transitionEpoch.current) return result;
     if (result.status === "failed") {
       await controller.current?.transitionTo(result.recoverTo, { origin: "direct", contentKey: options.contentKey });
       if (!mounted.current || epoch !== transitionEpoch.current) return result;

@@ -199,3 +199,104 @@
   --lab-cat-5: #f5a8c1;
   --lab-cat-5-text: #000000;
 }
+
+/* Movimiento: el layout contiene el texto; Flip actúa solo sobre fondos decorativos separados. */
+@layer components {
+  .lab .lab-focus-expand {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    isolation: isolate;
+    min-width: 0;
+  }
+
+  .lab .lab-focus-expand__context {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .lab .lab-focus-expand__item,
+  .lab .lab-focus-expand__detail {
+    position: relative;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .lab .lab-focus-expand__surface,
+  .lab .lab-focus-expand__detail-surface {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 1px solid var(--lab-line);
+    border-radius: 12px;
+    background: var(--lab-surface);
+  }
+
+  .lab .lab-focus-expand__item[data-selected="true"] .lab-focus-expand__surface {
+    border-color: var(--lab-accent);
+    background: var(--lab-accent-soft);
+  }
+
+  .lab .lab-focus-expand__detail {
+    min-height: 300px;
+  }
+
+  .lab .lab-focus-expand__detail-surface {
+    border-color: var(--lab-accent);
+    background: var(--lab-accent-soft);
+  }
+
+  .lab .lab-focus-expand__detail > div {
+    max-height: min(620px, 75svh);
+  }
+
+  .lab .lab-motion-button,
+  .lab .lab-motion-select {
+    min-height: 44px;
+    border: 1px solid var(--lab-muted);
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: var(--lab-surface);
+    color: var(--lab-ink);
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .lab .lab-motion-button {
+    cursor: pointer;
+  }
+
+  .lab .lab-motion-button:focus-visible,
+  .lab .lab-motion-select:focus-visible,
+  .lab .lab-motion-heading:focus-visible {
+    outline: 2px solid var(--lab-accent);
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .lab .lab-motion-button:hover {
+      border-color: var(--lab-accent);
+      color: var(--lab-accent);
+    }
+  }
+
+  @media (min-width: 760px) {
+    .lab .lab-focus-expand[data-motion-view="detail"] {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    }
+
+    .lab .lab-focus-expand[data-motion-view="detail"] .lab-focus-expand__context {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 460px) {
+    .lab .lab-focus-expand__context {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

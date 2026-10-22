@@ -59,6 +59,31 @@ const ref = (name) => `${NS}/${name}`;
 
 // Módulos de lib que se publican como items propios (los datos de demo no se publican).
 const LIB_ITEMS = {
+  "lib/motion/types.ts": {
+    name: "motion-types",
+    title: "Contratos de movimiento",
+    description: "Estados, orígenes, host y contrato cancelable del banco de movimiento.",
+  },
+  "lib/motion/tokens.ts": {
+    name: "motion-tokens",
+    title: "Tiempos de movimiento",
+    description: "Duraciones y curva canónicas de UIKIT-MOTION-001.",
+  },
+  "lib/motion/scene-controller.ts": {
+    name: "motion-scene-controller",
+    title: "Controlador de escena",
+    description: "Núcleo DOM con interrupción, limpieza, foco y respaldo instantáneo.",
+  },
+  "lib/motion/load-driver.ts": {
+    name: "motion-load-driver",
+    title: "Carga protegida del motor",
+    description: "Import dinámico de GSAP; el controlador conserva la interacción si falla.",
+  },
+  "lib/motion/gsap-driver.ts": {
+    name: "motion-gsap-driver",
+    title: "Driver GSAP de movimiento",
+    description: "Flip de superficies decorativas y fundido del texto a su tamaño final.",
+  },
   "lib/utils.ts": {
     name: "ui-kit-utils",
     title: "cn() de UI Kit",
@@ -136,7 +161,11 @@ const pkgName = (spec) => (spec.startsWith("@") ? spec.split("/").slice(0, 2).jo
 /** Imports de un archivo: paquetes npm y archivos internos. */
 function scan(file) {
   const src = readFileSync(file, "utf8");
-  const specs = [...src.matchAll(/(?:^|\n)\s*import\s[^;]*?from\s+["']([^"']+)["']/g)].map((m) => m[1]);
+  const specs = [
+    ...src.matchAll(/(?:^|\n)\s*import\s[^;]*?from\s+["']([^"']+)["']/g),
+    // La frontera protegida del driver también debe instalar todos sus módulos y paquetes.
+    ...src.matchAll(/\bimport\s*\(\s*["']([^"']+)["']\s*\)/g),
+  ].map((m) => m[1]);
   const npm = new Set();
   const local = new Set();
   for (const s of specs) {

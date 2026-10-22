@@ -4,7 +4,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const DIRS = ["components/ui", "components/blocks", "lib/kraa", "lib/rea", "styles"];
+const DIRS = ["components/ui", "components/blocks", "lib/kraa", "lib/rea", "lib/motion", "styles"];
 const FILES = ["lib/utils.ts"];
 // Fuentes .ts/.tsx/.css; los tests (.test.ts y .test.tsx) no son código del componente.
 // kraa-fonts.css es una fuente embebida (430 KB): no aporta como código y engordaría el JSON.

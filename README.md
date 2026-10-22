@@ -8,8 +8,9 @@ Para diseñar, construir, documentar y revisar un componente, sigue la [guía de
 ## Propuestas
 
 - [Banco de movimiento reutilizable y escena REMI](docs/propuestas/banco-movimiento-reutilizable-remi.md):
-  selección técnica, patrones, contratos, tiempos, recursos y criterios de aceptación. Es una especificación
-  para implementar; todavía no agrega componentes al catálogo.
+  selección técnica, patrones, contratos, tiempos, recursos y criterios de aceptación.
+- [Implementación del banco de movimiento](docs/implementacion/banco-movimiento.md): núcleo DOM, adaptadores,
+  cuatro recursos instalables y evidencia de verificación. Los recursos se mantienen como `candidate`.
 
 ## Tipos y familias
 
@@ -65,11 +66,12 @@ Las cinco familias siguen la convención.
 ```
 app/                      layout, estilos globales y páginas del banco (/componentes)
 components/ui/{remi,ninja,kraa,rea,lab}/   componentes por familia
-components/blocks/{ninja,kraa,rea}/    composiciones
+components/blocks/{ninja,kraa,rea,lab}/    composiciones
 components/docs/          navegación, pestañas y vistas previas del banco
 lib/component-registry.ts registro: una entrada por componente (genera su página)
 lib/kraa/, lib/rea/, lib/lab/   modelo y utilidades de Kraa, REA y Lab
 lib/demo/                 datos ficticios para las vistas previas
+lib/motion/               núcleo DOM, tokens y driver opcional GSAP
 styles/                   CSS de cada familia y fuentes de muestra
 ```
 

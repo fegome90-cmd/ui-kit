@@ -1162,6 +1162,200 @@ useGridShortcut(() => setOn((v) => !v));
 
   // ---------- Lab (tokens --lab-* bajo .lab; investigación de señales y magnitudes) ----------
   {
+    slug: "lab-scene-enter",
+    family: "Lab",
+    name: "Entrada de escena",
+    category: "Movimiento",
+    description: "Presenta una escena como unidad al avanzar; una interacción o cambio de entorno la deja estable.",
+    files: [
+      "components/ui/lab/scene-enter.tsx",
+      "lib/motion/types.ts",
+      "lib/motion/tokens.ts",
+      "lib/motion/scene-controller.ts",
+      "lib/motion/load-driver.ts",
+      "lib/motion/gsap-driver.ts",
+    ],
+    usage: `<SceneEnter entryKey={visita} origin="deck-forward" motionPolicy="system">
+  <section>Contenido de la escena</section>
+</SceneEnter>`,
+    props: [
+      {
+        name: "entryKey",
+        type: "string | number",
+        default: '"initial"',
+        description: "Una nueva clave permite la entrada explícita; no depende del montaje de cada hijo.",
+      },
+      {
+        name: "origin",
+        type: "MotionOrigin",
+        default: '"direct"',
+        description: "Solo deck-forward reproduce la entrada; carga directa y retroceso quedan estables.",
+      },
+      {
+        name: "motionPolicy",
+        type: '"system" | "reduce" | "none"',
+        default: '"system"',
+        description: "Sigue la preferencia, reduce el gesto o aplica el estado sin animación.",
+      },
+      {
+        name: "loadDriver",
+        type: 'false | SceneOptions["loadDriver"]',
+        description: "Carga opcional protegida. false conserva el comportamiento instantáneo.",
+      },
+      {
+        name: "ref",
+        type: "Ref<SceneEnterHandle>",
+        description: "enter(origin) reproduce una entrada explícita; settle() estabiliza.",
+      },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Implementación propia de M01, UIKIT-MOTION-001; duraciones iniciales, sin fidelidad atribuida a una referencia externa.",
+      "Pendiente completar QA visual de geometría, teclado, contraste en las paletas y prueba de instalación externa. Requiere React 19; la carga inicial puede usar el respaldo instantáneo mientras llega el driver.",
+    ],
+  },
+  {
+    slug: "lab-focus-expand",
+    family: "Lab",
+    name: "Foco, ampliación y retorno",
+    category: "Movimiento",
+    description:
+      "Abre una región de detalle con contexto visible; mueve fondos decorativos y muestra el texto a tamaño final.",
+    files: [
+      "components/ui/lab/focus-expand.tsx",
+      "lib/motion/types.ts",
+      "lib/motion/tokens.ts",
+      "lib/motion/scene-controller.ts",
+      "lib/motion/load-driver.ts",
+      "lib/motion/gsap-driver.ts",
+    ],
+    usage: `<FocusExpand label="Objetivos" items={objetivos}
+  value={objetivo} onValueChange={setObjetivo}
+  contentKey={proyecto.id} motionPolicy="system" />`,
+    props: [
+      {
+        name: "items",
+        type: "readonly FocusExpandItem[]",
+        description: "Objetivos con id único estable, title, summary opcional y content del detalle.",
+      },
+      { name: "label", type: "string", description: "Nombre accesible de la escena." },
+      {
+        name: "value / defaultValue",
+        type: "string | null",
+        default: "null",
+        description: "Id del detalle; null muestra el conjunto. Admite control externo y estado interno.",
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string | null) => void",
+        description: "Intención local de abrir o cerrar; en modo controlado el consumidor aplica el valor.",
+      },
+      {
+        name: "contentKey",
+        type: "string",
+        default: '"default"',
+        description: "Versiona el contenido; captura los nuevos items dentro del commit, después de medir el origen.",
+      },
+      {
+        name: "origin",
+        type: "MotionOrigin",
+        default: '"direct"',
+        description: "Origen de los cambios externos; los botones locales transfieren el foco y Escape cierra.",
+      },
+      {
+        name: "motionPolicy",
+        type: '"system" | "reduce" | "none"',
+        default: '"system"',
+        description: "Política de movimiento que conserva todos los controles.",
+      },
+      {
+        name: "loadDriver",
+        type: 'false | SceneOptions["loadDriver"]',
+        description: "Driver protegido e intercambiable; false opera sin motor.",
+      },
+      {
+        name: "ref",
+        type: "Ref<FocusExpandHandle>",
+        description: "transitionTo, enter, settle e invalidateLayout para integración con un host.",
+      },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Implementación propia de M02 y redistribución M03, UIKIT-MOTION-001; el detalle es una región de página y no un diálogo modal.",
+      "Pendiente completar QA visual, contenido límite, contraste en las paletas y prueba de instalación externa. Requiere React 19. Un cambio de items debe acompañarse de una nueva contentKey.",
+    ],
+  },
+  {
+    slug: "lab-step-reveal",
+    family: "Lab",
+    name: "Comentario vinculado al estado",
+    category: "Movimiento",
+    description:
+      "Funde un comentario cuando cambia su clave de estado, con espacio reservado y cancelación del gesto anterior.",
+    files: ["components/ui/lab/step-reveal.tsx", "lib/motion/tokens.ts", "lib/motion/types.ts"],
+    usage: `<StepReveal stateKey={paso} minBlockSize="5rem" aria-live="polite">
+  <p>{comentario}</p>
+</StepReveal>`,
+    props: [
+      {
+        name: "stateKey",
+        type: "string | number",
+        description: "Un cambio inicia un fundido; el primer render permanece estable.",
+      },
+      {
+        name: "minBlockSize",
+        type: 'CSSProperties["minBlockSize"]',
+        default: '"5rem"',
+        description: "Reserva mínima del comentario. Ajustarla al contenido esperado evita desplazar el panel.",
+      },
+      {
+        name: "motionPolicy",
+        type: '"system" | "reduce" | "none"',
+        default: '"system"',
+        description: "Fundido de 160 ms; 100 ms reducido; estado instantáneo con none.",
+      },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Implementación propia de M04, UIKIT-MOTION-001; WAAPI es opcional y el contenido queda visible sin ella.",
+      "Pendiente QA visual de comentarios extensos, reserva de espacio y anuncio con lectores de pantalla. Requiere React 19.",
+    ],
+  },
+  {
+    slug: "lab-motion-scene-demo",
+    family: "Lab",
+    name: "Escena explorable de proyectos",
+    category: "Bloques",
+    description:
+      "Combina entrada explícita, ampliación contextual y comentario en proyectos aportados por el consumidor.",
+    files: ["components/blocks/lab/motion-scene-demo.tsx"],
+    usage: `<MotionSceneDemo projects={proyectos} initialMotionPolicy="system" />`,
+    props: [
+      {
+        name: "projects",
+        type: "readonly MotionDemoProject[]",
+        description:
+          "Proyectos con id, name, summary, items y comments { overview, detail }. Sin datos ocultos del banco.",
+      },
+      { name: "initialProjectId", type: "string", description: "Proyecto inicial; por defecto usa el primero." },
+      {
+        name: "initialMotionPolicy",
+        type: '"system" | "reduce" | "none"',
+        default: '"system"',
+        description: "Política inicial del selector de movimiento.",
+      },
+    ],
+    status: "candidate",
+    provenance: "inferred",
+    notes: [
+      "Composición neutral propia; los datos ficticios de la vista previa viven en lib/demo/motion.ts y se pasan por props.",
+      "Pendiente completar QA visual, teclado, contraste en las paletas y prueba de instalación externa. Requiere React 19; no integra REMI ni el deck FALP.",
+    ],
+  },
+  {
     slug: "lab-presence-dot",
     family: "Lab",
     name: "Punto de presencia",

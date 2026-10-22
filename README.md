@@ -5,6 +5,12 @@ Sigue el estilo shadcn: el código vive en el repo y se copia o importa, no es u
 
 Para diseñar, construir, documentar y revisar un componente, sigue la [guía de trabajo](docs/guia-de-trabajo.md).
 
+## Propuestas
+
+- [Banco de movimiento reutilizable y escena REMI](docs/propuestas/banco-movimiento-reutilizable-remi.md):
+  selección técnica, patrones, contratos, tiempos, recursos y criterios de aceptación. Es una especificación
+  para implementar; todavía no agrega componentes al catálogo.
+
 ## Tipos y familias
 
 El banco se navega **por tipo de componente**: acciones, formularios, navegación, indicadores, gráficos,

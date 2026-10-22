@@ -2,6 +2,7 @@
 
 import { CircleCheck, TriangleAlert } from "lucide-react";
 import { type ReactNode, useId, useRef, useState } from "react";
+import { MotionSceneDemo } from "@/components/blocks/lab/motion-scene-demo";
 import { BentoGrid, BentoItem } from "@/components/ui/lab/bento-grid";
 import { CategoryWheel } from "@/components/ui/lab/category-wheel";
 import { ChapterCard } from "@/components/ui/lab/chapter-card";
@@ -11,6 +12,7 @@ import { DotNav } from "@/components/ui/lab/dot-nav";
 import { EncodingCompare } from "@/components/ui/lab/encoding-compare";
 import { FeatureTabs } from "@/components/ui/lab/feature-tabs";
 import { FilteredStat } from "@/components/ui/lab/filtered-stat";
+import { FocusExpand } from "@/components/ui/lab/focus-expand";
 import { HierarchyCells } from "@/components/ui/lab/hierarchy-cells";
 import { LabBackdrop, PATTERNS } from "@/components/ui/lab/lab-backdrop";
 import { LabGlowCard } from "@/components/ui/lab/lab-glow-card";
@@ -25,11 +27,14 @@ import { ProcessSteps } from "@/components/ui/lab/process-steps";
 import { ProportionSplit } from "@/components/ui/lab/proportion-split";
 import { RadialBars } from "@/components/ui/lab/radial-bars";
 import { RangeBars } from "@/components/ui/lab/range-bars";
+import { SceneEnter } from "@/components/ui/lab/scene-enter";
 import { ScrollySection } from "@/components/ui/lab/scrolly-section";
 import { SeriesChart } from "@/components/ui/lab/series-chart";
 import { SignalDisclosure } from "@/components/ui/lab/signal-disclosure";
 import { StatRing } from "@/components/ui/lab/stat-ring";
+import { StepReveal } from "@/components/ui/lab/step-reveal";
 import { TimeScale } from "@/components/ui/lab/time-scale";
+import { MOTION_PROJECTS } from "@/lib/demo/motion";
 import { PALETAS, PALETAS_LAB, type PaletaLab } from "@/lib/lab/paletas";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +46,51 @@ const TURNOS = [
 ];
 
 const fila = "flex flex-wrap items-end gap-[32px]";
+
+function SceneEnterPreview() {
+  const [entry, setEntry] = useState(0);
+  return (
+    <div className="grid w-full max-w-[720px] gap-[16px]">
+      <button type="button" className="lab-motion-button justify-self-start" onClick={() => setEntry((key) => key + 1)}>
+        Repetir entrada hacia adelante
+      </button>
+      <SceneEnter entryKey={entry} origin={entry ? "deck-forward" : "direct"}>
+        <div className="rounded-[12px] border border-lab-line bg-lab-surface p-[24px]">
+          <h3 className="mb-[8px] mt-0 text-[22px] font-semibold">Una escena completa</h3>
+          <p className="m-0 text-[15px] leading-[1.5] text-lab-muted">
+            La superficie entra como unidad. Puedes operar sus controles durante el movimiento.
+          </p>
+          <button type="button" className="lab-motion-button mt-[16px]">
+            Estabilizar al interactuar
+          </button>
+        </div>
+      </SceneEnter>
+    </div>
+  );
+}
+
+function StepRevealPreview() {
+  const [step, setStep] = useState(0);
+  const comments = [
+    "Vista general: el conjunto permite elegir un objetivo.",
+    "Detalle: el comentario cambia cuando cambia el estado.",
+    "Retorno: el contenido queda visible aunque se cancele el fundido.",
+  ];
+  return (
+    <div className="grid w-full max-w-[560px] gap-[16px]">
+      <button
+        type="button"
+        className="lab-motion-button justify-self-start"
+        onClick={() => setStep((key) => (key + 1) % comments.length)}
+      >
+        Cambiar comentario
+      </button>
+      <StepReveal stateKey={step} aria-live="polite" className="rounded-[12px] bg-lab-accent-soft p-[20px]">
+        <p className="m-0 text-[15px] leading-[1.5]">{comments[step]}</p>
+      </StepReveal>
+    </div>
+  );
+}
 
 /** Una variante con su nombre debajo, para que la vista previa se lea sin abrir el código. */
 function Muestra({ texto, children }: { texto: string; children: ReactNode }) {
@@ -203,6 +253,12 @@ function PalettePreview() {
 }
 
 export const LAB_PREVIEWS: Record<string, () => ReactNode> = {
+  "lab-scene-enter": () => <SceneEnterPreview />,
+  "lab-focus-expand": () => (
+    <FocusExpand label="Objetivos ficticios" items={MOTION_PROJECTS[0].items} className="w-full max-w-[860px]" />
+  ),
+  "lab-step-reveal": () => <StepRevealPreview />,
+  "lab-motion-scene-demo": () => <MotionSceneDemo projects={MOTION_PROJECTS} className="max-w-[960px]" />,
   "lab-presence-dot": () => (
     <div className="grid gap-[24px]">
       <div className={fila}>
@@ -735,6 +791,42 @@ LAB_PREVIEWS["lab-radial-bars"] = () => (
 );
 
 export const LAB_THUMBS: Record<string, ReactNode> = {
+  "lab-scene-enter": (
+    <span
+      inert
+      aria-hidden
+      className="flex h-[46px] w-[90px] items-center justify-center rounded-[6px] border border-lab-accent bg-lab-accent-soft text-[20px] text-lab-accent"
+    >
+      ↑
+    </span>
+  ),
+  "lab-focus-expand": (
+    <span inert aria-hidden className="grid h-[46px] w-[100px] grid-cols-[1fr_1.6fr] gap-[5px]">
+      <span className="grid gap-[4px]">
+        <span className="rounded-[4px] border border-lab-accent bg-lab-accent-soft" />
+        <span className="rounded-[4px] border border-lab-line" />
+      </span>
+      <span className="rounded-[5px] border border-lab-accent bg-lab-accent-soft" />
+    </span>
+  ),
+  "lab-step-reveal": (
+    <span
+      inert
+      aria-hidden
+      className="grid w-[100px] gap-[5px] rounded-[5px] border-l-[3px] border-lab-accent bg-lab-accent-soft p-[9px]"
+    >
+      <span className="h-[4px] w-full bg-lab-accent" />
+      <span className="h-[4px] w-[70%] bg-lab-muted" />
+    </span>
+  ),
+  "lab-motion-scene-demo": (
+    <span inert aria-hidden className="grid h-[50px] w-[100px] grid-cols-[1fr_1.6fr] gap-[4px]">
+      <span className="col-span-2 h-[6px] w-[60%] rounded-full bg-lab-muted" />
+      <span className="rounded-[4px] border border-lab-line" />
+      <span className="rounded-[4px] border border-lab-accent bg-lab-accent-soft" />
+      <span className="col-span-2 h-[6px] bg-lab-accent-soft" />
+    </span>
+  ),
   "lab-presence-dot": <PresenceDot rings={2} />,
   "lab-stat-ring": <StatRing size="sm" value="2B" caption="" className="scale-[0.6]" />,
   "lab-encoding-compare": (

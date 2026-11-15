@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Demo sintética · Órbita de papel</title>
+<link rel="stylesheet" href="./inspector.css">
+<style>
+body {margin:24px;background:#eef2f7;font:16px/1.5 system-ui} .stage {width:960px;height:540px;position:relative;background:#fff;transform:scale(0.75);transform-origin:top left;margin-bottom:-120px} [data-inspect] {position:absolute;box-sizing:border-box;padding:20px} h1 {left:48px;top:30px;width:650px;height:100px;margin:0;font-size:42px} .a {left:48px;top:180px;width:380px;height:260px;background:#dbeafe} .b {left:480px;top:180px;width:430px;height:260px;background:#fef3c7} nav {margin-top:24px} a,button {padding:12px}
+</style>
+<button id="show" type="button">Mostrar inspector</button><button id="hide" type="button">Ocultar</button><button id="destroy" type="button">Destruir</button>
+<p>Contenido totalmente sintético. Selección por teclado en el panel, sin interceptar la presentación.</p>
+<section class="stage" aria-label="Diapositiva sintética"><h1 data-inspect="Título">Órbita de papel</h1><article class="a" data-inspect="Bloque azul"><h2>Explorar</h2><p>Un ejemplo ficticio de texto y formas.</p><a href="#navigation">Enlace de presentación</a></article><article class="b" data-inspect="Bloque amarillo"><h2>Comparar</h2><p>Dos bloques separados para medir distancias.</p></article></section>
+<nav id="navigation"><a href="./overflow.html">Otra demo sintética</a></nav>
+<script type="module">
+import {createGridInspector} from './inspector.js';
+
+const inspector=createGridInspector(document.querySelector('.stage'),{width:960,height:540});
+document.querySelector('#show').onclick=()=>inspector.show();document.querySelector('#hide').onclick=()=>inspector.hide();document.querySelector('#destroy').onclick=()=>inspector.destroy();
+</script></html>

@@ -1001,15 +1001,47 @@ show("Ejemplo copiado");`,
     family: "REA",
     name: "Retícula superpuesta",
     category: "Superficies",
-    description: "Columnas tenues en acento para revisar alineación. useGridShortcut la alterna con Alt+G.",
-    files: ["components/ui/rea/rea-grid-overlay.tsx"],
+    description:
+      "Retícula e inspector geométrico opcional para HTML: cajas, porcentajes, bordes y separaciones. No evalúa calidad editorial.",
+    status: "candidate",
+    notes: [
+      "El adaptador instala JS/CSS en public y requiere alias @/* a la raíz, no src/*. Inspector nuevo: falta QA visual y de teclado en navegadores reales. Solo escala y traslación sin rotación, skew ni perspectiva. ReaGridInspector debe estar dentro del contenedor posicionado que referencia slideRef.",
+    ],
+    files: [
+      "components/ui/rea/rea-grid-overlay.tsx",
+      "public/rea-grid-inspector/inspector.js",
+      "public/rea-grid-inspector/inspector.css",
+    ],
     usage: `const [on, setOn] = useState(false);
 useGridShortcut(() => setOn((v) => !v));
-<ReaGridOverlay visible={on} />`,
+<ReaGridOverlay visible={on} />
+// Inspector opcional dentro del contenedor posicionado de slideRef:
+<ReaGridInspector slideRef={slideRef} visible={on} onVisibleChange={setOn} />`,
     props: [
       { name: "visible", type: "boolean", description: "Muestra la retícula." },
       { name: "columns", type: "number", default: "12", description: "Cantidad de columnas." },
-      { name: "contained", type: "boolean", default: "false", description: "Se ajusta al contenedor." },
+      { name: "contained", type: "boolean", default: "false", description: "ReaGridOverlay: se ajusta al contenedor." },
+      {
+        name: "slideRef",
+        type: "RefObject<HTMLElement | null>",
+        description: "ReaGridInspector: diapositiva que se mide.",
+      },
+      {
+        name: "width / height",
+        type: "number",
+        description: "ReaGridInspector: dimensiones locales opcionales; por defecto offsetWidth/Height.",
+      },
+      {
+        name: "selector",
+        type: "string",
+        default: '"[data-inspect]"',
+        description: "ReaGridInspector: bloques seleccionables dentro de la diapositiva.",
+      },
+      {
+        name: "onVisibleChange",
+        type: "(visible: boolean) => void",
+        description: "ReaGridInspector: notifica cierre local para sincronizar el consumidor.",
+      },
     ],
   },
   {

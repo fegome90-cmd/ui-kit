@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { type RefObject, useEffect, useState } from "react";
+import { createGridInspector } from "@/public/rea-grid-inspector/inspector.js";
+import "@/public/rea-grid-inspector/inspector.css";
 
 /** Retícula de columnas superpuesta, para revisar alineación. Decorativa y sin eventos de puntero. */
 export function ReaGridOverlay({
@@ -16,7 +18,7 @@ export function ReaGridOverlay({
   return (
     <div
       data-slot="rea-grid-overlay"
-      className="pointer-events-none fixed inset-0 z-90 px-(--rea-gutter) opacity-0 transition-opacity duration-400 ease-rea-out data-contained:absolute data-[visible=true]:opacity-100"
+      className="print:hidden pointer-events-none fixed inset-0 z-90 px-(--rea-gutter) opacity-0 transition-opacity duration-400 ease-rea-out data-contained:absolute data-[visible=true]:opacity-100"
       data-visible={visible}
       data-contained={contained || undefined}
       aria-hidden="true"
@@ -45,4 +47,44 @@ export function useGridShortcut(toggle: () => void, enabled = true) {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [toggle, enabled]);
+}
+
+/** Adaptador opcional: el núcleo mide y selecciona; ReaGridOverlay conserva la retícula REA. */
+export function ReaGridInspector({
+  slideRef,
+  visible,
+  width,
+  height,
+  selector = "[data-inspect]",
+  columns = 12,
+  onVisibleChange,
+}: {
+  slideRef: RefObject<HTMLElement | null>;
+  onVisibleChange?: (visible: boolean) => void;
+  visible: boolean;
+  width?: number;
+  height?: number;
+  selector?: string;
+  columns?: number;
+}) {
+  const [dismissed, setDismissed] = useState(false);
+  useEffect(() => {
+    if (!visible) setDismissed(false);
+  }, [visible]);
+  useEffect(() => {
+    if (!visible || dismissed || !slideRef.current) return;
+    const inspector = createGridInspector(slideRef.current, {
+      width,
+      height,
+      selector,
+      grid: false,
+      onClose: () => {
+        setDismissed(true);
+        onVisibleChange?.(false);
+      },
+    });
+    inspector.show();
+    return () => inspector.destroy();
+  }, [slideRef, visible, dismissed, width, height, selector, onVisibleChange]);
+  return <ReaGridOverlay visible={visible && !dismissed} contained columns={columns} />;
 }

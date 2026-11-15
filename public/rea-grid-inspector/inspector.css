@@ -1,0 +1,70 @@
+/* No selectores de contenido, resets globales ni cambios de layout de la presentación. */
+.rea-gi {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+.rea-gi[hidden] {
+  display: none !important;
+}
+.rea-gi .rea-gi-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  width: min(360px, calc(100vw - 24px));
+  max-height: 45vh;
+  overflow: auto;
+  box-sizing: border-box;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: #111827;
+  color: #fff;
+  border: 2px solid #93c5fd;
+  font:
+    14px / 1.5 system-ui,
+    sans-serif;
+  pointer-events: auto;
+}
+.rea-gi .rea-gi-panel select,
+.rea-gi .rea-gi-panel button {
+  color: #111827;
+  background: #fff;
+  font: inherit;
+  min-height: 36px;
+  width: 100%;
+}
+.rea-gi .rea-gi-panel :focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+.rea-gi .rea-gi-panel output {
+  display: block;
+}
+.rea-gi .rea-gi-box,
+.rea-gi .rea-gi-grid {
+  position: fixed;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.rea-gi .rea-gi-box {
+  outline: 1px dashed #2563eb;
+  outline-offset: -1px;
+}
+.rea-gi .rea-gi-selected {
+  outline: 3px solid #d97706;
+  outline-offset: -3px;
+}
+.rea-gi .rea-gi-grid {
+  display: grid;
+}
+.rea-gi .rea-gi-grid span {
+  border-inline: 1px solid #2563eb40;
+  background: #2563eb10;
+}
+@media print {
+  .rea-gi {
+    display: none !important;
+  }
+}

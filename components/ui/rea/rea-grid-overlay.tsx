@@ -1,6 +1,6 @@
 "use client";
 
-import { type RefObject, useEffect, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import { createGridInspector } from "@/public/rea-grid-inspector/inspector.js";
 import "@/public/rea-grid-inspector/inspector.css";
 
@@ -68,6 +68,10 @@ export function ReaGridInspector({
   columns?: number;
 }) {
   const [dismissed, setDismissed] = useState(false);
+  const onVisibleChangeRef = useRef(onVisibleChange);
+  useEffect(() => {
+    onVisibleChangeRef.current = onVisibleChange;
+  }, [onVisibleChange]);
   useEffect(() => {
     if (!visible) setDismissed(false);
   }, [visible]);
@@ -80,11 +84,11 @@ export function ReaGridInspector({
       grid: false,
       onClose: () => {
         setDismissed(true);
-        onVisibleChange?.(false);
+        onVisibleChangeRef.current?.(false);
       },
     });
     inspector.show();
     return () => inspector.destroy();
-  }, [slideRef, visible, dismissed, width, height, selector, onVisibleChange]);
+  }, [slideRef, visible, dismissed, width, height, selector]);
   return <ReaGridOverlay visible={visible && !dismissed} contained columns={columns} />;
 }

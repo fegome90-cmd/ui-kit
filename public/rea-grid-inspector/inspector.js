@@ -330,17 +330,7 @@ export function createGridInspector(slide, options = {}) {
     });
     if (!blocks[index]) return;
     const selectedBox = blocks[index].getBoundingClientRect();
-    let rendered = !(selectedBox.width === 0 && selectedBox.height === 0);
-    for (let node = blocks[index]; node; node = node.parentElement) {
-      const style = win.getComputedStyle(node);
-      if (
-        style.display === "none" ||
-        (node === blocks[index] && (style.visibility === "hidden" || style.visibility === "collapse")) ||
-        style.contentVisibility === "hidden"
-      )
-        rendered = false;
-    }
-    if (!rendered) {
+    if (!hasRenderedBox(blocks[index], selectedBox)) {
       output.textContent = t(
         "Bloque no visible o sin caja renderizada. Selecciona otro bloque para medir o guardar referencia.",
         "Block is hidden or has no rendered box. Select another block to measure or save a reference.",
@@ -377,8 +367,15 @@ export function createGridInspector(slide, options = {}) {
     )}top ${style.marginTop}; right ${style.marginRight}; bottom ${style.marginBottom}; left ${style.marginLeft}.`;
     const other = blocks[Number(compare.value)];
     if (other) {
-      const d = measureDistance(m, measureBox(rect, other.getBoundingClientRect(), size));
       const b = other.getBoundingClientRect();
+      if (!hasRenderedBox(other, b)) {
+        output.textContent += t(
+          " Bloque comparado no visible o sin caja renderizada. No se puede medir la separación.",
+          " Compared block is hidden or has no rendered box. Its gap cannot be measured.",
+        );
+        return;
+      }
+      const d = measureDistance(m, measureBox(rect, b, size));
       const ax = Math.max(selectedRect.left, Math.min(b.left + b.width / 2, selectedRect.right));
       const ay = Math.max(selectedRect.top, Math.min(b.top + b.height / 2, selectedRect.bottom));
       const bx = Math.max(b.left, Math.min(ax, b.right));
@@ -389,6 +386,19 @@ export function createGridInspector(slide, options = {}) {
         ? ` Gap: horizontal ${number(d.horizontal)} px, vertical ${number(d.vertical)} px, distance ${number(d.distance)} px.`
         : ` Separación: horizontal ${number(d.horizontal)} px, vertical ${number(d.vertical)} px, distancia ${number(d.distance)} px.`;
     }
+  }
+  function hasRenderedBox(element, box) {
+    if (box.width === 0 && box.height === 0) return false;
+    for (let node = element; node; node = node.parentElement) {
+      const style = win.getComputedStyle(node);
+      if (
+        style.display === "none" ||
+        (node === element && (style.visibility === "hidden" || style.visibility === "collapse")) ||
+        style.contentVisibility === "hidden"
+      )
+        return false;
+    }
+    return true;
   }
   function schedule() {
     if (!host.hidden && !destroyed && !frame)

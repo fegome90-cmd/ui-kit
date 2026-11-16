@@ -64,6 +64,31 @@ afterEach(() => {
 });
 
 describe("interacción independiente del inspector de grilla", () => {
+  it.each(["display", "visibility", "contentVisibility", "empty"])(
+    "no mide comparación oculta (%s) y recupera al mostrarla",
+    (reason) => {
+      const { slide, b, rect } = fixture();
+      const inspector = create(slide);
+      inspector.show();
+      select("Bloque seleccionado", "0");
+      select("Comparar con bloque", "1");
+      expect(panel().querySelector("output")?.textContent).toContain("distancia");
+      if (reason === "empty") vi.mocked(b.getBoundingClientRect).mockReturnValue(rect(0, 0, 0, 0));
+      else if (reason === "display") b.style.display = "none";
+      else if (reason === "visibility") b.style.visibility = "hidden";
+      else b.style.contentVisibility = "hidden";
+      inspector.refresh();
+      expect(panel().querySelector("output")?.textContent).toContain("Bloque comparado no visible");
+      expect(panel().querySelector("output")?.textContent).not.toContain("distancia");
+      expect(document.querySelectorAll(".rea-gi-dimension")).toHaveLength(4);
+      b.removeAttribute("style");
+      vi.mocked(b.getBoundingClientRect).mockReturnValue(rect(160, 70, 20, 20));
+      inspector.refresh();
+      expect(panel().querySelector("output")?.textContent).toContain("distancia");
+      expect(document.querySelectorAll(".rea-gi-dimension")).toHaveLength(5);
+    },
+  );
+
   it("conserva clicks y bubbling en modo lectura, también al ocultarlo", () => {
     const { slide, a } = fixture();
     const inspector = create(slide);

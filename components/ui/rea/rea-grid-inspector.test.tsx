@@ -82,6 +82,26 @@ describe("inspector DOM aislado", () => {
 });
 
 describe("adaptador React", () => {
+  it("conserva selección al cambiar sólo la identidad del callback y usa su versión vigente", () => {
+    const slide = fixture();
+    const ref = { current: slide };
+    const first = vi.fn();
+    const latest = vi.fn();
+    const view = render(
+      <ReaGridInspector slideRef={ref} visible onVisibleChange={(value) => first(value)} width={960} height={540} />,
+    );
+    const select = required<HTMLSelectElement>('[aria-label="Bloque seleccionado"]');
+    fireEvent.change(select, { target: { value: "0" } });
+    view.rerender(
+      <ReaGridInspector slideRef={ref} visible onVisibleChange={(value) => latest(value)} width={960} height={540} />,
+    );
+    expect(required<HTMLSelectElement>('[aria-label="Bloque seleccionado"]').value).toBe("0");
+    fireEvent.click(required('[aria-label="Ocultar inspector"]'));
+    expect(first).not.toHaveBeenCalled();
+    expect(latest).toHaveBeenCalledWith(false);
+    view.unmount();
+  });
+
   it("oculta retícula y panel al cerrar, vuelve a abrir y declara supresión de impresión", () => {
     const slide = fixture();
     const ref = { current: slide };

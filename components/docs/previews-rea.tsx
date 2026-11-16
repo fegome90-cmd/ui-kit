@@ -7,7 +7,7 @@ import { ReaSpecimenStage } from "@/components/blocks/rea/rea-specimen-stage";
 import { ReaButton } from "@/components/ui/rea/rea-button";
 import { ReaCommandPalette } from "@/components/ui/rea/rea-command-palette";
 import { ReaFilterGroup } from "@/components/ui/rea/rea-filter-group";
-import { ReaGridOverlay } from "@/components/ui/rea/rea-grid-overlay";
+import { ReaGridInspector } from "@/components/ui/rea/rea-grid-overlay";
 import { ReaCodeBox, ReaDetailRows } from "@/components/ui/rea/rea-inspector";
 import { ReaMonogram, ReaPreloader } from "@/components/ui/rea/rea-monogram";
 import { ReaGenWords, ReaWireline } from "@/components/ui/rea/rea-motion-text";
@@ -198,14 +198,19 @@ function ScrollProgressPreview() {
 }
 
 function GridOverlayPreview() {
-  const [on, setOn] = useState(true);
+  const [on, setOn] = useState(false);
+  const slideRef = useRef<HTMLDivElement>(null);
   return (
-    <div style={{ position: "relative", width: "100%", minHeight: 160 }}>
-      <ReaGridOverlay visible={on} contained />
-      <div style={{ position: "relative", ...stack }}>
+    <div ref={slideRef} style={{ position: "relative", width: "100%", minHeight: 200 }}>
+      <ReaGridInspector slideRef={slideRef} visible={on} onVisibleChange={setOn} />
+      <div data-inspect="Bloque sintético" style={{ position: "relative", ...stack }}>
         <ReaButton size="sm" variant="ghost" arrow={null} onClick={() => setOn((v) => !v)} aria-pressed={on}>
-          {on ? "Ocultar retícula" : "Mostrar retícula"}
+          {on ? "Ocultar inspector" : "Mostrar inspector"}
         </ReaButton>
+        <p>
+          Selecciona desde el panel o activa el modo de click; prueba la regla por teclado. Mide cajas, no tinta ni
+          calidad editorial.
+        </p>
       </div>
     </div>
   );

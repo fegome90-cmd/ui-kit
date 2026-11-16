@@ -102,13 +102,16 @@ const LIB_ITEMS = {
 };
 
 const isComponentFile = (f) => /^components\/(ui|blocks)\//.test(f);
-const fileType = (f) => (f.startsWith("components/blocks/") ? "registry:block" : "registry:ui");
+const fileType = (f) =>
+  f.startsWith("public/") ? "registry:file" : f.startsWith("components/blocks/") ? "registry:block" : "registry:ui";
 const fileTarget = (f) =>
-  f.startsWith("components/ui/")
-    ? `@ui/${f.slice("components/ui/".length)}`
-    : f.startsWith("components/blocks/")
-      ? `@components/${f.slice("components/".length)}`
-      : `@lib/${f.slice("lib/".length)}`;
+  f.startsWith("public/")
+    ? `~/${f}`
+    : f.startsWith("components/ui/")
+      ? `@ui/${f.slice("components/ui/".length)}`
+      : f.startsWith("components/blocks/")
+        ? `@components/${f.slice("components/".length)}`
+        : `@lib/${f.slice("lib/".length)}`;
 
 /** Resuelve "@/x/y" o "./y" (desde `from`) a la ruta del archivo del repo. */
 function resolveImport(spec, from) {
@@ -122,7 +125,7 @@ function resolveImport(spec, from) {
     }
     base = parts.join("/");
   } else return null;
-  for (const ext of [".tsx", ".ts"]) {
+  for (const ext of ["", ".tsx", ".ts"]) {
     try {
       readFileSync(base + ext);
       return base + ext;
@@ -223,7 +226,7 @@ for (const [family, theme] of Object.entries(THEMES)) {
 // Un item por entrada del banco. meta lleva la madurez y la procedencia al proyecto que instala.
 for (const c of COMPONENTS) {
   const meta = { status: statusOf(c), provenance: provenanceOf(c) };
-  const files = c.files.filter(isComponentFile);
+  const files = c.files.filter((f) => isComponentFile(f) || f.startsWith("public/rea-grid-inspector/"));
   if (!files.length) {
     // Recetas que viven solo en el tema (p. ej. rea-hover-lift): el item instala el tema.
     items.push({

@@ -1,0 +1,113 @@
+/* No selectores de contenido, resets globales ni cambios de layout de la presentación. */
+.rea-gi {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+.rea-gi[hidden] {
+  display: none !important;
+}
+.rea-gi .rea-gi-panel {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  width: min(360px, calc(100vw - 24px));
+  max-height: 45vh;
+  overflow: auto;
+  box-sizing: border-box;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: #111827;
+  color: #fff;
+  border: 2px solid #93c5fd;
+  font:
+    14px / 1.5 system-ui,
+    sans-serif;
+  pointer-events: auto;
+}
+.rea-gi .rea-gi-panel select,
+.rea-gi .rea-gi-panel button {
+  color: #111827;
+  background: #fff;
+  font: inherit;
+  min-height: 36px;
+  width: 100%;
+}
+.rea-gi .rea-gi-panel :focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 3px;
+}
+.rea-gi .rea-gi-panel output {
+  display: block;
+}
+.rea-gi .rea-gi-box,
+.rea-gi .rea-gi-grid {
+  position: fixed;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.rea-gi .rea-gi-box {
+  outline: 1px dashed #2563eb;
+  outline-offset: -1px;
+}
+.rea-gi .rea-gi-selected {
+  outline: 3px solid #d97706;
+  outline-offset: -3px;
+}
+.rea-gi .rea-gi-grid {
+  display: grid;
+}
+.rea-gi .rea-gi-grid span {
+  border-inline: 1px solid #2563eb40;
+  background: #2563eb10;
+}
+@media print {
+  .rea-gi {
+    display: none !important;
+  }
+}
+.rea-gi .rea-gi-dimension {
+  position: fixed;
+  height: 0;
+  border-top: 2px solid #d97706;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.rea-gi .rea-gi-dimension::before,
+.rea-gi .rea-gi-dimension::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  height: 8px;
+  border-left: 2px solid #d97706;
+}
+.rea-gi .rea-gi-dimension::after {
+  right: 0;
+}
+.rea-gi .rea-gi-dimension span {
+  position: absolute;
+  left: 8px;
+  bottom: 3px;
+  padding: 2px 4px;
+  background: #111827;
+  color: #fff;
+  white-space: nowrap;
+  font:
+    12px / 1.4 system-ui,
+    sans-serif;
+}
+.rea-gi .rea-gi-panel fieldset {
+  min-width: 0;
+}
+.rea-gi .rea-gi-panel label {
+  display: inline-block;
+  width: 50%;
+}
+.rea-gi .rea-gi-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  font: inherit;
+}

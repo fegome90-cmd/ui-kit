@@ -41,6 +41,41 @@ export function measureDistance(a, b) {
   const relation = horizontal > 0 || vertical > 0 ? "separation" : overlapX > 0 && overlapY > 0 ? "overlap" : "contact";
   return { horizontal, vertical, distance: Math.hypot(horizontal, vertical), overlapX, overlapY, relation };
 }
+/** Copia histórica aislada: caja DOM local, tamaño y fecha; no conserva nodos ni contenido. */
+export function createBoxSnapshot(box, size, label = "", timestamp = new Date().toISOString()) {
+  if (
+    ![size.width, size.height].every((value) => Number.isFinite(value) && value > 0) ||
+    ![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
+    box.width < 0 ||
+    box.height < 0
+  ) {
+    throw new RangeError("La referencia requiere una caja finita y tamaño positivo.");
+  }
+  const pixels = Object.freeze({ x: box.x, y: box.y, width: box.width, height: box.height });
+  const percent = Object.freeze({
+    x: (box.x / size.width) * 100,
+    y: (box.y / size.height) * 100,
+    width: (box.width / size.width) * 100,
+    height: (box.height / size.height) * 100,
+  });
+  return Object.freeze({
+    pixels,
+    percent,
+    size: Object.freeze({ width: size.width, height: size.height }),
+    label: String(label),
+    timestamp: String(timestamp),
+  });
+}
+/** Delta actual menos referencia. Porcentajes en puntos porcentuales; nunca una distancia espacial. */
+export function compareBoxSnapshots(reference, current) {
+  const delta = (a, b) => ({ x: b.x - a.x, y: b.y - a.y, width: b.width - a.width, height: b.height - a.height });
+  const sameSize = reference.size.width === current.size.width && reference.size.height === current.size.height;
+  return {
+    sameSize,
+    pixels: sameSize ? delta(reference.pixels, current.pixels) : null,
+    percent: delta(reference.percent, current.percent),
+  };
+}
 /** Solo matrices de escala positiva y traslación en ejes. Valida cada ancestro, no la matriz compuesta. */
 export function assertSupportedGeometry(element) {
   const win = element.ownerDocument.defaultView;
@@ -109,6 +144,7 @@ export function assertSupportedGeometry(element) {
  * @param {{selector?:string,width?:number,height?:number,grid?:boolean,columns?:number,locale?:"es"|"en",onClose?:()=>void}} [options]
  */
 export function createGridInspector(slide, options = {}) {
+  options = { ...options };
   const en = options.locale === "en";
   const t = (/** @type {string} */ es, /** @type {string} */ english) => (en ? english : es);
   const doc = slide.ownerDocument;
@@ -131,6 +167,7 @@ export function createGridInspector(slide, options = {}) {
   output.setAttribute("aria-live", "polite");
   const close = doc.createElement("button");
   close.type = "button";
+  close.setAttribute("aria-label", t("Ocultar inspector", "Hide inspector"));
   close.textContent = t("Ocultar inspector", "Hide inspector");
   const mode = doc.createElement("select");
   mode.setAttribute("aria-label", t("Modo de interacción", "Interaction mode"));
@@ -160,7 +197,18 @@ export function createGridInspector(slide, options = {}) {
   const rulerOutput = doc.createElement("output");
   rulerOutput.setAttribute("aria-live", "polite");
   ruler.append(rulerOutput);
-  panel.append(title, mode, choose, compare, output, ruler, close);
+  const saveReference = doc.createElement("button");
+  saveReference.type = "button";
+  saveReference.textContent = t("Guardar referencia", "Save reference");
+  const clearReference = doc.createElement("button");
+  clearReference.type = "button";
+  clearReference.textContent = t("Borrar referencia", "Clear reference");
+  const referenceOutput = doc.createElement("output");
+  referenceOutput.setAttribute("aria-label", t("Comparación histórica", "Historical comparison"));
+  referenceOutput.setAttribute("aria-live", "polite");
+  let reference = null;
+  let currentSnapshot = null;
+  panel.append(title, mode, choose, compare, output, ruler, saveReference, clearReference, referenceOutput, close);
   const outlines = doc.createElement("div");
   outlines.className = "rea-gi-outlines";
   outlines.setAttribute("aria-hidden", "true");
@@ -176,6 +224,15 @@ export function createGridInspector(slide, options = {}) {
   const number = (/** @type {number} */ n) => Math.round(n * 10) / 10;
   function refresh() {
     if (destroyed || host.hidden) return;
+    currentSnapshot = null;
+    saveReference.disabled = true;
+    clearReference.disabled = !reference;
+    referenceOutput.textContent = reference
+      ? `${t("Referencia histórica", "Historical reference")}: ${reference.label}; ${reference.timestamp}; ${reference.size.width} × ${reference.size.height} px. ${t("Selecciona una caja válida para comparar.", "Select a valid box to compare.")}`
+      : t(
+          "Sin referencia histórica. Selecciona un bloque y guarda su caja.",
+          "No historical reference. Select a block and save its box.",
+        );
     const rect = slide.getBoundingClientRect();
     const size = { width: options.width ?? slide.offsetWidth, height: options.height ?? slide.offsetHeight };
     const next = Array.from(slide.querySelectorAll(options.selector ?? "[data-inspect]")).filter(
@@ -272,10 +329,40 @@ export function createGridInspector(slide, options = {}) {
       outlines.append(outline);
     });
     if (!blocks[index]) return;
-    const m = measureBox(rect, blocks[index].getBoundingClientRect(), size);
+    const selectedBox = blocks[index].getBoundingClientRect();
+    let rendered = !(selectedBox.width === 0 && selectedBox.height === 0);
+    for (let node = blocks[index]; node; node = node.parentElement) {
+      const style = win.getComputedStyle(node);
+      if (
+        style.display === "none" ||
+        (node === blocks[index] && (style.visibility === "hidden" || style.visibility === "collapse")) ||
+        style.contentVisibility === "hidden"
+      )
+        rendered = false;
+    }
+    if (!rendered) {
+      output.textContent = t(
+        "Bloque no visible o sin caja renderizada. Selecciona otro bloque para medir o guardar referencia.",
+        "Block is hidden or has no rendered box. Select another block to measure or save a reference.",
+      );
+      return;
+    }
+    const m = measureBox(rect, selectedBox, size);
     output.textContent = `x ${number(m.x)} px (${number(m.percent.x)}%); y ${number(m.y)} px (${number(m.percent.y)}%); ancho ${number(m.width)} px (${number(m.percent.width)}%); alto ${number(m.height)} px (${number(m.percent.height)}%). Bordes: izq ${number(m.edges.left)}, arriba ${number(m.edges.top)}, der ${number(m.edges.right)}, abajo ${number(m.edges.bottom)} px. ${m.overflow ? "Desborde detectado." : "Sin desborde de caja."}`;
     if (en)
       output.textContent = `x ${number(m.x)} px (${number(m.percent.x)}%); y ${number(m.y)} px (${number(m.percent.y)}%); width ${number(m.width)} px (${number(m.percent.width)}%); height ${number(m.height)} px (${number(m.percent.height)}%). Edges: left ${number(m.edges.left)}, top ${number(m.edges.top)}, right ${number(m.edges.right)}, bottom ${number(m.edges.bottom)} px. ${m.overflow ? "Box overflow detected." : "No box overflow."}`;
+    currentSnapshot = createBoxSnapshot(
+      m,
+      size,
+      blocks[index].getAttribute("data-inspect") || `${t("Bloque", "Block")} ${index + 1}`,
+    );
+    saveReference.disabled = false;
+    if (reference) {
+      const comparison = compareBoxSnapshots(reference, currentSnapshot);
+      const formatDelta = (delta) =>
+        `Δx ${number(delta.x)}; Δy ${number(delta.y)}; Δw ${number(delta.width)}; Δh ${number(delta.height)}`;
+      referenceOutput.textContent = `${t("Referencia histórica", "Historical reference")}: ${reference.label}; ${reference.timestamp}; ${reference.size.width} × ${reference.size.height} px. ${t("Actual", "Current")}: ${currentSnapshot.label}; ${currentSnapshot.size.width} × ${currentSnapshot.size.height} px. ${t("Actual menos referencia, no gap espacial", "Current minus reference, not a spatial gap")}: ${formatDelta(comparison.percent)} ${t("puntos porcentuales", "percentage points")}. ${comparison.pixels ? `${formatDelta(comparison.pixels)} px.` : t("Tamaños distintos: delta px no comparable.", "Different sizes: pixel delta not comparable.")}`;
+    }
     const selectedRect = blocks[index].getBoundingClientRect();
     const cx = selectedRect.left + selectedRect.width / 2;
     const cy = selectedRect.top + selectedRect.height / 2;
@@ -374,6 +461,15 @@ export function createGridInspector(slide, options = {}) {
     pointIndex = 0;
     refresh();
   });
+  saveReference.addEventListener("click", () => {
+    refresh();
+    if (currentSnapshot) reference = currentSnapshot;
+    refresh();
+  });
+  clearReference.addEventListener("click", () => {
+    reference = null;
+    refresh();
+  });
   choose.addEventListener("change", refresh);
   compare.addEventListener("change", refresh);
   close.addEventListener("click", () => {
@@ -389,7 +485,7 @@ export function createGridInspector(slide, options = {}) {
   });
   panel.addEventListener("keyup", (event) => event.stopPropagation());
   panel.addEventListener("click", (event) => event.stopPropagation());
-  return {
+  const api = {
     show() {
       if (destroyed || !host.hidden) return;
       previousFocus = doc.activeElement;
@@ -406,13 +502,42 @@ export function createGridInspector(slide, options = {}) {
       win.visualViewport?.addEventListener("scroll", schedule);
       refresh();
     },
+    /** Cambia de superficie sin compartir nodos; las dimensiones omitidas usan offsetWidth/Height.
+     * @param {HTMLElement} nextSlide
+     * @param {{width?:number,height?:number}} [dimensions] */
+    setSlide(nextSlide, dimensions = {}) {
+      if (destroyed) return;
+      if (!(nextSlide instanceof win.HTMLElement) || nextSlide.ownerDocument !== doc)
+        throw new TypeError("La nueva diapositiva debe pertenecer al mismo documento.");
+      const visible = !host.hidden;
+      const panelFocus = host.contains(doc.activeElement) ? doc.activeElement : null;
+      hide();
+      slide = nextSlide;
+      options = { ...options, width: dimensions.width, height: dimensions.height };
+      blocks = [];
+      choose.value = "-1";
+      compare.value = "-1";
+      pointIndex = 0;
+      mode.value = "read";
+      coordinates.forEach((input) => {
+        input.value = "0";
+      });
+      currentSnapshot = null;
+      if (visible) {
+        api.show();
+        if (panelFocus instanceof win.HTMLElement && panelFocus.isConnected) panelFocus.focus({ preventScroll: true });
+      }
+    },
     hide,
     refresh,
     destroy() {
       if (destroyed) return;
       hide();
       destroyed = true;
+      reference = null;
+      currentSnapshot = null;
       host.remove();
     },
   };
+  return api;
 }

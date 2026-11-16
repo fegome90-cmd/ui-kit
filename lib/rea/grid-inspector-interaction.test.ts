@@ -215,7 +215,7 @@ describe("interacción independiente del inspector de grilla", () => {
     opener.focus();
     const inspector = create(slide);
     inspector.show();
-    const close = required(panel().querySelector<HTMLButtonElement>("button"));
+    const close = required(panel().querySelector<HTMLButtonElement>('[aria-label="Ocultar inspector"]'));
     close.focus();
     close.click();
     expect(document.activeElement).toBe(opener);
@@ -284,8 +284,8 @@ describe("interacción independiente del inspector de grilla", () => {
     expect(panel().getAttribute("aria-label")).toBeTruthy();
     for (const name of ["Modo de interacción", "Bloque seleccionado", "Comparar con bloque", "x1", "y1", "x2", "y2"])
       expect(panel().querySelector(`[aria-label="${name}"]`)).not.toBeNull();
-    expect(panel().querySelector("button")?.textContent).toMatch(/Ocultar|Hide/);
-    expect(panel().querySelectorAll('output[aria-live="polite"]')).toHaveLength(2);
+    expect(panel().querySelector('[aria-label="Ocultar inspector"]')?.textContent).toMatch(/Ocultar|Hide/);
+    expect(panel().querySelectorAll('output[aria-live="polite"]')).toHaveLength(3);
     expect(document.querySelector(".rea-gi-outlines")?.getAttribute("aria-hidden")).toBe("true");
     const css = readFileSync("public/rea-grid-inspector/inspector.css", "utf8");
     expect(css).toMatch(/:focus-visible\s*\{[^}]*outline:\s*3px/);

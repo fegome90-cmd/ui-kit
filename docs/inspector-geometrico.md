@@ -2,7 +2,8 @@
 
 Núcleo sin framework: `public/rea-grid-inspector/inspector.js` y `inspector.css`.
 No contiene presentaciones, datos ni activos privados. Demos enteramente sintéticas:
-`/rea-grid-inspector/columns.html` y `/rea-grid-inspector/overflow.html`.
+`/rea-grid-inspector/columns.html`, `/rea-grid-inspector/overflow.html` y
+`/rea-grid-inspector/comparison.html`.
 
 ```html
 <link rel="stylesheet" href="./inspector.css">
@@ -119,16 +120,40 @@ siguientes. Fuentes primarias consultadas para orientar el comportamiento:
 - [CSSOM View: getBoundingClientRect](https://www.w3.org/TR/cssom-view/#dom-element-getboundingclientrect): rectángulo envolvente de cajas transformadas, no tinta.
 - [CSS Transforms 2](https://www.w3.org/TR/css-transforms-2/#individual-transforms): propiedades individuales y contexto de transformación.
 
-La comparación entre diapositivas queda pendiente: este candidato compara únicamente
-bloques de una misma diapositiva. No se infiere equivalencia entre slides de dimensiones
-distintas ni se presentan capturas históricas como mediciones actuales.
+## Comparación histórica entre diapositivas
+
+Selecciona un bloque y pulsa **Guardar referencia**. La referencia copia su caja por
+valor (sin nodos DOM), etiqueta, fecha ISO y tamaño de diseño; permanece histórica y no
+se actualiza silenciosamente. **Borrar referencia** la elimina. No se usa almacenamiento
+persistente ni se comparte la referencia con otras instancias.
+
+`inspector.setSlide(nextSlide, {width, height})` cambia la superficie dentro del mismo
+documento y conserva sólo esa referencia. Desconecta observadores de la anterior, limpia
+selección y regla y vuelve al modo Lectura; las dimensiones omitidas usan `offsetWidth/offsetHeight` de la nueva
+superficie, nunca las dimensiones de la anterior. Tras `destroy()`, no realiza cambios.
+La demo `comparison.html` incluye controles de navegación independientes del inspector.
+
+Al seleccionar el nuevo bloque muestra deltas **actual menos referencia** para x/y/ancho/
+alto. Siempre expresa la diferencia proporcional en **puntos porcentuales**, no porcentaje
+de cambio. Sólo muestra deltas en píxeles si ambos tamaños de diseño coinciden exactamente;
+con tamaños distintos indica “delta px no comparable”. No representa separación espacial
+entre diapositivas ni demuestra equivalencia editorial de sus objetos.
+
+Los helpers `createBoxSnapshot(box, size, label?, timestamp?)` y
+`compareBoxSnapshots(reference, current)` ofrecen ese mismo cálculo sin UI. El primero
+crea una copia congelada; el segundo devuelve `sameSize`, `pixels` (o `null`) y `percent`.
+Las entradas del segundo deben proceder del primero. Una caja actual oculta, eliminada o
+con geometría incompatible no produce deltas válidos ni permite guardar referencia.
+La captura anterior sigue identificada como histórica. El adaptador React conserva su
+API; la navegación entre slides con referencia persistente usa esta instancia del núcleo
+HTML, no desmontajes/remontajes del adaptador.
 
 La ampliación requiere QA visual actual, teclado real, contraste efectivo, impresión,
 zoom nativo y matriz de navegadores. La evidencia histórica anterior no verifica los
 nuevos modos de selección y regla. Las pruebas de DOM simulado no sustituyen esas
 comprobaciones. El componente permanece **candidate** y el PR **draft**.
 
-## Verificación de la ampliación (noviembre de 2026)
+## Verificación de selección y regla (etapa anterior, noviembre de 2026)
 
 - Registry generado, validado y construido: 108 items; núcleo JS/CSS incluidos.
 - Biome global: 166 archivos comprobados, sin errores. TypeScript aprobado.
@@ -144,3 +169,15 @@ comprobaciones. El componente permanece **candidate** y el PR **draft**.
 La cobertura agregada de la biblioteca no representa cobertura del JS distribuido en
 `public/`: la configuración heredada instrumenta `lib/` y componentes. El núcleo sí es
 importado directamente por las pruebas geométricas y de interacción.
+
+
+## Verificación de comparación histórica (noviembre de 2026)
+
+- Suite completa: 24 archivos, 300 tests aprobados; ocho escenarios independientes
+  adicionales de snapshot, visibilidad, cambio de slide, foco y ciclo de vida.
+- TypeScript y Biome global aprobados (168 archivos). Registry: 108 items.
+- Build de producción aprobado, incluidas 100 páginas estáticas.
+- Auditoría independiente cerrada después de corregir cajas ocultas, override de
+  `visibility`, preservación del foco y retorno seguro a Lectura al cambiar de slide.
+- QA real de esta etapa aún pendiente al publicar el código. No se reutiliza como
+  evidencia la revisión de otra versión ni se declara E2E completo aprobado.

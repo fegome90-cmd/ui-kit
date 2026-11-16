@@ -10,7 +10,7 @@ describe("distribución del inspector", () => {
     expect(readFileSync("components/ui/rea/rea-grid-overlay.tsx", "utf8")).toContain(
       "@/public/rea-grid-inspector/inspector.js",
     );
-    for (const demo of ["columns", "overflow"]) {
+    for (const demo of ["columns", "overflow", "comparison"]) {
       const html = readFileSync(`public/rea-grid-inspector/${demo}.html`, "utf8");
       expect(html).toContain("sintétic");
       expect(html).toContain("./inspector.js");

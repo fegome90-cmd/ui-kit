@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo sintética · Comparar diapositivas</title>
+<link rel="stylesheet" href="./inspector.css">
+<style>
+body { margin:24px; background:#eef2f7; color:#111827; font:16px/1.5 system-ui,sans-serif; }
+nav { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+button,a { min-height:44px; padding:10px 14px; font:inherit; }
+.viewport { position:relative; width:100%; }
+.slide { position:relative; width:960px; height:540px; background:#fff; transform-origin:top left; }
+.slide[hidden] { display:none; }
+h2 { position:absolute; left:48px; top:20px; margin:0; font-size:28px; }
+[data-inspect] { position:absolute; box-sizing:border-box; padding:20px; background:#dbeafe; border:2px solid #1d4ed8; }
+.one { left:48px; top:54px; width:240px; height:108px; }
+.two { left:72px; top:81px; width:288px; height:135px; }
+.three { left:60px; top:67.5px; width:300px; height:135px; }
+.large { width:1200px; height:675px; }
+button:focus-visible,a:focus-visible { outline:3px solid #1d4ed8; outline-offset:3px; }
+</style>
+</head>
+<body>
+<h1>Comparación entre diapositivas</h1>
+<p>Contenido totalmente sintético. Selecciona el bloque de la diapositiva 1 y guarda una referencia en el inspector. Cambia a otra diapositiva y selecciona su bloque. La referencia es histórica: no cambia sola.</p>
+<nav aria-label="Diapositivas de prueba">
+<button type="button" data-slide="0" aria-pressed="true">Diapositiva 1 · 960 × 540</button>
+<button type="button" data-slide="1" aria-pressed="false">Diapositiva 2 · 960 × 540</button>
+<button type="button" data-slide="2" aria-pressed="false">Diapositiva 3 · 1200 × 675</button>
+<button type="button" id="show">Mostrar inspector</button>
+</nav>
+<p id="dimensions">Tamaño de diseño: 960 × 540 px.</p>
+<div class="viewport">
+<section class="slide" aria-label="Diapositiva 1"><div class="one" data-inspect="Bloque A">Referencia sintética A</div></section>
+<section class="slide" aria-label="Diapositiva 2" hidden><div class="two" data-inspect="Bloque B">Bloque sintético B</div></section>
+<section class="slide large" aria-label="Diapositiva 3" hidden><div class="three" data-inspect="Bloque C">Bloque sintético C</div></section>
+</div>
+<p>Entre 1 y 2: Δx 24 px, Δy 27 px, Δancho 48 px y Δalto 27 px. Entre 1 y 3: la proporción es idéntica, pero los píxeles no son comparables porque cambia el tamaño de diseño.</p>
+<a href="./columns.html">Volver a la demo de objetos</a>
+<script type="module">
+import { createGridInspector } from './inspector.js';
+
+const slides=Array.from(document.querySelectorAll('.slide'));
+const sizes=[{width:960,height:540},{width:960,height:540},{width:1200,height:675}];
+const viewport=document.querySelector('.viewport');
+let active=0;
+const inspector=createGridInspector(slides[active],sizes[active]);
+function fitSlide(){
+ const scale=Math.min(1,viewport.clientWidth/sizes[active].width);
+ slides[active].style.transform=`scale(${scale})`;
+ viewport.style.height=`${sizes[active].height*scale}px`;
+ inspector.refresh();
+}
+document.querySelectorAll('[data-slide]').forEach(button=>{button.addEventListener('click',()=>{
+ active=Number(button.dataset.slide);
+ slides.forEach((slide,i)=>{slide.hidden=i!==active;});
+ document.querySelectorAll('[data-slide]').forEach(control=>{control.setAttribute('aria-pressed',String(Number(control.dataset.slide)===active));});
+ document.querySelector('#dimensions').textContent=`Tamaño de diseño: ${sizes[active].width} × ${sizes[active].height} px.`;
+ fitSlide();
+ inspector.setSlide(slides[active],sizes[active]);
+});});
+document.querySelector('#show').addEventListener('click',()=>inspector.show());
+new ResizeObserver(fitSlide).observe(viewport);
+fitSlide();
+</script>
+</body>
+</html>

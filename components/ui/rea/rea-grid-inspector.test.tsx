@@ -90,7 +90,7 @@ describe("adaptador React", () => {
     const grid = document.querySelector('[data-slot="rea-grid-overlay"]');
     expect(grid).toHaveAttribute("data-visible", "true");
     expect(grid?.className).toContain("print:hidden");
-    fireEvent.click(document.querySelector(".rea-gi button") as HTMLButtonElement);
+    fireEvent.click(document.querySelector('[aria-label="Ocultar inspector"]') as HTMLButtonElement);
     expect(change).toHaveBeenCalledWith(false);
     expect(grid).toHaveAttribute("data-visible", "false");
     expect(document.querySelector(".rea-gi")).toBeNull();

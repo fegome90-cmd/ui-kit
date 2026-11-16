@@ -1002,7 +1002,7 @@ show("Ejemplo copiado");`,
     name: "Retícula superpuesta",
     category: "Superficies",
     description:
-      "Retícula e inspector geométrico opcional para HTML: cajas, porcentajes, bordes y separaciones. No evalúa calidad editorial.",
+      "Retícula e inspector geométrico para HTML: selección directa opcional, cotas de cajas/bordes y regla de dos puntos con teclado. No mide tinta ni calidad editorial.",
     status: "candidate",
     notes: [
       "El adaptador instala JS/CSS en public y requiere alias @/* a la raíz, no src/*. Inspector nuevo: falta QA visual y de teclado en navegadores reales. Solo escala y traslación sin rotación, skew ni perspectiva. ReaGridInspector debe estar dentro del contenedor posicionado que referencia slideRef.",

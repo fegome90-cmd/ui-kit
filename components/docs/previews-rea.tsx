@@ -207,7 +207,10 @@ function GridOverlayPreview() {
         <ReaButton size="sm" variant="ghost" arrow={null} onClick={() => setOn((v) => !v)} aria-pressed={on}>
           {on ? "Ocultar inspector" : "Mostrar inspector"}
         </ReaButton>
-        <p>Selecciona este bloque desde el panel. Solo mide geometría, no calidad editorial.</p>
+        <p>
+          Selecciona desde el panel o activa el modo de click; prueba la regla por teclado. Mide cajas, no tinta ni
+          calidad editorial.
+        </p>
       </div>
     </div>
   );

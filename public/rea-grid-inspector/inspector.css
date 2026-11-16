@@ -68,3 +68,46 @@
     display: none !important;
   }
 }
+.rea-gi .rea-gi-dimension {
+  position: fixed;
+  height: 0;
+  border-top: 2px solid #d97706;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.rea-gi .rea-gi-dimension::before,
+.rea-gi .rea-gi-dimension::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  height: 8px;
+  border-left: 2px solid #d97706;
+}
+.rea-gi .rea-gi-dimension::after {
+  right: 0;
+}
+.rea-gi .rea-gi-dimension span {
+  position: absolute;
+  left: 8px;
+  bottom: 3px;
+  padding: 2px 4px;
+  background: #111827;
+  color: #fff;
+  white-space: nowrap;
+  font:
+    12px / 1.4 system-ui,
+    sans-serif;
+}
+.rea-gi .rea-gi-panel fieldset {
+  min-width: 0;
+}
+.rea-gi .rea-gi-panel label {
+  display: inline-block;
+  width: 50%;
+}
+.rea-gi .rea-gi-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  font: inherit;
+}

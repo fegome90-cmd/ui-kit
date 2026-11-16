@@ -2,6 +2,15 @@ import { describe, expect, it } from "vitest";
 import { measureBox, measureDistance } from "../../public/rea-grid-inspector/inspector.js";
 
 describe("geometría local del inspector", () => {
+  it.each([NaN, Infinity, -Infinity, 0, -1])("rechaza dimensión local inválida %s", (width) => {
+    expect(() =>
+      measureBox(
+        { left: 0, top: 0, width: 100, height: 100 },
+        { left: 0, top: 0, width: 10, height: 10 },
+        { width, height: 100 },
+      ),
+    ).toThrow(RangeError);
+  });
   it.each([0.5, 1, 1.75, 2])("escala/zoom %s y scroll no cambian coordenadas locales", (scale) => {
     const slide = { left: -100, top: 75, width: 960 * scale, height: 540 * scale };
     const m = measureBox(

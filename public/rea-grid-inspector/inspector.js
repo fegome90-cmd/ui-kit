@@ -6,6 +6,13 @@ export function measureBox(slide, block, size) {
   if (![slide.width, slide.height, size.width, size.height].every((n) => Number.isFinite(n) && n > 0)) {
     throw new RangeError("La diapositiva debe tener dimensiones positivas y ser visible.");
   }
+  if (
+    ![slide.left, slide.top, block.left, block.top, block.width, block.height].every(Number.isFinite) ||
+    block.width < 0 ||
+    block.height < 0
+  ) {
+    throw new RangeError("Las cajas deben contener coordenadas finitas y dimensiones no negativas.");
+  }
   const x = ((block.left - slide.left) / slide.width) * size.width;
   const y = ((block.top - slide.top) / slide.height) * size.height;
   const width = (block.width / slide.width) * size.width;
@@ -29,10 +36,74 @@ export function measureBox(slide, block, size) {
 export function measureDistance(a, b) {
   const horizontal = Math.max(0, a.x - b.x - b.width, b.x - a.x - a.width);
   const vertical = Math.max(0, a.y - b.y - b.height, b.y - a.y - a.height);
-  return { horizontal, vertical, distance: Math.hypot(horizontal, vertical) };
+  const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+  const overlapY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+  const relation = horizontal > 0 || vertical > 0 ? "separation" : overlapX > 0 && overlapY > 0 ? "overlap" : "contact";
+  return { horizontal, vertical, distance: Math.hypot(horizontal, vertical), overlapX, overlapY, relation };
+}
+/** Solo matrices de escala positiva y traslación en ejes. Valida cada ancestro, no la matriz compuesta. */
+export function assertSupportedGeometry(element) {
+  const win = element.ownerDocument.defaultView;
+  for (let node = element; node; node = node.parentElement) {
+    const style = win.getComputedStyle(node);
+    const fail = () => {
+      throw new RangeError(
+        "Geometría no soportada: rotación, skew, perspectiva, escala no positiva o containing block de html/body.",
+      );
+    };
+    const transform = style.transform;
+    if (transform && transform !== "none") {
+      const values = transform
+        .slice(transform.indexOf("(") + 1, -1)
+        .split(",")
+        .map(Number);
+      const valid =
+        transform.startsWith("matrix(") &&
+        values.length === 6 &&
+        values.every(Number.isFinite) &&
+        values[0] > 0 &&
+        values[3] > 0 &&
+        values[1] === 0 &&
+        values[2] === 0;
+      if (!valid) fail();
+    }
+    if (style.perspective && style.perspective !== "none") fail();
+    if (
+      style.translate &&
+      style.translate !== "none" &&
+      (style.translate.match(/(?:calc\([^)]*\)|[^\s]+)/g) ?? []).length > 2
+    )
+      fail();
+    if (style.rotate && style.rotate !== "none" && !/^0(?:deg|rad|turn)?$/.test(style.rotate)) fail();
+    if (
+      style.scale &&
+      style.scale !== "none" &&
+      (style.scale.trim().split(/\s+/).length > 2 ||
+        !style.scale
+          .trim()
+          .split(/\s+/)
+          .every((v) => Number.isFinite(Number(v)) && Number(v) > 0))
+    )
+      fail();
+    if (
+      (node === element.ownerDocument.body || node === element.ownerDocument.documentElement) &&
+      ((transform && transform !== "none") ||
+        (style.translate && style.translate !== "none") ||
+        (style.scale && style.scale !== "none") ||
+        (style.rotate && style.rotate !== "none") ||
+        (style.filter && style.filter !== "none") ||
+        (style.backdropFilter && style.backdropFilter !== "none") ||
+        /transform|perspective|filter|translate|rotate|scale|contain/.test(style.willChange) ||
+        /paint|layout|strict|content/.test(style.contain) ||
+        style.contentVisibility === "auto" ||
+        style.contentVisibility === "hidden")
+    )
+      fail();
+  }
 }
 /**
- * Solo lectura sobre la diapositiva; la UI vive fuera de ella. Sin atajos globales ni captura de clicks.
+ * Solo lectura sobre la diapositiva; la UI vive fuera de ella. Sin atajos globales.
+ * No captura clicks salvo en los modos explícitos de selección y regla.
  * Solo escalado/traslación en ejes: rotación, skew y perspectiva no son coordenadas locales soportadas.
  * @param {HTMLElement} slide
  * @param {{selector?:string,width?:number,height?:number,grid?:boolean,columns?:number,locale?:"es"|"en",onClose?:()=>void}} [options]
@@ -61,7 +132,35 @@ export function createGridInspector(slide, options = {}) {
   const close = doc.createElement("button");
   close.type = "button";
   close.textContent = t("Ocultar inspector", "Hide inspector");
-  panel.append(title, choose, compare, output, close);
+  const mode = doc.createElement("select");
+  mode.setAttribute("aria-label", t("Modo de interacción", "Interaction mode"));
+  [
+    ["read", t("Lectura: clicks normales", "Read: normal clicks")],
+    ["select", t("Seleccionar con click", "Select with click")],
+    ["ruler", t("Regla: marcar dos puntos", "Ruler: pick two points")],
+  ].forEach(([value, label]) => {
+    mode.add(new win.Option(label, value));
+  });
+  const ruler = doc.createElement("fieldset");
+  const legend = doc.createElement("legend");
+  legend.textContent = t("Regla en px locales (también por teclado)", "Ruler in local px (keyboard supported)");
+  ruler.append(legend);
+  const coordinates = ["x1", "y1", "x2", "y2"].map((name) => {
+    const label = doc.createElement("label");
+    label.textContent = name;
+    const input = doc.createElement("input");
+    input.type = "number";
+    input.step = "any";
+    input.value = "0";
+    input.setAttribute("aria-label", name);
+    label.append(input);
+    ruler.append(label);
+    return input;
+  });
+  const rulerOutput = doc.createElement("output");
+  rulerOutput.setAttribute("aria-live", "polite");
+  ruler.append(rulerOutput);
+  panel.append(title, mode, choose, compare, output, ruler, close);
   const outlines = doc.createElement("div");
   outlines.className = "rea-gi-outlines";
   outlines.setAttribute("aria-hidden", "true");
@@ -69,6 +168,7 @@ export function createGridInspector(slide, options = {}) {
   doc.body.append(host);
   let destroyed = false;
   let frame = 0;
+  let pointIndex = 0;
   /** @type {HTMLElement[]} */
   let blocks = [];
   /** @type {Element | null} */
@@ -96,14 +196,54 @@ export function createGridInspector(slide, options = {}) {
       control.value = String(old ? blocks.indexOf(/** @type {HTMLElement} */ (old)) : -1);
     }
     outlines.replaceChildren();
+    rulerOutput.textContent = t(
+      "Regla no disponible hasta validar la geometría.",
+      "Ruler unavailable until geometry is validated.",
+    );
     output.textContent = t(
       "Selecciona un bloque. Valores en px locales y % de diapositiva.",
       "Select a block. Local pixels and slide percentages.",
     );
-    if (rect.width <= 0 || rect.height <= 0 || size.width <= 0 || size.height <= 0) {
+    if (![rect.width, rect.height, size.width, size.height].every((value) => Number.isFinite(value) && value > 0)) {
       output.textContent = t("Diapositiva no visible o sin dimensiones.", "Slide is hidden or has no dimensions.");
       return;
     }
+    try {
+      assertSupportedGeometry(slide);
+      blocks.forEach(assertSupportedGeometry);
+    } catch (error) {
+      output.textContent = en
+        ? "Unsupported geometry: rotation, skew, perspective, non-positive scale or html/body fixed containing block."
+        : String(error.message);
+      return;
+    }
+    function line(x1, y1, x2, y2, label) {
+      const mark = doc.createElement("div");
+      mark.className = "rea-gi-dimension";
+      Object.assign(mark.style, {
+        left: `${x1}px`,
+        top: `${y1}px`,
+        width: `${Math.hypot(x2 - x1, y2 - y1)}px`,
+        transform: `rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`,
+      });
+      const text = doc.createElement("span");
+      text.textContent = label;
+      mark.append(text);
+      outlines.append(mark);
+    }
+    const values = coordinates.map((input) => Number(input.value));
+    if (coordinates.every((input) => input.value !== "") && values.every(Number.isFinite)) {
+      const [x1, y1, x2, y2] = values;
+      rulerOutput.textContent = `Δx ${number(x2 - x1)}; Δy ${number(y2 - y1)}; d ${number(Math.hypot(x2 - x1, y2 - y1))} px`;
+      if (mode.value === "ruler")
+        line(
+          rect.left + (x1 / size.width) * rect.width,
+          rect.top + (y1 / size.height) * rect.height,
+          rect.left + (x2 / size.width) * rect.width,
+          rect.top + (y2 / size.height) * rect.height,
+          rulerOutput.textContent,
+        );
+    } else rulerOutput.textContent = t("Introduce cuatro coordenadas finitas.", "Enter four finite coordinates.");
     if (options.grid !== false) {
       const grid = doc.createElement("div");
       grid.className = "rea-gi-grid";
@@ -136,9 +276,28 @@ export function createGridInspector(slide, options = {}) {
     output.textContent = `x ${number(m.x)} px (${number(m.percent.x)}%); y ${number(m.y)} px (${number(m.percent.y)}%); ancho ${number(m.width)} px (${number(m.percent.width)}%); alto ${number(m.height)} px (${number(m.percent.height)}%). Bordes: izq ${number(m.edges.left)}, arriba ${number(m.edges.top)}, der ${number(m.edges.right)}, abajo ${number(m.edges.bottom)} px. ${m.overflow ? "Desborde detectado." : "Sin desborde de caja."}`;
     if (en)
       output.textContent = `x ${number(m.x)} px (${number(m.percent.x)}%); y ${number(m.y)} px (${number(m.percent.y)}%); width ${number(m.width)} px (${number(m.percent.width)}%); height ${number(m.height)} px (${number(m.percent.height)}%). Edges: left ${number(m.edges.left)}, top ${number(m.edges.top)}, right ${number(m.edges.right)}, bottom ${number(m.edges.bottom)} px. ${m.overflow ? "Box overflow detected." : "No box overflow."}`;
+    const selectedRect = blocks[index].getBoundingClientRect();
+    const cx = selectedRect.left + selectedRect.width / 2;
+    const cy = selectedRect.top + selectedRect.height / 2;
+    line(rect.left, cy, selectedRect.left, cy, `${number(m.edges.left)} px`);
+    line(selectedRect.right, cy, rect.right, cy, `${number(m.edges.right)} px`);
+    line(cx, rect.top, cx, selectedRect.top, `${number(m.edges.top)} px`);
+    line(cx, selectedRect.bottom, cx, rect.bottom, `${number(m.edges.bottom)} px`);
+    const style = win.getComputedStyle(blocks[index]);
+    output.textContent += `${t(
+      " Caja DOM (border-box), no tinta visible ni límites de glifos. Márgenes CSS declarados/computados (no separación efectiva): ",
+      " DOM box (border-box), not visible ink or glyph bounds. Computed CSS margins (not effective spacing): ",
+    )}top ${style.marginTop}; right ${style.marginRight}; bottom ${style.marginBottom}; left ${style.marginLeft}.`;
     const other = blocks[Number(compare.value)];
     if (other) {
       const d = measureDistance(m, measureBox(rect, other.getBoundingClientRect(), size));
+      const b = other.getBoundingClientRect();
+      const ax = Math.max(selectedRect.left, Math.min(b.left + b.width / 2, selectedRect.right));
+      const ay = Math.max(selectedRect.top, Math.min(b.top + b.height / 2, selectedRect.bottom));
+      const bx = Math.max(b.left, Math.min(ax, b.right));
+      const by = Math.max(b.top, Math.min(ay, b.bottom));
+      line(ax, ay, bx, by, `${d.relation}: ${number(d.distance)} px`);
+      output.textContent += ` ${t("Relación", "Relation")}: ${d.relation === "overlap" ? t("solapamiento", "overlap") : d.relation === "contact" ? t("contacto", "contact") : t("separación", "separation")}.`;
       output.textContent += en
         ? ` Gap: horizontal ${number(d.horizontal)} px, vertical ${number(d.vertical)} px, distance ${number(d.distance)} px.`
         : ` Separación: horizontal ${number(d.horizontal)} px, vertical ${number(d.vertical)} px, distancia ${number(d.distance)} px.`;
@@ -165,6 +324,7 @@ export function createGridInspector(slide, options = {}) {
   }
   function stop() {
     resize?.disconnect();
+    doc.removeEventListener("click", pick, true);
     mutation.disconnect();
     win.removeEventListener("resize", schedule);
     win.removeEventListener("scroll", schedule, true);
@@ -180,6 +340,40 @@ export function createGridInspector(slide, options = {}) {
     stop();
     if (restore && previousFocus instanceof win.HTMLElement && previousFocus.isConnected) previousFocus.focus();
   }
+  function pick(event) {
+    if (host.hidden || mode.value === "read" || host.contains(event.target)) return;
+    if (!slide.contains(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (mode.value === "select") {
+      const target = event.target.closest(options.selector ?? "[data-inspect]");
+      choose.value = String(blocks.indexOf(target));
+    } else {
+      const rect = slide.getBoundingClientRect();
+      const size = { width: options.width ?? slide.offsetWidth, height: options.height ?? slide.offsetHeight };
+      if (![rect.width, rect.height, size.width, size.height].every((value) => Number.isFinite(value) && value > 0)) {
+        refresh();
+        return;
+      }
+      try {
+        assertSupportedGeometry(slide);
+      } catch {
+        refresh();
+        return;
+      }
+      coordinates[pointIndex * 2].value = String(((event.clientX - rect.left) / rect.width) * size.width);
+      coordinates[pointIndex * 2 + 1].value = String(((event.clientY - rect.top) / rect.height) * size.height);
+      pointIndex = 1 - pointIndex;
+    }
+    refresh();
+  }
+  coordinates.forEach((input) => {
+    input.addEventListener("input", refresh);
+  });
+  mode.addEventListener("change", () => {
+    pointIndex = 0;
+    refresh();
+  });
   choose.addEventListener("change", refresh);
   compare.addEventListener("change", refresh);
   close.addEventListener("click", () => {
@@ -201,7 +395,11 @@ export function createGridInspector(slide, options = {}) {
       previousFocus = doc.activeElement;
       host.hidden = false;
       observe();
+      doc.addEventListener("click", pick, true);
       mutation.observe(slide, { subtree: true, childList: true, attributes: true, characterData: true });
+      for (let ancestor = slide.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        mutation.observe(ancestor, { attributes: true });
+      }
       win.addEventListener("resize", schedule);
       win.addEventListener("scroll", schedule, true);
       win.visualViewport?.addEventListener("resize", schedule);
